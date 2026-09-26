@@ -100,10 +100,16 @@ function ArrayView({ sim, hl }: { sim: BigOSim; hl: string | null }) {
             textAnchor="middle"
             style={{ fill: b.phase === 'found' ? SIG.res : MID, fontSize: 11 }}
           >
-            {hl === 'mid' ? '◆ ' : ''}mid {b.mid}
+            mid {b.mid}
           </text>
         </g>
       )}
+      {hl === 'mid' &&
+        (() => {
+          const m = b.mid ?? (b.lo + b.hi) >> 1;
+          const c = cells[Math.max(0, Math.min(cells.length - 1, m))];
+          return <rect x={c.x - 5} y={c.y - 5} width={c.w + 10} height={c.h + 10} rx={7} fill="none" stroke="var(--accent)" strokeWidth={1.4} strokeDasharray="3 3" />;
+        })()}
       <Verdict sim={sim} y={land ? cells[0].y + ch + 70 : cells[cells.length - 1].y + ch + 40} />
     </g>
   );

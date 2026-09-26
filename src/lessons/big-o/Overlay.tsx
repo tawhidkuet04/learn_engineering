@@ -390,7 +390,7 @@ function FibReadout({ sim, compact }: { sim: BigOSim; compact: boolean }) {
         </div>
       ) : (
         <div className={css.row2}>
-          <Tag c={SIG.heavy}>repeated calls</Tag>
+          <Tag c={SIG.heavy}>repeats in fib({f.n})</Tag>
           <span>{f.wastedCount}</span>
         </div>
       )}
