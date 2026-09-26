@@ -37,7 +37,7 @@ export const TRACKS: Track[] = [
       { slug: 'consistent-hashing', code: 'SD-04', title: 'Consistent Hashing', blurb: 'Add a server and move only 1/N of the keys, not all of them.', status: 'live', steps: 19, minutes: 25 },
       { slug: 'replication', code: 'SD-05', title: 'Database Replication', blurb: 'Leaders, followers, failover, and the replication lag that bites.', status: 'drafting' },
       { slug: 'sharding', code: 'SD-06', title: 'Sharding', blurb: 'Split a database that no longer fits on one machine.', status: 'drafting' },
-      { slug: 'rate-limiting', code: 'SD-07', title: 'Rate Limiting', blurb: 'Token buckets, leaky buckets and sliding windows, side by side.', status: 'drafting' },
+      { slug: 'rate-limiting', code: 'SD-07', title: 'Rate Limiting', blurb: 'Token buckets, leaky buckets and sliding windows, side by side.', status: 'live', steps: 20, minutes: 25 },
       { slug: 'message-queues', code: 'SD-08', title: 'Message Queues', blurb: 'Decouple services, absorb spikes, and retry safely.', status: 'drafting' },
       { slug: 'cap', code: 'SD-09', title: 'CAP & Consistency', blurb: 'What a network partition forces you to choose.', status: 'drafting' },
     ],
