@@ -47,7 +47,7 @@ export const TRACKS: Track[] = [
     title: 'Networking',
     intro: 'What actually happens between two computers.',
     topics: [
-      { slug: 'life-of-a-request', code: 'NET-01', title: 'What happens when you hit Enter', blurb: 'From URL to pixels: DNS, TCP, TLS and HTTP in one journey.', status: 'drafting' },
+      { slug: 'life-of-a-request', code: 'NET-01', title: 'What happens when you hit Enter', blurb: 'From URL to pixels: DNS, TCP, TLS and HTTP in one journey.', status: 'live', steps: 20, minutes: 28 },
       { slug: 'osi-model', code: 'NET-02', title: 'The OSI Model', blurb: 'Watch data get wrapped layer by layer, sent, then unwrapped.', status: 'drafting' },
       { slug: 'tcp', code: 'NET-03', title: 'TCP Handshakes & Reliability', blurb: 'SYN, ACK, lost packets, retransmits and congestion control.', status: 'live', steps: 21, minutes: 40 },
       { slug: 'dns', code: 'NET-04', title: 'DNS Resolution', blurb: 'Root, TLD and authoritative servers in a single lookup.', status: 'drafting' },
