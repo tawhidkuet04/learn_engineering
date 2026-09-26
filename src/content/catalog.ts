@@ -63,7 +63,7 @@ export const TRACKS: Track[] = [
     intro: 'The machinery under every program.',
     topics: [
       { slug: 'processes-threads', code: 'CS-01', title: 'Processes vs Threads', blurb: 'Isolation, shared memory and context switches.', status: 'drafting' },
-      { slug: 'event-loop', code: 'CS-02', title: 'The Event Loop', blurb: 'How one thread juggles thousands of tasks.', status: 'drafting' },
+      { slug: 'event-loop', code: 'CS-02', title: 'The Event Loop', blurb: 'How one thread juggles thousands of tasks.', status: 'live', steps: 19, minutes: 30 },
       { slug: 'hash-tables', code: 'CS-03', title: 'Hash Tables', blurb: 'Buckets, collisions and resizing, one insert at a time.', status: 'drafting' },
       { slug: 'stack-heap', code: 'CS-04', title: 'Stack vs Heap', blurb: 'Where your variables live, and how long.', status: 'drafting' },
       { slug: 'garbage-collection', code: 'CS-05', title: 'Garbage Collection', blurb: 'Mark, sweep, and generational tricks.', status: 'drafting' },
