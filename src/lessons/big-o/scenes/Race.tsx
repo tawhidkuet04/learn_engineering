@@ -88,8 +88,8 @@ function MachinesPanel({ sim, land, glow }: { sim: BigOSim; land: boolean; glow:
   return (
     <g>
       <rect className={css.panelBox} x={p.x0} y={p.y0} width={p.x1 - p.x0} height={p.y1 - p.y0} rx={10} />
-      {block(p.x0 + 12, p.x1 - 12, p.y0 + 18, allDone ? `stopwatch · ${(maxMs / minMs).toFixed(1)}× apart` : 'stopwatch', 'ms', 15)}
-      {block(p.x0 + 12, p.x1 - 12, p.y0 + 80, allDone ? 'comparisons · identical' : 'comparisons', 'steps', 15)}
+      {block(p.x0 + 12, p.x1 - 12, p.y0 + 20, allDone ? `stopwatch · ${(maxMs / minMs).toFixed(1)}× apart` : 'stopwatch', 'ms', 15)}
+      {block(p.x0 + 12, p.x1 - 12, p.y0 + 90, allDone ? 'comparisons · identical' : 'comparisons', 'steps', 15)}
     </g>
   );
 }

@@ -88,7 +88,7 @@ export interface LaneGeo {
 function racePanelH(sim: BigOSim, land: boolean) {
   switch (sim.cfg.race) {
     case 'machines':
-      return land ? 168 : 132;
+      return land ? 168 : 152;
     case 'constants':
       return land ? 236 : 184;
     case 'space':
@@ -255,7 +255,7 @@ export function bigGeo(sim: BigOSim): BigGeo {
   const bx1 = f.x1 - 8;
   const per = 5;
   const gap = 6;
-  return { bx0, bx1, by: f.y0 + 96, bh: 30, oy: f.y0 + 178, ladder: { x0: bx0, x1: bx1, y: f.y0 + 222, per, cw: (bx1 - bx0 - (per - 1) * gap) / per, chH: 22, gap } };
+  return { bx0, bx1, by: f.y0 + 100, bh: 30, oy: f.y0 + 196, ladder: { x0: bx0, x1: bx1, y: f.y0 + 240, per, cw: (bx1 - bx0 - (per - 1) * gap) / per, chH: 22, gap } };
 }
 
 /* ------------------------------------------------------------------ */
@@ -447,9 +447,11 @@ export function calloutRect(sim: BigOSim, target: string): Rect | null {
     return { x: (p.x0 + p.x1) / 2, y: (p.y0 + p.y1) / 2, w: p.x1 - p.x0, h: p.y1 - p.y0 };
   }
   if (v === 'binary' && target === 'mid') {
+    // Include the "mid" label above the cell so the callout clears it.
     const m = sim.bin.mid ?? 15;
     const c = binaryCells(sim).cells[m];
-    return c ? { x: c.x + c.w / 2, y: c.y + c.h / 2, w: c.w, h: c.h } : null;
+    const lift = 44;
+    return c ? { x: c.x + c.w / 2, y: c.y + (c.h - lift) / 2, w: c.w, h: c.h + lift } : null;
   }
   if (v === 'grid' && target === 'grid') {
     const g = gridGeo(sim, sim.grid.n);

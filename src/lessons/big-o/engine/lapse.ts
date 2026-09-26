@@ -83,6 +83,10 @@ export class LapseEngine {
     return this.finishLg(id) <= this.play;
   }
 
+  lastFinish() {
+    return Math.max(...this.lanes.map((id) => this.finishLg(id)));
+  }
+
   update(dt: number) {
     if (!this.running) return;
     this.play = Math.min(LAPSE_MAX, this.play + SPEED * dt);
@@ -92,7 +96,9 @@ export class LapseEngine {
         this.sim.rev++;
       }
     }
-    if (this.play >= LAPSE_MAX) {
+    // Stop once every lane is home, or when the clock passes the age of the universe.
+    const allHome = this.lanes.every((id) => this.isDone(id));
+    if (this.play >= LAPSE_MAX || (allHome && this.play >= this.lastFinish() + 0.6)) {
       this.running = false;
       this.sim.rev++;
       if (this.loop) this.later(4, () => this.race());

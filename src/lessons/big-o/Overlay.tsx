@@ -632,7 +632,7 @@ function Prompts({ sim }: { sim: BigOSim }) {
   if (v === 'binary') {
     const g = bigGeo(sim);
     return (
-      <StagePrompt x={fit(q.ask, midX)} y={g.by - (land ? 58 : 50)}>
+      <StagePrompt x={fit(q.ask, midX)} y={g.by - (land ? 58 : 62)}>
         {q.ask}
       </StagePrompt>
     );
@@ -645,8 +645,10 @@ function Prompts({ sim }: { sim: BigOSim }) {
       const g = geos[idx];
       if (g) {
         const text = land ? q.ask : q.ask.replace(/ steps at n = (\d+)\. At n = (\d+)\?/, ' at n=$1 → n=$2?');
+        // Phones pack the lanes tightly, so the question sits above them all;
+        // the asked lane's rail pulses yellow.
         return (
-          <StagePrompt x={fit(text, (g.tx0 + g.tx1) / 2)} y={g.ty - (land ? 16 : 22)}>
+          <StagePrompt x={fit(text, land ? (g.tx0 + g.tx1) / 2 : midX)} y={land ? g.ty - 16 : geos[0].y - 10}>
             {text}
           </StagePrompt>
         );

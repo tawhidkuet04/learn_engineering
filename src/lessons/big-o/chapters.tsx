@@ -195,8 +195,8 @@ const names = new Set(['alice', 'bob', 'carol', 'dave']);
               than the target, the target can only be in the right half, so throw the left half away. Otherwise throw the right half away. Repeat.
             </p>
             <p>
-              Every step <strong>halves</strong> the <Term k="range">range that&apos;s left</Term>: 32 → 16 → 8 → 4 → 2 → 1. Finding any number among
-              32 takes at most 6 checks.
+              Every check throws away at least half of the <Term k="range">range that&apos;s left</Term>. At worst the range goes 32 → 16 → 8 → 4 → 2 →
+              1, so finding any number among 32 takes at most 6 checks.
             </p>
             <p>
               The number of times you can halve n before reaching 1 is the <strong>logarithm</strong> of n, base 2. So binary search is{' '}
@@ -277,6 +277,10 @@ function binarySearch(sorted, target) {
               Linear is usually fine: a million items take about a millisecond. The trouble starts when one hides inside another loop. Call{' '}
               <code>includes</code> once per item and you&apos;ve written O(n²) without a nested loop in sight.
             </p>
+            <p>
+              If you look things up in the same data again and again, pay O(n) once to build a <code>Set</code>. After that, each{' '}
+              <code>has()</code> is O(1) on average, the hash lookup from chapter 2.
+            </p>
           </>
         ),
         hud: ['n', 'steps'],
@@ -287,9 +291,11 @@ function binarySearch(sorted, target) {
           code: `
 const ids = [17, 3, 88, 42, 9, 61, 25, 70, 5, 94, 33, 12, 58, 81, 46, 29];
 
-!ids.includes(46);          // walks from index 0 until it finds 46
-!ids.indexOf(46);           // same walk, returns 14
-ids.find((x) => x > 90);   // also a linear scan`,
+!ids.includes(46);          // O(n): walks from index 0 until it finds 46
+ids.indexOf(46);           // same walk, returns 14
+
+const idSet = new Set(ids); // O(n), once
+!idSet.has(46);             // O(1) on average, every time after`,
         },
       },
       {
@@ -468,6 +474,15 @@ function merge(a, b) {
               <Stat label="n²" value={s.grid.n * s.grid.n} />
             </>
           ),
+        },
+        quiz: {
+          question: 'A loop over all n users, and inside it a loop over the 7 days of the week. What’s the Big-O?',
+          options: [
+            { text: 'O(n²)', why: 'Only if both loops grow with the input. The inner loop always runs 7 times, however many users there are.' },
+            { text: 'O(7n)', why: 'That’s the right count, but Big-O drops constant factors, so it’s written O(n).' },
+            { text: 'O(n)', correct: true, why: '7 × n steps. A nested loop is only quadratic when the inner loop also grows with n.' },
+            { text: 'O(1)', why: 'The outer loop visits every user, so the work grows with n.' },
+          ],
         },
         hud: ['n', 'cmp'],
         legend: [LG.compared, LG.iLoop, LG.jLoop],
@@ -717,6 +732,15 @@ fib(50);   // 99 calls`,
           </>
         ),
         card: 'rules',
+        quiz: {
+          question: 'A function takes 3n² + 50n + 1,000 steps. What’s its Big-O?',
+          options: [
+            { text: 'O(3n²)', why: 'Right shape, but constant factors are dropped: O(n²).' },
+            { text: 'O(n² + n)', why: 'The n term is lower-order. At large n it’s noise next to n², so it goes too.' },
+            { text: 'O(n²)', correct: true, why: 'Keep the fastest-growing term and drop its constant. The 50n and the 1,000 vanish as n grows.' },
+            { text: 'O(1,000)', why: 'The 1,000 is a constant: it matters at tiny n and not at all at large n.' },
+          ],
+        },
         hud: ['n'],
         legend: [LG.gap],
         code: {

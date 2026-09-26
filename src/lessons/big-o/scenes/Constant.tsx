@@ -84,8 +84,8 @@ export function ConstantScene({ sim, hl }: { sim: BigOSim; hl: string | null }) 
 
   /* ---------------- row B: set.has("carol") ---------------- */
   const bTop = land ? f.y0 + 330 : f.y0 + 214;
-  const chipB = land ? { x: f.x0 + 4, y: bTop, w: 196, h: 44 } : { x: f.x0 + 2, y: bTop, w: 170, h: 34 };
-  const hashBox = land ? { x: f.x0 + 250, y: bTop - 6, w: 250, h: 56 } : { x: f.x1 - 158, y: bTop - 4, w: 156, h: 42 };
+  const chipB = land ? { x: f.x0 + 4, y: bTop, w: 196, h: 44 } : { x: f.x0 + 2, y: bTop, w: 164, h: 34 };
+  const hashBox = land ? { x: f.x0 + 250, y: bTop - 6, w: 250, h: 56 } : { x: f.x1 - 180, y: bTop - 4, w: 180, h: 42 };
   const bY = land ? bTop + 150 : bTop + 128;
   const bucketCount = k.buckets;
   const bIdx = k.bucket;
@@ -170,7 +170,7 @@ export function ConstantScene({ sim, hl }: { sim: BigOSim; hl: string | null }) 
         <text className={css.monoMid} x={hashBox.x + 12} y={hashBox.y + (land ? 22 : 17)} style={{ fontSize: land ? 11 : 9.5 }}>
           hash(&quot;{CONST_KEY}&quot;) = {land ? commas(k.hash) : `${(k.hash / 1e9).toFixed(2)}B`}
         </text>
-        <text className={css.monoStrong} x={hashBox.x + 12} y={hashBox.y + (land ? 42 : 33)} style={{ fontSize: land ? 12 : 10.5, fill: hIn >= 1 ? SIG.warn : 'var(--text-2)' }}>
+        <text className={css.monoStrong} x={hashBox.x + (land ? 12 : 10)} y={hashBox.y + (land ? 42 : 33)} style={{ fontSize: land ? 12 : 10, fill: hIn >= 1 ? SIG.warn : 'var(--text-2)' }}>
           mod {commas(bucketCount)} = {commas(bIdx)}
         </text>
       </g>
