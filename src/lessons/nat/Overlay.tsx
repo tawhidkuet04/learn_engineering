@@ -325,7 +325,7 @@ function RouteReadout({ sim, compact }: { sim: NatSim; compact?: boolean }) {
       <div className={css.result}>
         {r ? (
           <>
-            {r.dst}: most specific match <b>0.0.0.0/0 → WAN</b>
+            {r.dst} matches only <b>0.0.0.0/0 → WAN</b>
           </>
         ) : (
           <span className={css.dim}>waiting for a packet…</span>

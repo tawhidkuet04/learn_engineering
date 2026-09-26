@@ -111,7 +111,7 @@ export const CHAPTERS: Chapter[] = [
         side: ['pool'],
         strip: 'pool',
         code: {
-          title: 'iana.org/assignments/ipv4-address-space',
+          title: 'IANA IPv4 registry (excerpt)',
           lang: 'conf',
           code: `
 # Prefix  Designation  Date     Status
@@ -290,13 +290,13 @@ $ ip neigh
           lang: 'shell',
           code: `
 $ ip route
-!default via 192.168.1.1 dev wlan0 proto dhcp metric 600
-192.168.1.0/24 dev wlan0 proto kernel scope link src 192.168.1.23 metric 600
+!default via 192.168.1.1 dev wlan0 proto dhcp
+192.168.1.0/24 dev wlan0 proto kernel scope link
 
 $ ip route get 198.51.100.20
-!198.51.100.20 via 192.168.1.1 dev wlan0 src 192.168.1.23 uid 1000
+!198.51.100.20 via 192.168.1.1 dev wlan0 src 192.168.1.23
 $ ip route get 192.168.1.40
-192.168.1.40 dev wlan0 src 192.168.1.23 uid 1000`,
+192.168.1.40 dev wlan0 src 192.168.1.23`,
           note: 'Only the non-local destination goes "via" the gateway.',
         },
       },
@@ -361,11 +361,12 @@ $ ip route get 192.168.1.40
           ],
         },
         code: {
-          title: '/etc/dnsmasq.conf (on the router)',
+          title: 'router: /etc/dnsmasq.conf',
           lang: 'conf',
           code: `
-# lease 192.168.1.10–250 for 12 hours, and tell clients the mask
-!dhcp-range=192.168.1.10,192.168.1.250,255.255.255.0,12h
+# lease .10 to .250 for 12 hours (the mask
+# comes from the LAN interface: /24)
+!dhcp-range=192.168.1.10,192.168.1.250,12h
 dhcp-option=option:router,192.168.1.1
 dhcp-option=option:dns-server,192.168.1.1`,
         },
@@ -391,6 +392,15 @@ dhcp-option=option:dns-server,192.168.1.1`,
           </>
         ),
         legend: [LG.req, LG.res, LG.drop],
+        code: {
+          title: 'route-views.routeviews.org',
+          lang: 'shell',
+          code: `
+# a public view of the internet's routing table
+route-views> show ip bgp 192.168.1.23
+!% Network not in table`,
+          note: 'Route Views collects BGP routes from networks all over the world. Not one of them announces a route to private space.',
+        },
       },
     ],
   },
@@ -434,8 +444,10 @@ dhcp-option=option:dns-server,192.168.1.1`,
           title: 'router: iptables',
           lang: 'shell',
           code: `
-# Rewrite the source of everything leaving on the WAN port (eth0)
-!iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+# source NAT for everything leaving eth0 (WAN)
+!iptables -t nat -A POSTROUTING -o eth0 \\
+!  -j MASQUERADE
+# and forward packets between the ports at all
 sysctl -w net.ipv4.ip_forward=1`,
           note: 'MASQUERADE is source NAT to whatever address eth0 has right now. Home routers do exactly this.',
         },
@@ -470,8 +482,12 @@ sysctl -w net.ipv4.ip_forward=1`,
           code: `
 $ sudo conntrack -L -p tcp
 tcp  6 431999 ESTABLISHED
-!  src=192.168.1.23 dst=198.51.100.20 sport=51000 dport=443    # as sent
-!  src=198.51.100.20 dst=203.0.113.7 sport=443 dport=40001     # reply expected
+  # the packet as the laptop sent it
+!  src=192.168.1.23 dst=198.51.100.20
+!    sport=51000 dport=443
+  # the reply the router expects back
+!  src=198.51.100.20 dst=203.0.113.7
+!    sport=443 dport=40001
   [ASSURED] mark=0 use=1`,
           note: 'One entry per connection, wrapped here for readability. 431999 is the seconds left before it expires.',
         },
@@ -506,13 +522,14 @@ tcp  6 431999 ESTABLISHED
         strip: 'nat',
         legend: [LG.req, LG.res],
         code: {
-          title: 'router: sysctl',
+          title: 'router: conntrack timeouts',
           lang: 'shell',
           code: `
-$ sysctl net.netfilter.nf_conntrack_udp_timeout
-net.netfilter.nf_conntrack_udp_timeout = 30
-$ sysctl net.netfilter.nf_conntrack_tcp_timeout_established
-!net.netfilter.nf_conntrack_tcp_timeout_established = 432000`,
+$ cd /proc/sys/net/netfilter
+$ cat nf_conntrack_udp_timeout
+!30
+$ cat nf_conntrack_tcp_timeout_established
+!432000`,
           note: 'Linux defaults: an idle UDP mapping lasts 30 seconds, an established TCP connection 5 days.',
         },
       },
@@ -647,10 +664,13 @@ $ nc -vz -w 5 203.0.113.7 8080
           title: 'router: iptables',
           lang: 'shell',
           code: `
-# forward TCP port 8080 on the WAN side to the laptop
-!iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8080 \\
-!         -j DNAT --to-destination 192.168.1.23:8080
-iptables -A FORWARD -i eth0 -p tcp -d 192.168.1.23 --dport 8080 -j ACCEPT`,
+# WAN port 8080 → the laptop's port 8080
+!iptables -t nat -A PREROUTING -i eth0 \\
+!  -p tcp --dport 8080 \\
+!  -j DNAT --to-destination 192.168.1.23:8080
+# and let the forwarded traffic through
+iptables -A FORWARD -i eth0 -p tcp \\
+  -d 192.168.1.23 --dport 8080 -j ACCEPT`,
         },
       },
       {
@@ -687,7 +707,8 @@ iptables -A FORWARD -i eth0 -p tcp -d 192.168.1.23 --dport 8080 -j ACCEPT`,
 const pc = new RTCPeerConnection({
   iceServers: [
 !    { urls: 'stun:stun.example.org:3478' },
-!    { urls: 'turn:turn.example.org:3478', username: 'alice', credential: 's3cret' },
+!    { urls: 'turn:turn.example.org:3478',
+!      username: 'alice', credential: 's3cret' },
   ],
 });`,
           note: 'ICE gathers host, server-reflexive (from STUN) and relay (TURN) candidates, then keeps the best pair that works.',
@@ -779,8 +800,9 @@ $ curl ifconfig.me
           lang: 'shell',
           code: `
 $ ip -6 addr show wlan0
-!    inet6 2001:db8:4f3a:10:8d1c:4b2e:9a07:5e13/64 scope global dynamic
-    inet6 fe80::8d1c:4b2e:9a07:5e13/64 scope link
+!  inet6 2001:db8:4f3a:10:8d1c:4b2e:9a07:5e13/64
+       scope global dynamic
+  inet6 fe80::8d1c:4b2e:9a07:5e13/64 scope link
 $ curl -6 ifconfig.me
 !2001:db8:4f3a:10:8d1c:4b2e:9a07:5e13`,
           note: 'The address the world sees is the laptop’s own. Nothing rewrote it.',
