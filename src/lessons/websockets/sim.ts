@@ -207,6 +207,8 @@ export interface Stats {
   frames: number;
   framingBytes: number;
   httpAfterOpen: number;
+  /** Live deliveries between people connected to different servers */
+  crossLive: number;
 }
 
 const emptyStats = (): Stats => ({
@@ -225,6 +227,7 @@ const emptyStats = (): Stats => ({
   frames: 0,
   framingBytes: 0,
   httpAfterOpen: 0,
+  crossLive: 0,
 });
 
 interface HopOpts {
@@ -382,7 +385,7 @@ export class WsSim extends Sim {
   insp: InspPin | null = null;
   /** When the server started computing Sec-WebSocket-Accept (visual time) */
   acceptVt = -10;
-  lastLb: { pid: PersonId; sid: ServerId; vt: number } | null = null;
+  lastLb: { pid: PersonId; sid: ServerId; vt: number; only: boolean } | null = null;
   chooseLog: Record<Leaf, string[]> = { http: [], sse: [], ws: [] };
   seqT = 0;
   frameVt = -10;
@@ -477,8 +480,10 @@ export class WsSim extends Sim {
   /** Open (or start opening) whatever the current mode keeps open. */
   private startTransport(instant: boolean) {
     const c = this.cfg;
-    c.people.forEach((pid, i) => {
+    c.people.forEach((pid) => {
       const p = this.ppl.get(pid)!;
+      // Connect in a fixed order (Alice, Bob, Carol, Dave) whatever the drawing order.
+      const i = ALL_PEOPLE.indexOf(pid);
       if (c.mode === 'ws') {
         if (c.closed.includes(pid)) return;
         if (c.open === 'all' && instant) this.openNow(p);
@@ -833,13 +838,19 @@ export class WsSim extends Sim {
     if (cn) cn.lastTraffic = this.t;
   }
 
-  /** Floating label above a box, kept inside the stage. */
+  /**
+   * Floating label for a box, kept inside the stage. People's notes appear
+   * inside their chat window, under the header, where bubbles rarely reach.
+   */
   note(id: string, text: string, color: string = SIG.text, dur = 1.7) {
     const b = this.boxes.get(id);
     if (!b || Number.isNaN(b.x)) return;
     const half = text.length * 3.25 + 10;
     const x = clamp(b.x, half + 6, this.w - half - 6);
-    this.fx({ kind: 'text', at: { x, y: b.y - b.h / 2 - 8 }, text, color, dur });
+    const person = (ALL_PEOPLE as string[]).includes(id);
+    const hdr = b.h < 112 || b.w < 172 ? 24 : 30;
+    const y = person ? b.y - b.h / 2 + hdr + 26 : b.y - b.h / 2 - 8;
+    this.fx({ kind: 'text', at: { x, y }, text, color, dur });
   }
 
   /* ================================================================ */
@@ -1000,6 +1011,7 @@ export class WsSim extends Sim {
         tag: this.tagFor(r, 'frame', m.id),
         done: () => {
           q.lastHeard = this.t;
+          if (!resync && !m.got.has(r) && this.ppl.get(m.from)!.server !== q.server) this.stat.crossLive++;
           this.personGot(q, [m], resync);
         },
         lost: () => m.sent.delete(r),
@@ -1044,7 +1056,7 @@ export class WsSim extends Sim {
     const q = this.ppl.get('bob')!;
     if (!this.cfg.people.includes('bob') || this.cfg.mode !== 'http') return;
     this.stat.reqs++;
-    this.hop('bob', 'up', { color: SIG.req, r: 4, label: 'GET', tag: this.tagFor('bob', 'get'), done: () => this.respond(q, this.pendingFor('bob'), 'ask') });
+    this.hop('bob', 'up', { color: SIG.req, r: 4, label: 'GET', tag: this.tagFor('bob', 'get', q.lastId), done: () => this.respond(q, this.pendingFor('bob'), 'ask') });
     this.rev++;
   }
 
@@ -1074,7 +1086,7 @@ export class WsSim extends Sim {
     this.hop(q.id, 'up', {
       color: SIG.req,
       r: 3.8,
-      tag: this.tagFor(q.id, 'poll'),
+      tag: this.tagFor(q.id, 'poll', q.lastId),
       done: () => this.respond(q, this.pendingFor(q.id), 'short'),
     });
     this.rev++;
@@ -1087,7 +1099,7 @@ export class WsSim extends Sim {
       color: SIG.req,
       r: 3.8,
       label: 'GET',
-      tag: this.tagFor(q.id, 'lp'),
+      tag: this.tagFor(q.id, 'lp', q.lastId),
       done: () => {
         const ready = this.pendingFor(q.id);
         if (ready.length) {
@@ -1205,7 +1217,7 @@ export class WsSim extends Sim {
           }
           p.server = sid;
           p.lbPicked = true;
-          this.lastLb = { pid, sid, vt: this.vt };
+          this.lastLb = { pid, sid, vt: this.vt, only: this.liveServers().filter((x) => this.srv.get(x)!.up).length < 2 };
           this.note('lb', `${PEOPLE[pid].name} → ${SERVER_META[sid].name}`, SIG.warn, 1.4);
           this.ver++;
           this.send({ from: `gate:${pid}`, to: sid, dur: dur ? dur * 0.52 : LEG_B, color: SIG.req, r: 4.2, label: 'GET Upgrade', tag, onArrive: () => atServer(sid) });
@@ -1499,7 +1511,13 @@ export class WsSim extends Sim {
           : picked === 'push'
             ? 'HTTP doesn’t work that way: a server can only answer a request, and Bob has none open. The message waits until his browser asks. Here it comes.'
             : 'It isn’t lost: the server stored it. It just can’t deliver it until Bob’s browser asks. Here it comes.',
-      resolve: () => this.after(0.5, () => this.bobAsk()),
+      resolve: () => {
+        this.after(0.5, () => this.bobAsk());
+        // Wrong answer: play it again with a new message until it clicks.
+        this.after(5.5, () => {
+          if (this.game && !this.game.done) this.chat('alice');
+        });
+      },
     });
   }
 
@@ -1522,8 +1540,27 @@ export class WsSim extends Sim {
             : picked === '426'
               ? 'Close! 426 Upgrade Required is what a server says when you must upgrade but didn’t ask. Bob did ask, so the answer is 101 Switching Protocols.'
               : 'A redirect would send Bob somewhere else. This server is happy to switch right here: 101 Switching Protocols.',
-      resolve: () => this.accept(p, sid),
+      resolve: () => {
+        this.accept(p, sid);
+        // Wrong answer: Bob reloads the page and the handshake runs again.
+        this.after(this.cfg.slowHandshake ? 7.5 : 4, () => {
+          if (this.game && !this.game.done) this.reload(p.id);
+        });
+      },
     });
+  }
+
+  /** The page reloads: its socket closes and a new handshake starts. */
+  private reload(pid: PersonId) {
+    const p = this.ppl.get(pid)!;
+    for (const s of this.srv.values()) s.conns.delete(pid);
+    p.conn = 'closed';
+    this.inspShown.delete('upgrade');
+    this.inspShown.delete('101');
+    this.note(pid, 'page reloaded', SIG.warn, 1.8);
+    this.ver++;
+    this.after(1.4, () => this.connect(pid));
+    this.rev++;
   }
 
   private sendSplit() {
@@ -1633,7 +1670,6 @@ export class WsSim extends Sim {
     if (this.cfg.mode === mode) return;
     const servers = mode === 'ws' ? this.cfg.servers : 1;
     this.cfg = { ...this.cfg, mode, servers, redis: servers === 2 && this.cfg.redis, receivers: mode === 'sse' ? ['alice', 'bob'] : ['bob'] };
-    this.stat = emptyStats();
     this.rebuildConnections();
   }
 
@@ -1646,6 +1682,7 @@ export class WsSim extends Sim {
 
   private rebuildConnections() {
     this.clearTransient();
+    this.stat = emptyStats();
     for (const s of this.srv.values()) {
       s.conns = new Map();
       s.up = true;
@@ -1664,7 +1701,11 @@ export class WsSim extends Sim {
       p.lastHeard = this.t;
       p.nextPoll = this.t + 0.5;
     }
-    for (const m of this.history) m.sent = new Set(m.got.keys());
+    // A fresh start: whatever was still undelivered is dropped, not resynced.
+    for (const m of this.history) {
+      m.expect = m.expect.filter((r) => m.got.has(r));
+      m.sent = new Set(m.got.keys());
+    }
     this.cfg = { ...this.cfg, open: 'connect' };
     this.startTransport(false);
     this.syncBoxes();

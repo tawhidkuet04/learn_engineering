@@ -22,7 +22,7 @@ export interface SceneProps {
 export function Scene(props: SceneProps) {
   switch (props.sim.cfg.view) {
     case 'race':
-      return <RaceScene sim={props.sim} />;
+      return <RaceScene sim={props.sim} highlight={props.highlight} />;
     case 'seq':
       return <SeqScene sim={props.sim} />;
     case 'frame':
@@ -46,6 +46,8 @@ function ChatScene({ sim, highlight, focus }: SceneProps) {
     <g>
       <Wires sim={sim} />
       <HeldMarks sim={sim} />
+      <BlockedMarks sim={sim} />
+      <HandshakeMarks sim={sim} />
       <Pipes sim={sim} focus={focus} glow={highlight} />
       {c.lb && <LbBar sim={sim} dim={dim('lb')} glow={glow('lb')} />}
       {c.redis && <RedisNode sim={sim} dim={dim('redis') || !c.backplane} glow={glow('redis')} />}
@@ -440,6 +442,71 @@ function HeldMarks({ sim }: { sim: WsSim }) {
   );
 }
 
+/** Plain HTTP: the server has news for Bob but no request of his to answer. */
+function BlockedMarks({ sim }: { sim: WsSim }) {
+  if (sim.cfg.mode !== 'http' || !sim.cfg.people.includes('bob')) return null;
+  const waiting = sim.pendingFor('bob').length;
+  if (!waiting) return null;
+  const c = sim.route(sim.ppl.get('bob')!.server, 'bob');
+  if (!c) return null;
+  const from = bezier(c, 0.04);
+  const to = bezier(c, 0.42);
+  const land = sim.orient === 'landscape';
+  const pulse = 0.55 + 0.45 * Math.sin(sim.vt * 3);
+  return (
+    <g opacity={0.9}>
+      <line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={SIG.res} strokeWidth={1.6} strokeDasharray="3 4" strokeOpacity={0.55} />
+      <g transform={`translate(${fx(to.x)},${fx(to.y)})`} stroke={SIG.err} strokeWidth={2} strokeLinecap="round" opacity={pulse}>
+        <line x1={-4.5} y1={-4.5} x2={4.5} y2={4.5} />
+        <line x1={-4.5} y1={4.5} x2={4.5} y2={-4.5} />
+      </g>
+      <text
+        className={`${css.small} ${css.halo}`}
+        x={land ? to.x : to.x + 12}
+        y={land ? to.y + 20 : to.y + 4}
+        textAnchor={land ? 'middle' : 'start'}
+        style={{ fill: SIG.err }}
+      >
+        no request to answer
+      </text>
+    </g>
+  );
+}
+
+/** While the upgrade is in flight, the connection underneath is plain TCP + TLS. */
+function HandshakeMarks({ sim }: { sim: WsSim }) {
+  if (sim.cfg.mode !== 'ws' || sim.cfg.lb) return null;
+  const asking = !!sim.game?.pending;
+  return (
+    <g>
+      {sim.cfg.people.map((pid) => {
+        const p = sim.ppl.get(pid)!;
+        if (p.conn !== 'connecting' || !p.net) return null;
+        const c = sim.route(pid, p.server);
+        if (!c) return null;
+        const m = bezier(c, 0.5);
+        const land = sim.orient === 'landscape';
+        const horizontal = Math.abs(c.p3.x - c.p0.x) > Math.abs(c.p3.y - c.p0.y);
+        return (
+          <g key={pid}>
+            <path d={curvePath(c)} fill="none" stroke="rgba(143,166,201,0.55)" strokeWidth={2.4} />
+            {!(asking && !land) && (
+            <text
+              className={`${css.small} ${css.halo}`}
+              x={horizontal ? m.x : m.x + 12}
+              y={horizontal ? m.y + (land ? 22 : 20) : m.y + 4}
+              textAnchor={horizontal ? 'middle' : 'start'}
+            >
+              TCP + TLS, still HTTP
+            </text>
+            )}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
 function CutMarks({ sim }: { sim: WsSim }) {
   return (
     <g>
@@ -483,7 +550,7 @@ function CutMarks({ sim }: { sim: WsSim }) {
 
 const LANE_TITLE: Record<string, string> = { short: 'Short polling', long: 'Long polling', ws: 'WebSocket' };
 
-function RaceScene({ sim }: { sim: WsSim }) {
+function RaceScene({ sim, highlight }: { sim: WsSim; highlight: string | null }) {
   const land = sim.orient === 'landscape';
   const g = raceGeo(sim.w, sim.h, land);
   const r = sim.race;
@@ -508,7 +575,17 @@ function RaceScene({ sim }: { sim: WsSim }) {
         const summary = `${lane.requests} requests · ${lane.empty} empty · avg ${avg == null ? '–' : `${avg.toFixed(1)} s`}`;
         return (
           <g key={L.kind}>
-            <rect x={g.x0 - (land ? 104 : 8)} y={L.y} width={g.x1 - g.x0 + (land ? 104 : 16)} height={L.h} rx={10} fill="rgba(8,13,24,0.5)" stroke="rgba(143,166,201,0.14)" />
+            <rect
+              x={g.x0 - (land ? 104 : 8)}
+              y={L.y}
+              width={g.x1 - g.x0 + (land ? 104 : 16)}
+              height={L.h}
+              rx={10}
+              fill="rgba(8,13,24,0.5)"
+              stroke={highlight === `lane:${L.kind}` ? 'var(--accent)' : 'rgba(143,166,201,0.14)'}
+              strokeDasharray={highlight === `lane:${L.kind}` ? '3 3' : undefined}
+              strokeWidth={highlight === `lane:${L.kind}` ? 1.4 : 1}
+            />
             <text className={css.laneTitle} x={land ? g.x0 - 92 : g.x0} y={L.y + (land ? 18 : 15)}>
               {title}
             </text>
@@ -598,7 +675,7 @@ function RaceScene({ sim }: { sim: WsSim }) {
                   const label = `${lat.toFixed(1)} s`;
                   const lw = label.length * 6.2;
                   const mid = (a + b) / 2;
-                  const show = mid - lw / 2 > lastRight + 4;
+                  const show = mid - lw / 2 > lastRight + 4 && mid - lw / 2 > g.x0 + 2;
                   if (show) lastRight = mid + lw / 2;
                   return (
                     <g key={d.id}>
@@ -613,6 +690,25 @@ function RaceScene({ sim }: { sim: WsSim }) {
                   );
                 });
               })()}
+              {r.msgs.map((m) => {
+                if (lane.deliv.some((d) => d.id === m.id)) return null;
+                const a = X(m.ts);
+                const b = g.x1;
+                const wait = now - m.ts;
+                if (wait < 0.3) return null;
+                const y = L.yBob + (land ? 9 : 7);
+                const col = wait > 3 ? SIG.err : SIG.heavy;
+                return (
+                  <g key={`w${m.id}`} opacity={0.9}>
+                    <path d={`M${fx(a)},${y - 3} V${y} H${fx(b)}`} fill="none" stroke={col} strokeWidth={1.2} strokeDasharray="3 3" />
+                    {b - a > 44 && (
+                      <text className={`${css.lat} ${css.halo}`} x={(a + b) / 2} y={y + 11} textAnchor="middle" style={{ fill: col }}>
+                        {wait.toFixed(1)} s…
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
             </g>
             {land && (
               <g transform={`translate(${g.sumX},${L.y})`}>
@@ -864,7 +960,7 @@ function FrameScene({ sim, highlight }: SceneProps) {
           <g key={i} opacity={0.35 + 0.65 * k}>
             <rect x={bc.x} y={bc.y} width={g.bw} height={g.bh} rx={4} fill={col} fillOpacity={bc.group === 'more' ? 0.03 : 0.1} stroke={col} strokeOpacity={bc.group === 'more' ? 0.3 : 0.6} strokeDasharray={bc.group === 'more' ? '3 3' : undefined} />
             <text className={land ? css.hexCell : css.hexCellSm} x={bc.x + g.bw / 2} y={bc.y + g.bh / 2 + (land ? 4.5 : 4)} textAnchor="middle" style={bc.group === 'more' ? { fill: 'var(--text-3)', fontSize: land ? 11 : 9.5 } : undefined}>
-              {value != null ? hex(value) : `+${moreN >= 1000 ? `${Math.round(moreN / 1000)}K` : moreN}`}
+              {value != null ? hex(value) : moreLabel(moreN, g.bw)}
             </text>
             {bc.group === 'payload' && f.plain && (
               <text className={css.bitIdx} x={bc.x + g.bw / 2} y={bc.y + g.bh + 12} textAnchor="middle" style={{ fill: SIG.pink }}>
@@ -893,6 +989,12 @@ function FrameScene({ sim, highlight }: SceneProps) {
       <WireDump f={f} x={sim.w / 2} y={g.sumY + (land ? 44 : 32)} land={land} />
     </g>
   );
+}
+
+/** "+294" or "+99,994" if it fits the cell, else "+99K". */
+function moreLabel(n: number, cellW: number) {
+  const full = `+${n.toLocaleString('en-US')}`;
+  return full.length * 6.2 <= cellW - 4 ? full : `+${Math.floor(n / 1000)}K`;
 }
 
 /** The whole frame as it appears on the wire, colored by part. */

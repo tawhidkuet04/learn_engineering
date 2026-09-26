@@ -89,7 +89,7 @@ export const CHAPTERS: Chapter[] = [
         readouts: ['mailbox'],
         strip: 'mailbox',
         legend: [LG.req, LG.res],
-        callouts: [{ target: 'srv1', text: <>has the message, <b>can&apos;t send it</b></>, dir: 'up', landOnly: true }],
+        callouts: [{ target: 'bob', text: <>no request open, <b>nothing arrives</b></>, dir: 'down', landOnly: true }],
         code: {
           title: 'chat.js · Alice’s browser',
           lang: 'js',
@@ -233,7 +233,6 @@ let after = 17;   // id of the newest message we have
         hud: ['reqs', 'empty', 'avg', 'worst'],
         readouts: ['mailbox'],
         legend: [LG.req, LG.msgs, LG.empty],
-        callouts: [{ target: 'held:bob', text: <>request <b>held open</b> until there&apos;s news</>, dir: 'up', landOnly: true }],
         code: {
           title: 'long-poll.js',
           lang: 'js',
@@ -527,7 +526,7 @@ ws.onclose = (e) => console.log('closed with code', e.code);
         },
         hud: ['delivered', 'avg', 'reqs'],
         legend: [LG.frame, LG.pipe],
-        callouts: [{ target: 'pipe:alice', text: <><b>both directions</b> at once</>, dir: 'up', landOnly: true }],
+        callouts: [{ target: 'pipe:alice', text: <><b>both directions</b> at once</>, dir: 'down', landOnly: true }],
         code: {
           title: 'server.js · the ws library',
           lang: 'js',
@@ -710,9 +709,9 @@ setInterval(() => {
         body: (
           <>
             <p>
-              Connections don&apos;t always end politely. When Bob&apos;s laptop loses Wi-Fi, no close frame gets out. The <Term k="srv1">server</Term>{' '}
-              still thinks Bob is connected, <Term k="bob">Bob&apos;s browser</Term> still thinks its connection is open, and frames sent into it
-              simply vanish.
+              Connections don&apos;t always end politely. When Bob&apos;s train goes into a tunnel, or a router along the way reboots, no close frame
+              gets through. The <Term k="srv1">server</Term> still thinks Bob is connected, <Term k="bob">Bob&apos;s browser</Term> still thinks its
+              connection is open, and frames sent into it simply vanish.
             </p>
             <p>
               Heartbeats catch this from both ends. The server sees a ping go unanswered and terminates the connection. Bob&apos;s side notices it
@@ -724,8 +723,9 @@ setInterval(() => {
               last message it saw, and the server <strong>resends everything it missed</strong>.
             </p>
             <Aside>
-              Browsers answer pings automatically but hide them from JavaScript, so page code can&apos;t use them to watch its own connection.
-              Libraries like Socket.IO send their own heartbeat messages instead, and that&apos;s what Bob&apos;s side does here.
+              Browsers answer protocol pings automatically but hide them from JavaScript, so page code can&apos;t use them to watch its own
+              connection. Libraries like Socket.IO send heartbeats as ordinary messages instead, and that&apos;s the kind Bob&apos;s side watches
+              here.
             </Aside>
           </>
         ),
@@ -838,7 +838,7 @@ $ ulimit -n              # open files (sockets) allowed per process
       {
         id: 'different-servers',
         title: 'Alice and Bob on different servers',
-        cfg: { lb: false },
+        cfg: { lb: false, auto: { from: ['alice', 'dave', 'carol', 'bob'], min: 3.2, max: 4.6, first: 1.5 } },
         predict: { kind: 'split', needed: 3, prompt: 'Who receives the message?' },
         body: (
           <>
@@ -950,21 +950,22 @@ ws.on('message', (data) => {
         body: (
           <>
             <p>
-              WebSockets are the right tool when <strong>both sides talk often and latency matters</strong>: chat, multiplayer games, collaborative
-              editors, trading screens.
+              <Term k="leaf:ws">WebSockets</Term> are the right tool when <strong>both sides talk often and latency matters</strong>: chat, multiplayer
+              games, collaborative editors, trading screens.
             </p>
             <p>
               If only the server talks, as with notifications, live scores, progress bars or an AI model streaming its answer,{' '}
-              <strong>Server-Sent Events</strong> are simpler. They&apos;re plain HTTP, so auth, proxies, compression and HTTP/2 just work, and
-              reconnection is built in.
+              <Term k="leaf:sse">Server-Sent Events</Term> are simpler. They&apos;re plain HTTP, so they reuse your cookies, auth and HTTP/2
+              connections, and reconnection is built in. (Just make sure proxies don&apos;t buffer the stream.)
             </p>
             <p>
-              Everything else, which is most of an app, should stay <strong>plain HTTP</strong>: stateless requests that any server can answer and any
-              cache can store. Even polling is fine when updates are rare and a minute of delay doesn&apos;t matter.
+              Everything else, which is most of an app, should stay <Term k="leaf:http">plain HTTP</Term>: stateless requests that any server can
+              answer and any cache can store. Even polling is fine when updates are rare and a minute of delay doesn&apos;t matter.
             </p>
             <Aside>
-              HTTP/2 and HTTP/3 don&apos;t replace WebSockets: they multiplex requests, but the server still can&apos;t start one. WebSockets can run
-              over HTTP/2 streams (RFC 8441), and WebTransport over HTTP/3 is the newer option for games and media.
+              HTTP/2 and HTTP/3 don&apos;t replace WebSockets: they carry many requests over one connection, but every response still answers a
+              request. (HTTP/2 server push only preloaded files into the browser cache, and browsers have dropped it.) WebSockets can also run over
+              HTTP/2 (RFC 8441), and WebTransport over HTTP/3 is the newer option for games and media.
             </Aside>
           </>
         ),

@@ -240,7 +240,8 @@ function ConnsReadout({ sim, compact }: { sim: WsSim; compact: boolean }) {
         <div className={css.result}>
           {lb ? (
             <>
-              last upgrade: {PEOPLE[lb.pid].name} → <b>{SERVER_META[lb.sid].name}</b> <span className={css.dim}>(fewest sockets)</span>
+              last upgrade: {PEOPLE[lb.pid].name} → <b>{SERVER_META[lb.sid].name}</b>{' '}
+              <span className={css.dim}>{lb.only ? '(the only one up)' : '(fewest sockets)'}</span>
             </>
           ) : (
             <span className={css.dim}>the load balancer picks a server once, at the upgrade</span>
@@ -427,7 +428,8 @@ interface InspContent {
 
 function inspContent(sim: WsSim, kind: InspKind, pid: PersonId, msgId: number | null): InspContent | null {
   const m = msgId != null ? sim.history.find((x) => x.id === msgId) : null;
-  const p = sim.ppl.get(pid)!;
+  // For GETs the number in the tag is the "after" cursor they were sent with.
+  const after = msgId ?? sim.ppl.get(pid)!.lastId;
   switch (kind) {
     case 'post':
       return {
@@ -439,21 +441,21 @@ function inspContent(sim: WsSim, kind: InspKind, pid: PersonId, msgId: number | 
       return {
         head: 'HTTP request',
         tone: 'req',
-        lines: [{ t: `GET /messages?room=42&after=${p.lastId} HTTP/1.1`, kind: 'strong' }, 'Host: chat.example', 'Cookie: session=9c1e…'],
-        note: `Anything newer than message ${p.lastId}?`,
+        lines: [{ t: `GET /messages?room=42&after=${after} HTTP/1.1`, kind: 'strong' }, 'Host: chat.example', 'Cookie: session=9c1e…'],
+        note: `Anything newer than message ${after}?`,
       };
     case 'poll':
       return {
         head: 'HTTP request · every poll',
         tone: 'req',
-        lines: [{ t: `GET /messages?room=42&after=${p.lastId} HTTP/1.1`, kind: 'strong' }, 'Host: chat.example', 'Cookie: session=9c1e…', 'User-Agent: Mozilla/5.0 …'],
+        lines: [{ t: `GET /messages?room=42&after=${after} HTTP/1.1`, kind: 'strong' }, 'Host: chat.example', 'Cookie: session=9c1e…', 'User-Agent: Mozilla/5.0 …'],
         note: 'Hundreds of bytes of headers, usually for an empty answer.',
       };
     case 'lp':
       return {
         head: 'HTTP request · long poll',
         tone: 'req',
-        lines: [{ t: `GET /poll?room=42&after=${p.lastId} HTTP/1.1`, kind: 'strong' }, 'Host: chat.example', 'Cookie: session=9c1e…'],
+        lines: [{ t: `GET /poll?room=42&after=${after} HTTP/1.1`, kind: 'strong' }, 'Host: chat.example', 'Cookie: session=9c1e…'],
         note: 'The server keeps this open until it has news.',
       };
     case 'sse':

@@ -223,9 +223,9 @@ const MISSIONS: Mission[] = [
   {
     id: 'across',
     title: 'Across the gap',
-    text: 'With two servers, get one of Alice’s messages to Bob.',
+    text: 'With two servers, get a message from Alice to Bob the moment she sends it.',
     hint: 'Hint: the servers need a way to talk to each other.',
-    check: (s) => s.cfg.servers === 2 && s.history.some((m) => m.from === 'alice' && m.got.has('bob')),
+    check: (s) => s.cfg.servers === 2 && s.stat.crossLive > 0,
   },
   {
     id: 'comeback',
