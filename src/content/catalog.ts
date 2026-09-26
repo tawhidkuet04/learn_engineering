@@ -32,7 +32,7 @@ export const TRACKS: Track[] = [
         steps: 25,
         minutes: 25,
       },
-      { slug: 'caching', code: 'SD-02', title: 'Caching', blurb: 'Cache-aside, TTLs, eviction, and why invalidation is famously hard.', status: 'drafting' },
+      { slug: 'caching', code: 'SD-02', title: 'Caching', blurb: 'Cache-aside, TTLs, eviction, and why invalidation is famously hard.', status: 'live', steps: 19, minutes: 25 },
       { slug: 'cdn', code: 'SD-03', title: 'CDNs', blurb: 'Serve bytes from the edge, close to every user on the planet.', status: 'drafting' },
       { slug: 'consistent-hashing', code: 'SD-04', title: 'Consistent Hashing', blurb: 'Add a server and move only 1/N of the keys, not all of them.', status: 'live', steps: 19, minutes: 25 },
       { slug: 'replication', code: 'SD-05', title: 'Database Replication', blurb: 'Leaders, followers, failover, and the replication lag that bites.', status: 'drafting' },
@@ -64,7 +64,7 @@ export const TRACKS: Track[] = [
     topics: [
       { slug: 'processes-threads', code: 'CS-01', title: 'Processes vs Threads', blurb: 'Isolation, shared memory and context switches.', status: 'drafting' },
       { slug: 'event-loop', code: 'CS-02', title: 'The Event Loop', blurb: 'How one thread juggles thousands of tasks.', status: 'live', steps: 19, minutes: 30 },
-      { slug: 'hash-tables', code: 'CS-03', title: 'Hash Tables', blurb: 'Buckets, collisions and resizing, one insert at a time.', status: 'drafting' },
+      { slug: 'hash-tables', code: 'CS-03', title: 'Hash Tables', blurb: 'Buckets, collisions and resizing, one insert at a time.', status: 'live', steps: 23, minutes: 25 },
       { slug: 'stack-heap', code: 'CS-04', title: 'Stack vs Heap', blurb: 'Where your variables live, and how long.', status: 'drafting' },
       { slug: 'garbage-collection', code: 'CS-05', title: 'Garbage Collection', blurb: 'Mark, sweep, and generational tricks.', status: 'drafting' },
       { slug: 'cpu-caches', code: 'CS-06', title: 'CPU Caches', blurb: 'Why memory layout can make code 10× faster.', status: 'drafting' },
