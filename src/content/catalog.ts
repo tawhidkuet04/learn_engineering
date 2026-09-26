@@ -65,7 +65,7 @@ export const TRACKS: Track[] = [
       { slug: 'processes-threads', code: 'CS-01', title: 'Processes vs Threads', blurb: 'Isolation, shared memory and context switches.', status: 'live', steps: 20, minutes: 22 },
       { slug: 'event-loop', code: 'CS-02', title: 'The Event Loop', blurb: 'How one thread juggles thousands of tasks.', status: 'live', steps: 19, minutes: 30 },
       { slug: 'hash-tables', code: 'CS-03', title: 'Hash Tables', blurb: 'Buckets, collisions and resizing, one insert at a time.', status: 'live', steps: 23, minutes: 25 },
-      { slug: 'stack-heap', code: 'CS-04', title: 'Stack vs Heap', blurb: 'Where your variables live, and how long.', status: 'drafting' },
+      { slug: 'stack-heap', code: 'CS-04', title: 'Stack vs Heap', blurb: 'Where your variables live, and how long.', status: 'live', steps: 19, minutes: 32 },
       { slug: 'garbage-collection', code: 'CS-05', title: 'Garbage Collection', blurb: 'Mark, sweep, and generational tricks.', status: 'drafting' },
       { slug: 'cpu-caches', code: 'CS-06', title: 'CPU Caches', blurb: 'Why memory layout can make code 10× faster.', status: 'drafting' },
       { slug: 'race-conditions', code: 'CS-07', title: 'Race Conditions & Locks', blurb: 'Two threads, one counter, and a lost update.', status: 'live', steps: 19, minutes: 25 },
