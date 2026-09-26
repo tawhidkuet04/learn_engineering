@@ -1,5 +1,5 @@
 import type { Client, LB, Server } from './entities';
-import type { Rng } from './rng';
+import type { Rng } from '@/lib/sim/rng';
 import type { Algo } from './types';
 
 export type Detail =

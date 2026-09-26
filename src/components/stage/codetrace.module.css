@@ -1,0 +1,86 @@
+.trace {
+  position: absolute;
+  overflow: auto;
+  border-radius: 10px;
+  border: 1px solid var(--rule-strong);
+  background: rgba(6, 10, 19, 0.94);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+  scrollbar-width: thin;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 11px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-2);
+}
+
+.dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(var(--line-rgb), 0.25);
+}
+
+.pre {
+  margin: 0;
+  padding: 7px 0 9px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  color: #c9d4e6;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 12px 0 0;
+  white-space: pre;
+  transition: background 180ms;
+}
+
+.line[data-state='active'] {
+  background: rgba(255, 210, 63, 0.12);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.line[data-state='done'] .code {
+  opacity: 0.55;
+}
+
+.num {
+  flex: none;
+  width: 30px;
+  text-align: right;
+  color: var(--text-3);
+  font-size: 10.5px;
+}
+
+.line[data-state='active'] .num {
+  color: var(--accent);
+}
+
+.code {
+  flex: 1;
+  min-width: 0;
+}
+
+.mark {
+  flex: none;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: rgba(75, 227, 160, 0.12);
+  color: #8ff3c6;
+  font-size: 10.5px;
+}

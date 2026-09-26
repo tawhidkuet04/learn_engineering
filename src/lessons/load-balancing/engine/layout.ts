@@ -1,4 +1,4 @@
-import { clamp, lerp } from './geometry';
+import { clamp, lerp } from '@/lib/sim/geometry';
 import type { World } from './world';
 
 export const UNIT = { h: 11, gap: 3, header: 22, pad: 7 };

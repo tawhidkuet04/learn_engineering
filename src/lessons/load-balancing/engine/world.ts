@@ -19,9 +19,9 @@ import {
   serverLabel,
 } from './constants';
 import type { Box, Client, HealthState, Job, LB, RedisNode, Server } from './entities';
-import { bezier, clamp, curveBetween, curvePath, damp, lerp, type Curve, type Pt } from './geometry';
+import { bezier, clamp, curveBetween, curvePath, damp, lerp, type Curve, type Pt } from '@/lib/sim/geometry';
 import { layoutWorld } from './layout';
-import { mulberry32 } from './rng';
+import { mulberry32 } from '@/lib/sim/rng';
 import type { ClientSpec, LBId, Orient, Pool, ScriptEvent, ServerSpec, WorldConfig } from './types';
 
 /* ------------------------------------------------------------------ */
