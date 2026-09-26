@@ -111,6 +111,10 @@ export function CheatSheet() {
           Keep the <strong>working set</strong> small: smaller types, arrays of structs split by field, tiles that fit in cache.
         </li>
         <li>
+          Misses come in three kinds: <strong>compulsory</strong> (first touch), <strong>capacity</strong> (too much data) and{' '}
+          <strong>conflict</strong> (too many lines fighting over one set).
+        </li>
+        <li>
           Data written by different threads should live on <strong>different lines</strong>: pad hot per-thread counters to 64 bytes.
         </li>
         <li>

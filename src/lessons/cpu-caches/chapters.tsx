@@ -157,7 +157,7 @@ L2 cache:   8 MiB (8 instances)     # 1 MiB per core
             <p>
               An <strong>L1 hit</strong> is 1 second, a glance at your desk. <strong>L2</strong> takes 4 seconds and <strong>L3</strong> 15. A trip to{' '}
               <strong>RAM</strong> takes nearly <strong>2 minutes</strong>. An <strong>SSD read</strong> takes more than a day, and a round trip to
-              another server in the same datacenter about a week.
+              another server in the same datacenter almost a week.
             </p>
             <p>Your turn: send a load to each level and watch the stopwatch.</p>
             <Aside>At this stage&apos;s scale, an SSD would sit tens of meters past the right edge of your screen.</Aside>
@@ -265,6 +265,10 @@ $ sysctl -n hw.cachelinesize        # macOS, Apple silicon
               Lines in the cache are outlined green in RAM and listed in the L1. Watch the <strong>next out</strong> tag: when all 4 slots are full, a
               miss evicts the least recently used line to make room.
             </p>
+            <Aside>
+              Our toy cache lets any line go in any slot. A real L1 is 8- to 12-way <em>set-associative</em>: each address maps to one small set of
+              slots, so a few unlucky addresses (say, 4 KB apart) can evict each other even while the rest of the cache sits empty.
+            </Aside>
           </>
         ),
         hud: ['hits', 'misses', 'rate'],
@@ -354,12 +358,12 @@ for (int i = 0; i < n; i++) sum += a[rand() % n];`,
               <em>before</em> you ask for them (the violet fills), so they&apos;re already arriving when the loop gets there.
             </p>
             <p>
-              This step runs at <strong>real proportions</strong>: a hit takes 1 ns of screen time and a trip to RAM takes 100 times as long. Turn the
-              prefetcher on and compare the time.
+              This step runs at <strong>real proportions</strong>: on screen, as on the chip, a trip to RAM takes 100 times as long as a hit. Turn
+              the prefetcher on and compare the time.
             </p>
             <Aside>
               Real prefetchers track many streams at once, spot constant strides, and run 10–20 lines ahead, so a sequential loop runs at close to full
-              memory bandwidth. They stop at 4 KB page boundaries, and they can&apos;t guess where a linked list or a hash table goes next.
+              memory bandwidth. Most stop at 4 KB page boundaries, and none can guess where a linked list or a hash table goes next.
             </Aside>
           </>
         ),
@@ -373,8 +377,8 @@ for (int i = 0; i < n; i++) sum += a[rand() % n];`,
               apply: (s) => s.setPrefetch(true),
               note: (
                 <>
-                  After two misses it spots the stream and runs ahead. Lines arrive early or partway there, and the pass takes about{' '}
-                  <strong>half the time</strong>.
+                  After two misses it spots the stream and runs ahead. Each line is already on its way when the loop needs it, and the pass drops to
+                  about <strong>660 ns</strong>, 2.6× faster.
                 </>
               ),
             },
@@ -432,7 +436,6 @@ for (int i = 0; i < n; i++) {
         side: ['access'],
         strip: 'access',
         legend: [LG.cursor, LG.fill, LG.inL1],
-        callouts: [{ target: 'wide:row:7', text: <>each row: <b>128 bytes</b>, 2 lines</>, dir: 'down' }],
         code: {
           title: 'sum_rows.c',
           lang: 'c',
@@ -481,8 +484,8 @@ for (int j = 0; j < 16; j++)       // columns outside
         body: (
           <>
             <p>
-              Two cores run the two loops over identical arrays: 128 loads and 128 additions each. This time the animation runs at{' '}
-              <strong>real proportions</strong>, so a hit takes 1 ns of screen time and a miss 100 times as long.
+              Two cores run the two loops over identical arrays: 128 loads and 128 additions each. The animation runs at{' '}
+              <strong>real proportions</strong>, so on screen a miss takes 100 times as long as a hit, just like on the chip.
             </p>
             <p>
               Row order pays one miss per line and uses all 8 values it fetched. Column order uses one value from each line, and by the time it comes
@@ -492,8 +495,8 @@ for (int j = 0; j < 16; j++)       // columns outside
               That&apos;s 7.5× slower here. On real hardware, summing a big matrix column by column is typically 3–10× slower, and worse as it grows.
             </p>
             <Aside>
-              Stride prefetchers can spot a constant jump like this, but they won&apos;t cross a 4 KB page and they can&apos;t change the arithmetic:
-              the column walk still fetches 8 bytes for every one it uses.
+              Stride prefetchers can spot a constant jump like this, but most won&apos;t cross a 4 KB page, and none can change the arithmetic: the
+              column walk still fetches a whole 64-byte line for every 8-byte value it uses.
             </Aside>
           </>
         ),
@@ -592,8 +595,8 @@ $ perf stat -e cache-references,cache-misses ./chase 256M
             </p>
             <p>
               Then shrink the working set instead. <strong>Tiling</strong>, also called blocking, works through the array in small blocks. Here a tile
-              is 4 rows tall, so a column walk inside it touches just 4 lines, exactly what the toy L1 holds. The loop is still column by column, but
-              every line gets fully used before it&apos;s evicted.
+              is 4 rows tall, so walking its columns keeps just 4 lines in play at a time, exactly what the toy L1 holds. The loop is still column by
+              column, but every line gets fully used before it&apos;s evicted.
             </p>
             <p>Switch between the two and compare the misses.</p>
             <Aside>

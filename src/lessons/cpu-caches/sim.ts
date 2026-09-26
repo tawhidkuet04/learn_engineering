@@ -39,7 +39,7 @@ export interface Cfg {
 }
 
 export const DEFAULTS: Cfg = {
-  view: 'grid',
+  view: 'wall',
   cache: false,
   human: false,
   dims: 1,
@@ -190,6 +190,8 @@ export class CacheSim extends Sim {
 
   constructor() {
     super();
+    this.ma.configure({ order: DEFAULTS.order, ways: DEFAULTS.ways, prefetch: false });
+    this.mb.configure({ order: DEFAULTS.orderB, ways: DEFAULTS.ways, prefetch: false });
     this.syncBoxes();
   }
 
@@ -529,7 +531,7 @@ export class CacheSim extends Sim {
       const rg = 3;
       const top = 74;
       const coreBelow = ncol === 2;
-      const ramTop = (coreBelow ? top + 50 : top) + l1H + 24;
+      const ramTop = (coreBelow ? top + 56 : top) + l1H + 24;
       const avail = h - 56 - 80 - ramTop - 10;
       const ch = Math.floor(clamp((avail - 32 - (rows - 1) * rg) / rows, 12, 22));
       this.cell = { cw, ch, lg, rg, padL: 8, padT: 24, padR: 8, padB: 8 };
@@ -542,8 +544,8 @@ export class CacheSim extends Sim {
         this.place('core', 16 + coreW / 2, top + l1H / 2, coreW, 52);
         this.place('l1', w - 16 - l1W / 2, top + l1H / 2, l1W, l1H);
       } else {
-        this.place('core', w / 2, top + 18, 160, 36);
-        this.place('l1', w / 2, top + 50 + l1H / 2, l1W, l1H);
+        this.place('core', w / 2, top + 22, 160, 44);
+        this.place('l1', w / 2, top + 56 + l1H / 2, l1W, l1H);
       }
       this.place('ram', w / 2, ramTop + rh / 2, rw, rh);
     }
@@ -1041,7 +1043,11 @@ export class CacheSim extends Sim {
       this.wallStart();
       return;
     }
-    W.passes = [...W.passes, W.passNs].slice(-2);
+    // With a cache, remember walk 1 (cold) and walk 2 (warm) separately; they
+    // stay on screen through the flush and get refreshed by the next cycle.
+    const next = [...W.passes];
+    next[this.cfg.cache ? W.pass : 0] = W.passNs;
+    W.passes = next;
     W.k = 0;
     W.passNs = 0;
     W.sum = 0;
@@ -1052,7 +1058,6 @@ export class CacheSim extends Sim {
       this.after(1.6, () => {
         W.cached.clear();
         W.pass = 0;
-        W.passes = [];
         if (this.orient === 'landscape') this.say('cache', 'cache flushed', SIG.text2, 1.2);
         this.rev++;
       });

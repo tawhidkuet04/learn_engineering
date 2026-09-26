@@ -130,12 +130,7 @@ function WallScene({ sim, dim, glow }: { sim: CacheSim; dim: Pred; glow: Pred })
       })}
       {cache && (
         <Card box={cache} dim={dim('cache')} glow={glow('cache')} tone="rgba(75,227,160,0.55)">
-          <Title x={12} y={land ? 22 : 20} text="cache" sub={land ? 'SRAM · ~1 ns' : undefined} />
-          {!land && (
-            <text className={stage.mono} x={60} y={20}>
-              SRAM · ~1 ns
-            </text>
-          )}
+          <Title x={12} y={land ? 22 : 20} text="cache" sub="SRAM · ~1 ns" />
           {LIST.map((n, k) => {
             const has = W.cached.has(k);
             if (land) {
@@ -530,6 +525,7 @@ function GridScene({ sim, dim, glow }: { sim: CacheSim; dim: Pred; glow: Pred })
           {!stalled && <circle cx={core.w - 12} cy={12} r={3.2} fill={SIG.res} />}
         </Card>
       )}
+      {land && <TimeBar sim={sim} mid="a" race={false} />}
       <FillFlights sim={sim} mid="a" />
     </g>
   );
@@ -542,7 +538,7 @@ function RaceScene({ sim, glow }: { sim: CacheSim; glow: Pred }) {
         <g key={mid}>
           <RamGrid sim={sim} mid={mid} glow={glow(mid === 'a' ? 'ram' : 'ram:b')} />
           <L1Box sim={sim} mid={mid} glow={glow(mid === 'a' ? 'l1' : 'l1:b')} />
-          <TimeBar sim={sim} mid={mid} />
+          <TimeBar sim={sim} mid={mid} race />
           <FillFlights sim={sim} mid={mid} />
         </g>
       ))}
@@ -560,33 +556,40 @@ const ORDER_TITLE: Record<string, string> = {
   colquiz: 'column by column',
 };
 
-function TimeBar({ sim, mid }: { sim: CacheSim; mid: 'a' | 'b' }) {
+/** Time spent in loads so far, on the scale of the worst case (every load a miss). */
+function TimeBar({ sim, mid, race }: { sim: CacheSim; mid: 'a' | 'b'; race: boolean }) {
   const ram = sim.boxes.get(mid === 'a' ? 'ram' : 'ram:b');
   const m = sim.machine(mid);
   if (!ram) return null;
   const land = sim.orient === 'landscape';
-  const w = ram.w - 16;
+  const w = race ? ram.w - 16 : ram.w - 32;
   const x = ram.x - w / 2;
   const y = ram.y + ram.h / 2 + (land ? 22 : 12);
-  const max = m.seq.length * 100;
+  const max = Math.max(1, m.seq.length) * 100;
   const f = clamp(m.ns / max, 0, 1);
   const done = m.finished;
   const other = sim.machine(mid === 'a' ? 'b' : 'a');
-  const winner = done && (!other.finished || m.ns <= other.ns);
+  const winner = race && done && other.finished && m.ns <= other.ns;
+  const color = race ? (mid === 'a' ? SIG.res : SIG.heavy) : m.ns / Math.max(1, m.accesses) > 50 ? SIG.heavy : SIG.res;
   return (
     <g opacity={ram.alpha}>
       <rect x={x} y={y} width={w} height={land ? 8 : 6} rx={3} className={css.gaugeTrack} />
-      <rect x={x} y={y} width={Math.max(1, w * f)} height={land ? 8 : 6} rx={3} fill={mid === 'a' ? SIG.res : SIG.heavy} opacity={0.85} />
+      <rect x={x} y={y} width={Math.max(1, w * f)} height={land ? 8 : 6} rx={3} fill={color} opacity={0.85} />
       <text x={x} y={y + (land ? 24 : 17)} className={css.timeText} style={land ? undefined : { fontSize: 9.5 }}>
+        {race ? '' : 'time in loads: '}
         {fmtNs(m.ns, true)}
         {done ? '  ✓ done' : ''}
       </text>
-      {winner && other.finished && (
+      {winner && (
         <text x={x + w} y={y + (land ? 24 : 17)} textAnchor="end" className={css.timeText} style={{ fill: SIG.res, fontSize: land ? undefined : 9.5 }}>
           {(other.ns / Math.max(1, m.ns)).toFixed(1)}× faster
         </text>
       )}
-      {!land && null}
+      {!race && (
+        <text x={x + w} y={y + 24} textAnchor="end" className={css.axisText}>
+          bar ends at {fmtNs(max, true)}: every load a miss
+        </text>
+      )}
     </g>
   );
 }
