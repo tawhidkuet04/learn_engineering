@@ -1,0 +1,535 @@
+/* =========================================================
+   CAP lesson: replica cards, the partition line, quorum
+   brackets, on-stage questions and a few panel pieces.
+   ========================================================= */
+
+/* ---------- SVG: cards ---------- */
+.node {
+  transition: opacity 250ms;
+}
+
+.card {
+  fill: var(--node-fill);
+  stroke: rgba(var(--line-rgb), 0.55);
+  stroke-width: 1.1;
+}
+
+.cardInner {
+  fill: none;
+  stroke: rgba(var(--line-rgb), 0.12);
+  stroke-width: 1;
+}
+
+.head {
+  fill: rgba(var(--line-rgb), 0.06);
+}
+
+.rule {
+  stroke: rgba(var(--line-rgb), 0.18);
+  stroke-width: 1;
+}
+
+.city {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  fill: var(--text-1);
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  fill: var(--text-3);
+}
+
+.caps {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--text-3);
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 500;
+  fill: var(--text-1);
+}
+
+.valueSm {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.pillText {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  fill: var(--text-3);
+}
+
+.status {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+}
+
+.name {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  fill: var(--text-1);
+}
+
+.avatar {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.feedRow {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+}
+
+.rtt {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  fill: rgba(var(--line-rgb), 0.85);
+  paint-order: stroke;
+  stroke: var(--ink-1);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.cutLabel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  fill: #ff7d92;
+  paint-order: stroke;
+  stroke: var(--ink-1);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.sideLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  paint-order: stroke;
+  stroke: var(--ink-1);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.bracketLabel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  paint-order: stroke;
+  stroke: var(--ink-1);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+/* ---------- HTML overlay: a question asked on the stage ---------- */
+.ask {
+  position: absolute;
+  z-index: 4;
+  width: 268px;
+  padding: 10px 12px 12px;
+  border-radius: 11px;
+  background: rgba(20, 17, 4, 0.94);
+  border: 1px solid rgba(255, 210, 63, 0.75);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(255, 210, 63, 0.08);
+  animation: askIn 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.askDock {
+  left: 10px;
+  right: 10px;
+  bottom: 56px;
+  width: auto;
+}
+
+@keyframes askIn {
+  from {
+    opacity: 0;
+    margin-top: 6px;
+  }
+}
+
+.askKicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.askQ {
+  margin: 5px 0 9px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  color: #fff3c4;
+}
+
+.askRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.askBtn {
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 210, 63, 0.6);
+  background: rgba(255, 210, 63, 0.08);
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition:
+    background 150ms,
+    border-color 150ms;
+}
+
+.askBtn:hover {
+  background: rgba(255, 210, 63, 0.2);
+  border-color: var(--accent);
+}
+
+/* ---------- HTML overlay: CAP definitions card ---------- */
+.capGrid {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 5px 8px;
+  align-items: baseline;
+}
+
+.capLetter {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1;
+  color: var(--text-1);
+}
+
+.capOn {
+  color: var(--accent);
+}
+
+.capText {
+  font-size: 10.5px;
+  color: var(--text-2);
+}
+
+.capText b {
+  color: var(--text-1);
+  font-weight: 500;
+}
+
+/* ---------- spectrum view ---------- */
+.spec {
+  position: absolute;
+  inset: 0;
+  pointer-events: none !important;
+}
+
+.specStop {
+  position: absolute;
+  transform: translate(0, -50%);
+  font-family: var(--font-sans);
+  transition:
+    opacity 300ms,
+    color 300ms;
+}
+
+.specName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.specStop[data-on='true'] .specName {
+  color: var(--accent);
+}
+
+.specGuar {
+  margin-top: 1px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.specDetail {
+  position: absolute;
+  width: 330px;
+  padding: 14px 16px 15px;
+  border-radius: 12px;
+  background: rgba(10, 15, 28, 0.92);
+  border: 1px solid rgba(255, 210, 63, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  transform: translate(0, -50%);
+  transition: top 450ms cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.specDetailStrip {
+  left: 10px !important;
+  right: 10px;
+  bottom: 56px;
+  top: auto !important;
+  width: auto;
+  transform: none;
+  padding: 10px 12px 11px;
+}
+
+.specDetailStrip .specTitle {
+  font-size: 18px;
+}
+
+.specDetailStrip .specBody {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.specDetailStrip .specList {
+  margin-top: 6px;
+  font-size: 10px;
+}
+
+.specDetailStrip .specUsed {
+  margin-top: 6px;
+  padding-top: 5px;
+}
+
+.specTitle {
+  font-family: var(--font-display);
+  font-size: 21px;
+  line-height: 1.1;
+  color: var(--text-1);
+}
+
+.specBody {
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.specList {
+  display: grid;
+  gap: 3px;
+  margin-top: 9px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.specOk {
+  color: #8ff3c6;
+}
+
+.specNo {
+  color: #ff9aab;
+}
+
+.specUsed {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(var(--line-rgb), 0.2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.specUsed b {
+  color: var(--text-1);
+  font-weight: 500;
+}
+
+.specAxis {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+/* ---------- readout extras ---------- */
+.vv {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+}
+
+.good {
+  color: #8ff3c6;
+}
+
+.bad {
+  color: #ff9aab;
+}
+
+.warn {
+  color: #ffc98a;
+}
+
+.dimText {
+  color: var(--text-3);
+}
+
+/* ---------- panel: quorum card ---------- */
+.verdict {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.verdict[data-ok='true'] {
+  background: rgba(75, 227, 160, 0.08);
+  border: 1px solid rgba(75, 227, 160, 0.35);
+}
+
+.verdict[data-ok='false'] {
+  background: rgba(255, 77, 106, 0.07);
+  border: 1px solid rgba(255, 77, 106, 0.35);
+}
+
+.verdict strong {
+  margin-right: 4px;
+}
+
+.verdict[data-ok='true'] strong {
+  color: var(--sig-res);
+}
+
+.verdict[data-ok='false'] strong {
+  color: var(--sig-err);
+}
+
+.formula {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-1);
+}
+
+.clientRow {
+  display: grid;
+  grid-template-columns: 88px 1fr 1fr;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-1);
+}
+
+.clientRow:first-of-type {
+  margin-top: 12px;
+}
+
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.who i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 18%, transparent);
+}
+
+.who small {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.mini {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: rgba(8, 13, 24, 0.7);
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.mini:hover:not(:disabled) {
+  border-color: rgba(var(--line-rgb), 0.55);
+}
+
+.mini:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.miniHot {
+  border-color: rgba(255, 210, 63, 0.55);
+  color: var(--accent);
+}
+
+.segRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.chip {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: rgba(var(--line-rgb), 0.5);
+  color: var(--text-1);
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: rgba(255, 210, 63, 0.1);
+  color: var(--text-1);
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-3);
+}
