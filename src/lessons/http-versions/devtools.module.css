@@ -1,0 +1,231 @@
+/* A stand-in for the browser's DevTools Network panel, drawn in blueprint colors. */
+.caption {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  white-space: nowrap;
+  pointer-events: none !important;
+}
+
+.dt {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  border: 1px solid var(--rule-strong);
+  background: rgba(8, 12, 22, 0.96);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  font-family: var(--font-sans);
+  color: var(--text-2);
+  pointer-events: none !important;
+}
+
+.tabs {
+  display: flex;
+  flex: none;
+  height: 30px;
+  padding: 0 6px;
+  border-bottom: 1px solid var(--rule-strong);
+  background: rgba(18, 27, 48, 0.9);
+  overflow: hidden;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 12px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.tabOn {
+  color: var(--text-1);
+  box-shadow: inset 0 -2px 0 var(--sig-req);
+}
+
+.toolbar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 28px;
+  padding: 0 11px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 11px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.rec {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--sig-err);
+  box-shadow: 0 0 8px rgba(255, 77, 106, 0.6);
+}
+
+.table {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.row {
+  display: grid;
+  align-items: center;
+  height: var(--rh);
+  border-bottom: 1px solid rgba(143, 166, 201, 0.07);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-2);
+  white-space: nowrap;
+  animation: rowIn 260ms ease-out;
+}
+
+.row > span {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes rowIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.head {
+  height: 24px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-3);
+  background: rgba(18, 27, 48, 0.9);
+  border-bottom: 1px solid var(--rule-strong);
+  animation: none;
+}
+
+.name {
+  gap: 7px;
+  color: var(--text-1);
+}
+
+.name i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 1.5px;
+}
+
+.proto {
+  background: rgba(255, 210, 63, 0.08);
+  color: var(--accent);
+  font-weight: 500;
+  box-shadow:
+    inset 1px 0 0 rgba(255, 210, 63, 0.4),
+    inset -1px 0 0 rgba(255, 210, 63, 0.4);
+}
+
+.head .proto {
+  font-weight: 600;
+  box-shadow:
+    inset 1px 0 0 rgba(255, 210, 63, 0.4),
+    inset -1px 0 0 rgba(255, 210, 63, 0.4),
+    inset 0 2px 0 var(--accent);
+}
+
+.pending {
+  color: var(--text-3);
+}
+
+.wf {
+  position: relative;
+}
+
+.wf i {
+  position: absolute;
+  top: 50%;
+  display: block;
+  min-width: 1px;
+}
+
+.queue {
+  height: 1px;
+  margin-top: 0;
+  background: rgba(143, 166, 201, 0.5);
+}
+
+.conn {
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 1.5px;
+  background: var(--sig-heavy);
+}
+
+.wait {
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 1px;
+  background: rgba(143, 166, 201, 0.55);
+}
+
+.dl {
+  height: 9px;
+  margin-top: -4.5px;
+  border-radius: 2px;
+}
+
+.lost {
+  height: 0;
+  border-top: 1.5px dashed var(--sig-err);
+}
+
+.stall {
+  height: 13px;
+  margin-top: -6.5px;
+  border-radius: 2px;
+  border: 1px solid var(--sig-err);
+  background: repeating-linear-gradient(45deg, rgba(255, 77, 106, 0.35) 0 2px, transparent 2px 5px);
+}
+
+.footer {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 14px;
+  height: 26px;
+  padding: 0 11px;
+  border-top: 1px solid var(--rule-strong);
+  background: rgba(18, 27, 48, 0.9);
+  font-size: 11px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .row {
+    font-size: 10px;
+  }
+  .row > span {
+    padding: 0 6px;
+  }
+  .tab {
+    padding: 0 8px;
+    font-size: 11px;
+  }
+  .footer {
+    gap: 10px;
+    font-size: 10px;
+  }
+}
