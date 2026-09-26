@@ -159,7 +159,7 @@ export default function Home() {
           <h2 className={css.catalogTitle}>
             {TRACKS.reduce((n, t) => n + t.topics.length, 0)} topics, <em>one at a time.</em>
           </h2>
-          <p className={css.catalogLede}>Each topic is a complete lesson you can finish in one sitting. New ones land as they come off the drafting table.</p>
+          <p className={css.catalogLede}>Each topic is a complete lesson you can finish in one sitting: a live simulation, questions that make you predict, and a playground to break things in.</p>
         </div>
 
         {TRACKS.map((track, ti) => {
@@ -171,7 +171,7 @@ export default function Home() {
                 <h3 className={css.trackTitle}>{track.title}</h3>
                 <span className={css.trackIntro}>{track.intro}</span>
                 <span className={css.trackCount}>
-                  {live} live · {track.topics.length - live} in drafting
+                  {live === track.topics.length ? `${live} lessons` : `${live} live · ${track.topics.length - live} in drafting`}
                 </span>
               </div>
               <div className={css.grid}>
