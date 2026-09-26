@@ -4,6 +4,8 @@
 
 .shell {
   display: grid;
+  /* minmax(0, 1fr): long timeline labels must not widen the page */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto;
   height: 100dvh;
   min-height: 600px;
@@ -612,6 +614,7 @@
   display: flex;
   align-items: flex-end;
   gap: 14px;
+  min-width: 0;
   padding: 10px 18px 12px;
   border-top: 1px solid var(--rule);
 }
