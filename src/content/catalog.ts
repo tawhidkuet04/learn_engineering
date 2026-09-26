@@ -50,7 +50,7 @@ export const TRACKS: Track[] = [
       { slug: 'life-of-a-request', code: 'NET-01', title: 'What happens when you hit Enter', blurb: 'From URL to pixels: DNS, TCP, TLS and HTTP in one journey.', status: 'live', steps: 20, minutes: 28 },
       { slug: 'osi-model', code: 'NET-02', title: 'The OSI Model', blurb: 'Watch data get wrapped layer by layer, sent, then unwrapped.', status: 'drafting' },
       { slug: 'tcp', code: 'NET-03', title: 'TCP Handshakes & Reliability', blurb: 'SYN, ACK, lost packets, retransmits and congestion control.', status: 'live', steps: 21, minutes: 40 },
-      { slug: 'dns', code: 'NET-04', title: 'DNS Resolution', blurb: 'Root, TLD and authoritative servers in a single lookup.', status: 'drafting' },
+      { slug: 'dns', code: 'NET-04', title: 'DNS Resolution', blurb: 'Root, TLD and authoritative servers in a single lookup.', status: 'live', steps: 22, minutes: 25 },
       { slug: 'tls', code: 'NET-05', title: 'TLS & HTTPS', blurb: 'How two strangers agree on a secret while everyone listens.', status: 'live', steps: 21, minutes: 32 },
       { slug: 'http-versions', code: 'NET-06', title: 'HTTP/1.1 vs 2 vs 3', blurb: 'Head-of-line blocking, multiplexing and QUIC.', status: 'live', steps: 20, minutes: 32 },
       { slug: 'nat', code: 'NET-07', title: 'IP, Subnets & NAT', blurb: 'How billions of devices share a few billion addresses.', status: 'drafting' },
