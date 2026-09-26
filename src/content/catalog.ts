@@ -54,7 +54,7 @@ export const TRACKS: Track[] = [
       { slug: 'tls', code: 'NET-05', title: 'TLS & HTTPS', blurb: 'How two strangers agree on a secret while everyone listens.', status: 'live', steps: 21, minutes: 32 },
       { slug: 'http-versions', code: 'NET-06', title: 'HTTP/1.1 vs 2 vs 3', blurb: 'Head-of-line blocking, multiplexing and QUIC.', status: 'live', steps: 20, minutes: 32 },
       { slug: 'nat', code: 'NET-07', title: 'IP, Subnets & NAT', blurb: 'How billions of devices share a few billion addresses.', status: 'drafting' },
-      { slug: 'websockets', code: 'NET-08', title: 'WebSockets', blurb: 'Keeping a line open for chat, games and live data.', status: 'drafting' },
+      { slug: 'websockets', code: 'NET-08', title: 'WebSockets', blurb: 'Keeping a line open for chat, games and live data.', status: 'live', steps: 19, minutes: 28 },
     ],
   },
   {
