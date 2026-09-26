@@ -1,8 +1,6 @@
 'use client';
 
 import type { CSSProperties } from 'react';
-import { ScrambleText } from '@/components/lesson/ScrambleText';
-import { Icon } from '@/components/lesson/Icon';
 import type { HudView } from '../engine/world';
 import css from './chrome.module.css';
 
@@ -109,67 +107,6 @@ export function Legend({ keys, bottom }: { keys: LegendKey[]; bottom?: number })
           {LEGEND[k].label}
         </span>
       ))}
-    </div>
-  );
-}
-
-export function PlaybackControls({
-  playing,
-  onToggle,
-  speed,
-  onSpeed,
-  onReplay,
-}: {
-  playing: boolean;
-  onToggle: () => void;
-  speed: number;
-  onSpeed: (s: number) => void;
-  onReplay: () => void;
-}) {
-  const noFocus = (e: { preventDefault: () => void }) => e.preventDefault();
-  return (
-    <div className={css.controls} onMouseDown={noFocus}>
-      <button type="button" className={cx(css.btn, css.btnPrimary)} onClick={onToggle} aria-label={playing ? 'Pause animation' : 'Play animation'} title="Space">
-        <Icon name={playing ? 'pause' : 'play'} size={14} />
-      </button>
-      <div className={css.seg} role="group" aria-label="Speed">
-        {[0.5, 1, 2].map((s) => (
-          <button key={s} type="button" aria-pressed={speed === s} onClick={() => onSpeed(s)}>
-            {s}×
-          </button>
-        ))}
-      </div>
-      <span className={css.divider} />
-      <button type="button" className={css.btn} onClick={onReplay} title="Replay this step (R)">
-        <Icon name="replay" size={14} />
-        Replay
-      </button>
-    </div>
-  );
-}
-
-export function TitleBlock({ code, title, chapter, chapterNo, step, stepNo, total }: { code: string; title: string; chapter: string; chapterNo: number; step: string; stepNo: number; total: number }) {
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  return (
-    <div className={css.titleBlock} aria-hidden>
-      <div className={css.tbRow}>
-        <span className={css.tbTitle}>{title}</span>
-        <span className={css.tbCode}>{code}</span>
-      </div>
-      <div className={css.tbRow}>
-        <span className={css.tbKey}>ch {pad(chapterNo)}</span>
-        <span className={css.tbVal}>
-          <ScrambleText text={chapter.toUpperCase()} />
-        </span>
-      </div>
-      <div className={css.tbRow}>
-        <span className={css.tbKey}>
-          {pad(stepNo)}/{pad(total)}
-        </span>
-        <span className={css.tbVal}>
-          <ScrambleText text={step.toUpperCase()} />
-        </span>
-      </div>
     </div>
   );
 }

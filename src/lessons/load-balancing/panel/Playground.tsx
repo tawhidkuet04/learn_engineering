@@ -7,7 +7,7 @@ import { ALGO_NAMES } from '../engine/algorithms';
 import type { Algo, ServerSpec, Size } from '../engine/types';
 import type { World } from '../engine/world';
 import { nginxConfig } from './nginxConfig';
-import { usePoll } from './usePoll';
+import { usePoll } from '@/components/lesson/usePoll';
 import css from './panel.module.css';
 
 const ALGOS: Algo[] = ['rr', 'least', 'weighted', 'iphash', 'random', 'p2c'];

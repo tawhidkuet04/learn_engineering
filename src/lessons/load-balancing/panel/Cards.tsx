@@ -5,7 +5,7 @@ import { Icon } from '@/components/lesson/Icon';
 import { lessonCss } from '@/components/lesson/Prose';
 import type { World } from '../engine/world';
 import type { Interaction } from '../types';
-import { usePoll } from './usePoll';
+import { usePoll } from '@/components/lesson/usePoll';
 import css from './panel.module.css';
 
 type Of<K extends Interaction['kind']> = Extract<Interaction, { kind: K }>;
