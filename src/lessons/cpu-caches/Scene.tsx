@@ -487,7 +487,7 @@ function Chart({ sim }: { sim: CacheSim }) {
       <line x1={px} y1={g.y} x2={px} y2={g.y + g.h} className={css.marker} />
       <circle cx={px} cy={py} r={9} fill={SIG.warn} opacity={0.18} />
       <circle cx={px} cy={py} r={4.5} fill={SIG.warn} />
-      <g transform={`translate(${labelLeft ? px - 10 : px + 10},${py - 14})`}>
+      <g transform={`translate(${labelLeft ? px - 10 : px + 10},${py < g.y + 44 ? py + 24 : py - 14})`}>
         <text textAnchor={labelLeft ? 'end' : 'start'} className={css.markerText}>
           {fmtBytes(ws)} → {ns < 10 ? ns.toFixed(1) : Math.round(ns)} ns
         </text>
@@ -820,7 +820,7 @@ function FillFlights({ sim, mid }: { sim: CacheSim; mid: 'a' | 'b' }) {
       const w = lr.w + (sr.w - lr.w) * u;
       const h = lr.h + (sr.h - lr.h) * u;
       const cxp = lr.x + lr.w / 2 + (sr.x + sr.w / 2 - (lr.x + lr.w / 2)) * u;
-      const cyp = lr.y + lr.h / 2 + (sr.y + sr.h / 2 - (lr.y + lr.h / 2)) * u - Math.sin(Math.PI * u) * (land && !race ? 30 : 12);
+      const cyp = lr.y + lr.h / 2 + (sr.y + sr.h / 2 - (lr.y + lr.h / 2)) * u - Math.sin(Math.PI * u) * (land && !race ? 12 : 6);
       const cwv = w / PER_LINE;
       out.push(
         <g key={`s${f.line}`}>

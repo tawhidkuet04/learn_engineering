@@ -441,7 +441,13 @@ export function StageOverlay({ sim, hud = [], side = [], strip }: { sim: CacheSi
   return (
     <>
       <Hud items={hudItems(sim, hud)} />
-      {loop && <CodeTrace x={sim.w - 14 - 300} y={14} w={300} title="the loop" lang="c" code={loop.code} active={loop.active} marks={{ [loop.active]: loop.mark }} />}
+      {loop &&
+        (() => {
+          // Wide enough for the longest line (12px mono ≈ 7.3px per character) plus the gutter.
+          const longest = Math.max(...loop.code.split('\n').map((l) => l.length));
+          const w = Math.min(380, Math.max(300, Math.ceil(longest * 7.3 + 60)));
+          return <CodeTrace x={sim.w - 14 - w} y={14} w={w} title="the loop" lang="c" code={loop.code} active={loop.active} marks={{ [loop.active]: loop.mark }} />;
+        })()}
       {land && side.length > 0 && <SideReadouts sim={sim} keys={side} />}
       {!land && v === 'ladder' && side.includes('human') && <PortraitHuman sim={sim} />}
       {!land && strip && <div className={css.strip}>{renderReadout(strip, sim, true)}</div>}

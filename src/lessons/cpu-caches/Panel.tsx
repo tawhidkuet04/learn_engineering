@@ -139,11 +139,11 @@ interface Mission {
 
 const MISSIONS: Mission[] = [
   {
-    id: 'line',
-    title: 'One miss per line',
-    text: 'Finish a pass with at most 16 misses (one per line) and the prefetcher off.',
-    hint: 'Hint: read memory in the order it’s laid out.',
-    check: (p) => !p.prefetch && p.misses <= 16,
+    id: 'tiny',
+    title: 'Tiny cache, no problem',
+    text: 'Shrink the L1 to 2 lines, keep the prefetcher off, and finish a pass with at most 16 misses: one per line.',
+    hint: 'Hint: which pattern is done with each line before it moves on?',
+    check: (p) => p.ways === 2 && !p.prefetch && p.misses <= 16,
   },
   {
     id: 'ahead',
@@ -160,11 +160,11 @@ const MISSIONS: Mission[] = [
     check: (p) => p.order === 'col' && p.misses <= 16,
   },
   {
-    id: 'thrash',
+    id: 'defeat',
     title: 'Break it',
-    text: 'Finish a pass where every single load misses.',
-    hint: 'Hint: jump to a new line on every load, with too little cache to come back to.',
-    check: (p) => p.misses === p.n,
+    text: 'Turn the prefetcher on and still miss on every single load.',
+    hint: 'Hint: prefetchers look for neighbouring lines. Which pattern never touches two in a row?',
+    check: (p) => p.prefetch && p.misses === p.n,
   },
 ];
 
