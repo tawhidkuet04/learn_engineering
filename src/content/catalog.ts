@@ -34,7 +34,7 @@ export const TRACKS: Track[] = [
       },
       { slug: 'caching', code: 'SD-02', title: 'Caching', blurb: 'Cache-aside, TTLs, eviction, and why invalidation is famously hard.', status: 'drafting' },
       { slug: 'cdn', code: 'SD-03', title: 'CDNs', blurb: 'Serve bytes from the edge, close to every user on the planet.', status: 'drafting' },
-      { slug: 'consistent-hashing', code: 'SD-04', title: 'Consistent Hashing', blurb: 'Add a server and move only 1/N of the keys, not all of them.', status: 'drafting' },
+      { slug: 'consistent-hashing', code: 'SD-04', title: 'Consistent Hashing', blurb: 'Add a server and move only 1/N of the keys, not all of them.', status: 'live', steps: 19, minutes: 25 },
       { slug: 'replication', code: 'SD-05', title: 'Database Replication', blurb: 'Leaders, followers, failover, and the replication lag that bites.', status: 'drafting' },
       { slug: 'sharding', code: 'SD-06', title: 'Sharding', blurb: 'Split a database that no longer fits on one machine.', status: 'drafting' },
       { slug: 'rate-limiting', code: 'SD-07', title: 'Rate Limiting', blurb: 'Token buckets, leaky buckets and sliding windows, side by side.', status: 'drafting' },
