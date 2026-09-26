@@ -896,6 +896,7 @@ export class WsSim extends Sim {
 
   private post(p: PState, m: Msg) {
     if (p.conn === 'open') this.stat.httpAfterOpen++;
+    this.stat.reqs++;
     this.hop(p.id, 'up', {
       color: SIG.req,
       label: 'POST',
@@ -1111,7 +1112,13 @@ export class WsSim extends Sim {
         }
         this.rev++;
       },
-      lost: () => (q.lp = 'idle'),
+      lost: () => {
+        // The request failed: wait a moment before trying again.
+        q.lp = 'back';
+        this.after(2, () => {
+          if (q.lp === 'back') q.lp = 'idle';
+        });
+      },
     });
     this.rev++;
   }
@@ -1126,7 +1133,12 @@ export class WsSim extends Sim {
   /* ================================================================ */
 
   private sseOpen(q: PState) {
-    if (q.sse !== 'closed') return;
+    if (q.sse !== 'closed' || this.cfg.mode !== 'sse' || this.cfg.view !== 'chat') return;
+    // EventSource retries a failed stream by itself, after about 3 seconds.
+    const failed = () => {
+      q.sse = 'closed';
+      this.after(3, () => this.sseOpen(q));
+    };
     q.sse = 'opening';
     this.stat.reqs++;
     this.hop(q.id, 'up', {
@@ -1146,9 +1158,9 @@ export class WsSim extends Sim {
             for (const m of this.pendingFor(q.id)) this.ssePush(q, m);
             this.rev++;
           },
-          lost: () => (q.sse = 'closed'),
+          lost: failed,
         }),
-      lost: () => (q.sse = 'closed'),
+      lost: failed,
     });
   }
 
@@ -1630,6 +1642,16 @@ export class WsSim extends Sim {
     if (p.net) return;
     p.net = true;
     this.note(pid, 'Wi-Fi back', SIG.res, 2);
+    const c = this.cfg;
+    if (c.view === 'chat' && c.mode !== 'ws') {
+      // HTTP transports: send what failed while offline.
+      const queued = p.outbox.splice(0);
+      queued.forEach((m, i) => this.after(0.2 + i * 0.3, () => this.post(p, m)));
+      // An open event stream reconnects with Last-Event-ID and catches up.
+      if (c.mode === 'sse' && p.sse === 'open') {
+        this.pendingFor(pid).forEach((m, i) => this.after(0.4 + i * 0.25, () => this.ssePush(p, m)));
+      }
+    }
     this.rev++;
   }
 
@@ -1669,7 +1691,7 @@ export class WsSim extends Sim {
   setMode(mode: Mode) {
     if (this.cfg.mode === mode) return;
     const servers = mode === 'ws' ? this.cfg.servers : 1;
-    this.cfg = { ...this.cfg, mode, servers, redis: servers === 2 && this.cfg.redis, receivers: mode === 'sse' ? ['alice', 'bob'] : ['bob'] };
+    this.cfg = { ...this.cfg, mode, servers, redis: servers === 2 && this.cfg.redis, receivers: ['alice', 'bob'] };
     this.rebuildConnections();
   }
 
