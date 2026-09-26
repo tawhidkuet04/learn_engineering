@@ -338,7 +338,7 @@
 
 .natRow {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1.3fr) 50px minmax(0, 1.2fr) 30px;
+  grid-template-columns: 35px minmax(0, 1.25fr) 48px minmax(0, 1.3fr) 26px;
   align-items: center;
   gap: 8px;
   padding: 1px 6px;
@@ -430,6 +430,9 @@
   margin-top: 6px;
   padding-top: 5px;
   border-top: 1px dashed rgba(var(--line-rgb), 0.22);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* routing table */

@@ -666,9 +666,9 @@ iptables -A FORWARD -i eth0 -p tcp -d 192.168.1.23 --dport 8080 -j ACCEPT`,
             </p>
             <p>
               First, each asks a <Term k="stun">STUN server</Term> “what address do you see me as?” and learns its public mapping: Alice is
-              203.0.113.7:40001. They swap these through the app&apos;s <Term k="server">server</Term>. Then both send to the other&apos;s public address at
-              about the same time. Each outgoing packet opens a row in its own router, so the other side&apos;s packets now look like replies. The first
-              one may bounce, but then the <strong>hole is punched</strong>.
+              203.0.113.7:40001. They swap these through the app&apos;s <Term k="server">server</Term>. Then both send straight to the other&apos;s public
+              address. Alice&apos;s first packet dies at Bob&apos;s router, but on its way out it added a row to <em>her</em> router. So when Bob&apos;s packet
+              arrives, it looks like a reply and gets in. Now both routers have a row: the <strong>hole is punched</strong>.
             </p>
             <p>
               If a router picks a new public port for every destination (a <strong>symmetric NAT</strong>), the address STUN saw is useless to the peer.

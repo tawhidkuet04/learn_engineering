@@ -149,12 +149,12 @@ function BitsScene({ sim, hl }: { sim: NatSim; hl: string }) {
                 </g>
               );
             })}
-            {/* octet values above the address row */}
+            {/* octet values: above the address row, or under it on phones where the row label sits on top */}
             {row === 'addr' &&
               [0, 1, 2, 3].map((k) => {
                 const x = (bitX(g, k * 8) + bitX(g, k * 8 + 7) + g.cell) / 2;
                 return (
-                  <text key={k} className={css.octet} x={x} y={y - (land ? 9 : 6)} textAnchor="middle" fill={fo === k ? SIG.warn : SIG.text2} style={{ fontSize: land ? 12 : 9.5 }}>
+                  <text key={k} className={css.octet} x={x} y={land ? y - 9 : y + g.ch + 11} textAnchor="middle" fill={fo === k ? SIG.warn : SIG.text2} style={{ fontSize: land ? 12 : 9.5 }}>
                     {oc[k]}
                   </text>
                 );
@@ -181,7 +181,7 @@ function BitsScene({ sim, hl }: { sim: NatSim; hl: string }) {
         </g>
       )}
       {c.places && fo >= 0 && (
-        <text className={css.sumLine} x={sim.w / 2} y={rowY(g, 0) + g.ch + (land ? 46 : 28)} textAnchor="middle" style={land ? undefined : { fontSize: 11.5 }}>
+        <text className={css.sumLine} x={sim.w / 2} y={rowY(g, 0) + g.ch + (land ? 46 : 36)} textAnchor="middle" style={land ? undefined : { fontSize: 11.5 }}>
           <tspan fill={SIG.text2}>{oc[fo].toString(2).padStart(8, '0')}</tspan>
           {placeSum(oc[fo]).includes('+') && (
             <>
@@ -195,7 +195,9 @@ function BitsScene({ sim, hl }: { sim: NatSim; hl: string }) {
       )}
 
       {/* the network / host divider */}
-      {split && maskIn > 0 && <Divider g={g} x={dividerX(g, sim.prefixVis)} top={rowY(g, 0) - (land ? 30 : 22)} bottom={bottom + 8} label={`/${P}`} opacity={maskIn} />}
+      {split && maskIn > 0 && (
+        <Divider g={g} x={dividerX(g, sim.prefixVis)} top={rowY(g, 0) - (land ? 30 : 22)} bottom={bottom + 8} label={`/${P}`} opacity={maskIn} rows={c.rows.length} />
+      )}
 
       {/* brackets naming the two parts */}
       {split && (!c.andAnim || sweep >= 1) && <Brackets g={g} y={bottom + (land ? 22 : 16)} P={P} dv={dividerX(g, sim.prefixVis)} land={land} hl={hl} />}
@@ -228,11 +230,18 @@ function RowLabel({ g, y, name, value, land }: { g: BitsGeo; y: number; name: st
   );
 }
 
-function Divider({ g, x, top, bottom, label, opacity }: { g: BitsGeo; x: number; top: number; bottom: number; label: string; opacity: number }) {
+function Divider({ g, x, top, bottom, label, opacity, rows }: { g: BitsGeo; x: number; top: number; bottom: number; label: string; opacity: number; rows: number }) {
   const w = label.length * (g.land ? 8 : 7) + 14;
   return (
     <g opacity={opacity}>
-      <line x1={x} y1={top + 8} x2={x} y2={bottom} stroke={SIG.warn} strokeWidth={1.4} strokeDasharray="4 4" />
+      {g.land ? (
+        <line x1={x} y1={top + 8} x2={x} y2={bottom} stroke={SIG.warn} strokeWidth={1.4} strokeDasharray="4 4" />
+      ) : (
+        // On phones the row labels sit above each row, so only cut through the bits themselves.
+        Array.from({ length: rows }, (_, i) => (
+          <line key={i} x1={x} y1={rowY(g, i) - 3} x2={x} y2={rowY(g, i) + g.ch + 3} stroke={SIG.warn} strokeWidth={1.4} strokeDasharray="3 3" />
+        ))
+      )}
       <rect x={x - w / 2} y={top - 9} width={w} height={g.land ? 19 : 16} rx={g.land ? 9.5 : 8} fill={SIG.warn} />
       <text className={css.divLabel} x={x} y={top + (g.land ? 4.5 : 3)} textAnchor="middle" style={{ fontSize: g.land ? 11.5 : 10 }}>
         {label}
@@ -435,13 +444,15 @@ function MapScene({ sim, hl }: { sim: NatSim; hl: string }) {
       hatch = true;
       stroke = 'rgba(143,166,201,0.26)';
     }
+    // 172/8 and 192/8 each hold one private sub-block: outline them in teal too.
+    if (mode === 'private' && (n === 172 || n === 192)) stroke = 'rgba(45,212,191,0.75)';
     const glow = hl === `map:${n}` || (hl === 'map:private' && (n === 10 || n === 172 || n === 192)) || (hl === 'map:reserved' && kind !== 'unicast' && kind !== 'private');
     cells.push(
       <g key={n}>
         <rect x={x} y={y} width={s} height={s} rx={2.5} fill={fill} stroke={glow ? SIG.warn : stroke} strokeWidth={glow ? 1.6 : 1} />
         {hatch && <rect x={x} y={y} width={s} height={s} rx={2.5} fill="url(#kit-hatch-dim)" />}
         {flash > 0.01 && <rect x={x} y={y} width={s} height={s} rx={2.5} fill={SIG.text} opacity={flash * 0.35} />}
-        {land && (
+        {(land || (mode === 'private' && n === 10)) && (
           <text className={css.cellNum} x={x + s / 2} y={y + s / 2 + 3.2} textAnchor="middle" fill={labelColor}>
             {n}
           </text>
@@ -534,7 +545,9 @@ function NetScene({ sim, hl }: { sim: NatSim; hl: string }) {
       {sim.noRoute && sim.vt - sim.noRoute.vt < 3.6 && <NoRoute sim={sim} />}
       {['laptop', 'phone', 'tv', 'guest', 'bob'].map((id) => {
         const box = b(id);
-        return box ? <Device key={id} box={box} sim={sim} id={id} dim={dim(id)} glow={glow(id)} hot={!!pend && askingAt === id} /> : null;
+        // Playground: devices switched off are dimmed.
+        const off = c.scenario === 'play' && id !== 'guest' && id !== 'bob' && !sim.active.has(id);
+        return box ? <Device key={id} box={box} sim={sim} id={id} dim={dim(id) || off} glow={glow(id)} hot={!!pend && askingAt === id} /> : null;
       })}
       {['router', 'routerB', 'cgnat'].map((id) => {
         const box = b(id);
@@ -820,7 +833,7 @@ function Device({ box, sim, id, dim, glow, hot }: { box: Box; sim: NatSim; id: s
       </Frame>
     );
   }
-  const stream = sim.stream && sim.stream.dev === id ? sim.stream : null;
+  const stream = sim.stream && sim.stream.dev === id && sim.active.has(id) ? sim.stream : null;
   return (
     <Frame box={box} dim={dim} glow={glow} hot={hot}>
       <rect x={iconX - 3} y={box.h / 2 - 11} width={22} height={22} rx={6} fill="rgba(45,212,191,0.08)" stroke="rgba(45,212,191,0.35)" />
@@ -840,8 +853,8 @@ function Device({ box, sim, id, dim, glow, hot }: { box: Box; sim: NatSim; id: s
         </g>
       )}
       {stream && (
-        <text className={css.badgeText} x={box.w - 8} y={13} textAnchor="end" fill={stream.stalled ? SIG.err : SIG.res}>
-          {stream.stalled ? '■ stalled' : '▶ streaming'}
+        <text className={css.badgeText} x={box.w - 8} y={13} textAnchor="end" style={{ fill: stream.stalled ? SIG.err : SIG.res }}>
+          {narrow ? (stream.stalled ? '■' : '▶') : stream.stalled ? '■ stalled' : '▶ streaming'}
         </text>
       )}
     </Frame>

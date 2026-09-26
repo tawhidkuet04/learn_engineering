@@ -344,7 +344,6 @@ export class NatSim extends Sim {
   route: { dst: string; row: number; vt: number } | null = null;
   serverLog: LogLine[] = [];
   carolLog: LogLine[] = [];
-  peerLog: LogLine[] = [];
   stats: Stats = { conns: 0, inTries: 0, inOk: 0, inDrop: 0, drops: 0, expiredDrops: 0, lostNoRoute: 0, punched: false };
   /** Public ports whose mapping timed out (box:proto:port) */
   expired = new Set<string>();
@@ -404,7 +403,6 @@ export class NatSim extends Sim {
     this.route = null;
     this.serverLog = [];
     this.carolLog = [];
-    this.peerLog = [];
     this.stats = { conns: 0, inTries: 0, inOk: 0, inDrop: 0, drops: 0, expiredDrops: 0, lostNoRoute: 0, punched: false };
     this.noRoute = null;
     this.expired = new Set();
@@ -549,7 +547,7 @@ export class NatSim extends Sim {
     /* portrait: internet on top, home at the bottom */
     const cw = Math.min(172, W - 40);
     if (topo === 'two') {
-      const hy = 120;
+      const hy = 134;
       if (hosts.includes('server') && hosts.includes('stun')) {
         put('server', W * 0.28, hy, Math.min(150, W * 0.46), 44);
         put('stun', W * 0.72, hy, Math.min(150, W * 0.46), 44);
@@ -557,12 +555,12 @@ export class NatSim extends Sim {
         put('server', W / 2, hy, 150, 44);
         put('stun', W / 2, hy, 150, 44);
       }
-      put('cloud', W / 2, 196, 132, 54);
+      put('cloud', W / 2, 206, 132, 54);
       const rw = Math.min(156, W * 0.44);
-      put('router', W * 0.27, 282, rw, 58);
-      put('routerB', W * 0.73, 282, rw, 58);
-      put('laptop', W * 0.27, 372, rw, 44);
-      put('bob', W * 0.73, 372, rw, 44);
+      put('router', W * 0.27, 290, rw, 58);
+      put('routerB', W * 0.73, 290, rw, 58);
+      put('laptop', W * 0.27, 378, rw, 44);
+      put('bob', W * 0.73, 378, rw, 44);
       return;
     }
     const n = devs.length;
@@ -571,20 +569,20 @@ export class NatSim extends Sim {
     const twoHosts = hosts.includes('carol') || hosts.includes('stun');
     const hw = Math.min(150, W * 0.44);
     if (topo === 'cgnat') {
-      put('server', twoHosts ? W * 0.72 : W / 2, 108, hw, 42);
-      put('carol', W * 0.28, 108, hw, 42);
-      put('cloud', W / 2, 172, 128, 48);
-      put('cgnat', W / 2, 238, cw, 52);
-      put('router', W / 2, 304, cw, 52);
-      devs.forEach((id, i) => put(id, W / 2 + (i - (n - 1) / 2) * stepX, 392, dw, 44));
+      put('server', twoHosts ? W * 0.72 : W / 2, 130, hw, 42);
+      put('carol', W * 0.28, 130, hw, 42);
+      put('cloud', W / 2, 190, 128, 46);
+      put('cgnat', W / 2, 250, cw, 52);
+      put('router', W / 2, 312, cw, 52);
+      devs.forEach((id, i) => put(id, W / 2 + (i - (n - 1) / 2) * stepX, 396, dw, 44));
       return;
     }
-    put('server', twoHosts ? W * 0.72 : W / 2, 124, hw, 44);
-    put('carol', W * 0.28, 124, hw, 44);
-    put('stun', W * 0.28, 124, hw, 44);
-    put('cloud', W / 2, 198, 136, 56);
-    put('router', W / 2, 276, cw, 56);
-    devs.forEach((id, i) => put(id, W / 2 + (i - (n - 1) / 2) * stepX, 378, dw, 46));
+    put('server', twoHosts ? W * 0.72 : W / 2, 134, hw, 44);
+    put('carol', W * 0.28, 134, hw, 44);
+    put('stun', W * 0.28, 134, hw, 44);
+    put('cloud', W / 2, 206, 136, 56);
+    put('router', W / 2, 282, cw, 56);
+    devs.forEach((id, i) => put(id, W / 2 + (i - (n - 1) / 2) * stepX, 384, dw, 46));
   }
 
   /* ---------------- ports, the LAN bus and packet paths ---------------- */
@@ -1027,14 +1025,15 @@ export class NatSim extends Sim {
     const expired = this.expired.has(`${at}:${p.proto}:${p.dst.port}`);
     if (expired) this.stats.expiredDrops++;
     if (p.app === 'carol') this.stats.inDrop++;
-    if (p.app === 'carol') this.carolStatus(p, at === 'cgnat' ? 'dropped by the ISP' : 'dropped · timed out', 'bad');
+    if (p.app === 'carol') this.carolStatus(p, at === 'cgnat' ? 'dropped at ISP' : 'dropped', 'bad');
     if (p.app === 'stream' && this.stream) {
       this.stream.stalled = true;
       this.stream.stallVt = this.vt;
       this.stream.seenAs = null;
     }
-    const why = expired ? 'mapping expired · dropped' : p.app === 'p2p' ? 'no hole yet · dropped' : `no mapping for :${p.dst.port} · dropped`;
+    const why = expired ? 'mapping expired · dropped' : p.app === 'p2p' ? 'no row for Alice yet · dropped' : `no mapping for :${p.dst.port} · dropped`;
     this.dropAt(p, at, why);
+    if (p.app === 'p2p') this.p2pAdvance('bounced');
   }
 
   /* ---------------- NAT ---------------- */
@@ -1211,11 +1210,12 @@ export class NatSim extends Sim {
       if (at === 'laptop') this.p2p.alice = { ...p.mapped };
       if (at === 'bob') this.p2p.bob = { ...p.mapped };
       this.note(at, `I'm ${ep(p.mapped)}`, SIG.hc, 2.2);
+      this.p2pAdvance('stun');
     }
     if (p.app === 'p2p') {
       this.stats.punched = true;
-      this.peerLog.unshift({ text: `${at === 'bob' ? 'Bob' : 'Alice'} got a packet from ${ep(p.src)}`, tone: 'ok', vt: this.vt });
-      this.peerLog = this.peerLog.slice(0, 4);
+      this.note(at, 'got it ✓', SIG.res, 1.2);
+      this.p2pAdvance('through');
     }
     this.rev++;
   }
@@ -1254,9 +1254,9 @@ export class NatSim extends Sim {
       this.serverLog.unshift({ text: `${ep(p.src)}`, tone: 'ok', vt: this.vt });
       this.serverLog = this.serverLog.slice(0, 4);
     }
-    if (p.app === 'stream' && this.stream) {
+    if (p.app === 'stream' && this.stream && this.active.has(this.stream.dev)) {
       this.stream.seenAs = { ...p.src };
-      this.stream.nextPush = this.t + 4;
+      this.stream.nextPush = this.t + 8;
     }
     this.rev++;
     if (p.app === 'probe') return;
@@ -1771,7 +1771,7 @@ export class NatSim extends Sim {
           );
         }
       };
-      res.head = 'TCP · web server → your router';
+      res.head = `reply for :${row.outside.port}`;
       this.emit(res, 'server');
       return;
     }
@@ -1842,57 +1842,81 @@ export class NatSim extends Sim {
       if (inspect) this.inspectId = p.id;
       this.emit(p, dev);
     };
+    this.p2pStage = 0;
     this.p2p.phase = 'Step 1 · ask STUN: "what address do you see?"';
     this.after(0.6, () => stunReq('laptop', true));
-    this.after(2.0, () => stunReq('bob', false));
-    this.after(7.6, () => {
-      this.p2p.phase = 'Step 2 · swap addresses through the app server';
-      this.rev++;
-      // Each side sends its public address to the other through the app's server (the signaling channel).
-      const env = (from: 'laptop' | 'bob', text: string) => {
-        const gw = from === 'laptop' ? 'router' : 'routerB';
-        const to = from === 'laptop' ? 'bob' : 'laptop';
-        const gw2 = to === 'laptop' ? 'router' : 'routerB';
-        const p = this.mk({ proto: 'tcp', head: text, src: { ip: '' }, dst: { ip: '' }, color: SIG.hc, app: 'lan', label: text });
-        const legs: [string, string, number][] = [
-          [from, gw, 0.55],
-          [gw, 'server', 0.95],
-          ['server', gw2, 0.95],
-          [gw2, to, 0.55],
-        ];
-        const run = (i: number) => {
-          if (i >= legs.length) {
-            this.note(to, 'got the address', SIG.hc, 1.4);
-            return;
-          }
-          const [a, b, d] = legs[i];
-          this.hop(p, a, b, d, () => run(i + 1));
-        };
-        run(0);
-      };
-      env('laptop', '203.0.113.7:40001');
-      this.after(0.7, () => env('bob', '198.51.100.77:62000'));
-    });
-    this.after(11.6, () => {
+    this.after(1.4, () => stunReq('bob', false));
+  }
+
+  /** Hole punching moves on when each phase has actually finished. */
+  private p2pStage = 0;
+
+  private p2pAdvance(event: 'stun' | 'signal' | 'bounced' | 'through') {
+    if (this.cfg.scenario !== 'p2p') return;
+    if (event === 'stun' && this.p2pStage === 0 && this.p2p.alice && this.p2p.bob) {
+      this.p2pStage = 1;
+      this.after(0.9, () => this.p2pSignal());
+    } else if (event === 'signal' && this.p2pStage === 1) {
+      this.p2pStage = 2;
+    } else if (event === 'signal' && this.p2pStage === 2) {
+      this.p2pStage = 3;
       this.p2p.exchanged = true;
-      this.p2p.phase = 'Step 3 · both send at once: hole punching';
-      this.rev++;
-      this.peerSend('laptop', true);
-    });
-    this.after(12.3, () => this.peerSend('bob', false));
-    this.after(15.4, () => {
-      this.p2p.phase = 'Connected: packets flow directly, peer to peer';
-      this.rev++;
-      const loop = (who: 'laptop' | 'bob') => {
-        this.peerSend(who, false);
-        this.after(1.7, () => loop(who === 'laptop' ? 'bob' : 'laptop'));
+      this.after(0.8, () => {
+        this.p2p.phase = "Step 3 · Alice sends first: her NAT adds a row for Bob";
+        this.rev++;
+        this.peerSend('laptop', true);
+      });
+    } else if (event === 'bounced' && this.p2pStage === 3) {
+      this.p2pStage = 4;
+      this.p2p.phase = "Bob's NAT had no row yet, so it dropped that one. Now Bob sends…";
+      this.after(1.2, () => this.peerSend('bob', true));
+    } else if (event === 'through' && this.p2pStage === 4) {
+      this.p2pStage = 5;
+      this.p2p.phase = "Alice's row let Bob in. Both NATs have rows now: connected";
+      this.after(1.0, () => {
+        const loop = (who: 'laptop' | 'bob') => {
+          this.peerSend(who, false);
+          this.after(1.7, () => loop(who === 'laptop' ? 'bob' : 'laptop'));
+        };
+        loop('laptop');
+      });
+    }
+    this.rev++;
+  }
+
+  /** Each side sends its public address to the other through the app's server (the signaling channel). */
+  private p2pSignal() {
+    this.p2p.phase = 'Step 2 · swap addresses through the app server';
+    this.rev++;
+    const env = (from: 'laptop' | 'bob', text: string) => {
+      const gw = from === 'laptop' ? 'router' : 'routerB';
+      const to = from === 'laptop' ? 'bob' : 'laptop';
+      const gw2 = to === 'laptop' ? 'router' : 'routerB';
+      const p = this.mk({ proto: 'tcp', head: text, src: { ip: '' }, dst: { ip: '' }, color: SIG.hc, app: 'lan', label: text });
+      const legs: [string, string, number][] = [
+        [from, gw, 0.55],
+        [gw, 'server', 0.95],
+        ['server', gw2, 0.95],
+        [gw2, to, 0.55],
+      ];
+      const run = (i: number) => {
+        if (i >= legs.length) {
+          this.note(to, 'got the address', SIG.hc, 1.4);
+          this.p2pAdvance('signal');
+          return;
+        }
+        const [a, b, d] = legs[i];
+        this.hop(p, a, b, d, () => run(i + 1));
       };
-      loop('laptop');
-    });
+      run(0);
+    };
+    env('laptop', ep(this.p2p.alice));
+    this.after(0.7, () => env('bob', ep(this.p2p.bob)));
   }
 
   private peerSend(dev: 'laptop' | 'bob', inspect: boolean) {
-    const dst = dev === 'laptop' ? { ip: '198.51.100.77', port: 62000 } : { ip: PUBLIC_IP, port: 40001 };
+    const peer = dev === 'laptop' ? this.p2p.bob : this.p2p.alice;
+    const dst = peer ? { ...peer } : dev === 'laptop' ? { ip: '198.51.100.77', port: 62000 } : { ip: PUBLIC_IP, port: 40001 };
     const p = this.mk({
       proto: 'udp',
       head: dev === 'laptop' ? 'Alice → Bob' : 'Bob → Alice',
@@ -1933,10 +1957,20 @@ export class NatSim extends Sim {
 
   /* Playground knobs */
   setActive(dev: string, on: boolean) {
+    const st = this.stream && this.stream.dev === dev ? this.stream : null;
     if (on) {
       this.active.add(dev);
       this.nextOpen.set(dev, this.t + 0.3);
-    } else this.active.delete(dev);
+      // Back on: start watching again.
+      if (st && !st.seenAs) this.after(0.4, () => this.openConn(dev, { app: 'stream', port: this.nextPort(dev), label: true }));
+    } else {
+      this.active.delete(dev);
+      // Switched off: the stream ends, so its server stops pushing.
+      if (st) {
+        st.seenAs = null;
+        st.stalled = false;
+      }
+    }
     this.rev++;
   }
 

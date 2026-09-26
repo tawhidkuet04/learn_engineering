@@ -363,9 +363,14 @@ export function NatReadout({
   const n = sim.nats.get(id);
   if (!n) return null;
   const rows = n.rows;
-  const shown = rows.slice(-max);
-  const hidden = rows.length - shown.length;
   const lk = n.lookup && sim.vt - n.lookup.vt < 2.4 ? n.lookup : null;
+  // On phones a failed lookup takes a line, so show one row fewer to keep the strip's height.
+  const cap = compact && lk && !lk.ok ? Math.max(1, max - 1) : max;
+  // Keep the static forward visible, then the newest rows.
+  const statics = rows.filter((m) => m.static);
+  const dynamic = rows.filter((m) => !m.static);
+  const shown = [...statics, ...dynamic.slice(-Math.max(0, cap - statics.length))].slice(0, cap);
+  const hidden = rows.length - shown.length;
   const head = title ?? (id === 'cgnat' ? `ISP CGNAT · ${n.pub}` : id === 'routerB' ? `Bob's NAT · ${n.pub}` : `NAT table · public ${n.pub}`);
   const fresh = rows.some((m) => sim.vt - m.bornVt < 1) || !!(lk && sim.vt - lk.vt < 0.8);
   if (!n.on) {
@@ -377,7 +382,7 @@ export function NatReadout({
   }
   if (compact) {
     return (
-      <Ro head={head} fresh={fresh}>
+      <Ro head={hidden > 0 ? `${head} · ${rows.length} rows` : head} fresh={fresh}>
         <div className={css.natCompact}>
           {shown.length === 0 && <div className={css.dim}>empty</div>}
           {shown.map((m) => (
@@ -389,7 +394,6 @@ export function NatReadout({
               <span>{m.static ? 'port forward' : `${m.proto} ${ep(m.remote)}`}</span>
             </div>
           ))}
-          {hidden > 0 && <div className={css.dim}>+{hidden} more</div>}
         </div>
         {lk && !lk.ok && <div className={cx(css.lookup, css.bad)}>:{lk.port} from {lk.from.ip} → no row → drop</div>}
       </Ro>
@@ -408,7 +412,7 @@ export function NatReadout({
           {!short && <span>remote</span>}
           <span>idle</span>
         </div>
-        {shown.length === 0 && <div className={css.dim}>empty: nothing has gone out yet</div>}
+        {shown.length === 0 && <div className={css.dim}>{sim.stats.conns > 0 ? 'empty: no live connections' : 'empty: nothing has gone out yet'}</div>}
         {shown.map((m) => {
           const left = m.static ? 1 : clamp(1 - (sim.t - m.last) / timeout, 0, 1);
           return (
@@ -418,8 +422,8 @@ export function NatReadout({
               <span className={m.static ? css.natStatic : undefined}>:{m.outside.port}</span>
               {!short && <span className={m.static ? css.natStatic : undefined}>{m.static ? 'any (forward)' : ep(m.remote)}</span>}
               {m.static ? (
-                <span className={css.natStatic} style={{ fontSize: 9 }}>
-                  static
+                <span className={css.natStatic} title="static: never expires">
+                  ∞
                 </span>
               ) : (
                 <span className={css.idle}>
@@ -433,7 +437,15 @@ export function NatReadout({
       </div>
       {lk && (
         <div className={cx(css.lookup, lk.ok ? css.good : css.bad)}>
-          in: {lk.proto} :{lk.port} from {ep(lk.from)} → {lk.ok ? 'row found ✓' : 'no row → drop'}
+          {short ? (
+            <>
+              in :{lk.port} from {lk.from.ip} → {lk.ok ? 'found ✓' : 'no row, drop'}
+            </>
+          ) : (
+            <>
+              in: {lk.proto} :{lk.port} from {ep(lk.from)} → {lk.ok ? 'row found ✓' : 'no row → drop'}
+            </>
+          )}
         </div>
       )}
     </Ro>
@@ -525,7 +537,7 @@ function renderReadout(k: ReadoutKey, sim: NatSim, compact: boolean) {
           key={k}
           sim={sim}
           compact={compact}
-          max={compact ? 3 : 6}
+          max={compact ? 3 : 5}
           cols={sim.cfg.topo === 'cgnat' ? 'short' : 'full'}
           title={sim.cfg.topo === 'cgnat' ? `home router · WAN ${sim.nats.get('router')?.pub}` : sim.cfg.topo === 'two' ? `Alice's NAT · ${sim.nats.get('router')?.pub}` : undefined}
         />
@@ -584,12 +596,12 @@ function placeFor(k: ReadoutKey, sim: NatSim): CSSProperties | null {
     const r = b('router');
     if (!r) return null;
     const top = lowest() + 50;
-    if (sim.cfg.topo === 'two') return { left: 16, top, width: 420 };
+    if (sim.cfg.topo === 'two') return { left: 16, top, width: 438 };
     if (sim.cfg.topo === 'cgnat') return { left: clamp(r.x - 170, 16, W), top, width: 300 };
     const width = k === 'rt' ? 340 : 430;
     return { left: clamp(r.x - r.w / 2 - 20, 16, W - width - 16), top, width };
   }
-  if (k === 'natB') return { right: 16, top: lowest() + 50, width: 420 };
+  if (k === 'natB') return { right: 16, top: lowest() + 50, width: 438 };
   if (k === 'cgnat') {
     const r = b('router');
     if (!r) return null;

@@ -174,13 +174,6 @@ interface Mission {
 
 const MISSIONS: Mission[] = [
   {
-    id: 'full',
-    title: 'Full house',
-    text: 'Get 6 live mappings into the NAT table at once.',
-    hint: 'Hint: every device online, and a timeout long enough to remember them.',
-    check: (s) => s.liveMappings() >= 6,
-  },
-  {
     id: 'door',
     title: 'Open door',
     text: "Let Carol reach the laptop's web server on :8080.",
@@ -197,9 +190,9 @@ const MISSIONS: Mission[] = [
   {
     id: 'quiet',
     title: 'Lights out',
-    text: 'Empty the NAT table completely.',
-    hint: 'Hint: rows only disappear once nothing uses them.',
-    check: (s) => s.rowsOf('router').filter((m) => m.goneVt == null).length === 0 && s.t > 3,
+    text: 'Empty the NAT table completely, port forward included.',
+    hint: 'Hint: rows only disappear once nothing uses them. A shorter timeout speeds it up.',
+    check: (s) => s.rowsOf('router').filter((m) => m.goneVt == null).length === 0 && s.stats.conns > 0,
   },
 ];
 
