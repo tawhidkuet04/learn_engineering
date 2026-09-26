@@ -415,13 +415,14 @@ export class CacheSim extends Sim {
     const { w, h } = this;
     const land = this.orient === 'landscape';
     if (land) {
-      const cy = clamp(h * 0.47, 250, h - 290);
+      // Leave room for the HUD above and the callout + title block below.
+      const rh = clamp(h - 330, 320, 440);
+      const cy = clamp(h * 0.47, 96 + rh / 2, h - 150 - rh / 2);
       const coreW = clamp(w * 0.25, 200, 250);
       const cx = 36 + coreW / 2;
       this.place('core', cx, cy, coreW, 180);
       if (this.boxes.has('cache')) this.place('cache', cx + coreW / 2 + 40 + 78, cy, 156, 180);
       const rw = clamp(w * 0.4, 330, 410);
-      const rh = clamp(h * 0.56, 360, 440);
       const rx = w - 36 - rw / 2;
       this.place('ram', rx, cy, rw, rh);
       const nw = Math.min(124, rw * 0.32);
@@ -452,8 +453,9 @@ export class CacheSim extends Sim {
     const { w, h } = this;
     const land = this.orient === 'landscape';
     const human = this.cfg.human;
-    // Phones get a taller chain when there's no table to fit underneath.
-    const s = mini ? 0.7 : human ? 1 : land ? 1.2 : 1.4;
+    // Phones get a taller chain when there's no table to fit underneath; with
+    // the human-time table, short landscape stages shrink the chain to fit it.
+    const s = mini ? 0.7 : human ? (land ? clamp((h - 470) / 210, 0.72, 1) : 1) : land ? 1.2 : 1.4;
     const small = !land;
     const coreW = (small ? 72 : 128) * (mini ? 0.72 : 1);
     const coreH = (small ? 84 : 150) * s;
@@ -465,7 +467,9 @@ export class CacheSim extends Sim {
       l3: { w: small ? 13 : 20, h: (small ? 86 : 160) * s },
     };
     const margin = small ? 16 : 44;
-    const cy = mini ? (small ? 112 : 168) : small ? (human ? 176 : 210) : human ? clamp(h * 0.31, 200, 260) : h * 0.4;
+    // Landscape: the dimension line sits ~35px above the tallest box and must clear the HUD.
+    const minCy = 118 + ramH / 2;
+    const cy = mini ? (small ? 112 : 168) : small ? (human ? 176 : 210) : human ? minCy : Math.max(h * 0.4, minCy);
     const coreX = margin + coreW / 2;
     const ramLeft = w - margin - ramW;
     const x0 = coreX + coreW / 2;
@@ -600,14 +604,30 @@ export class CacheSim extends Sim {
   private layoutCores() {
     const { w, h } = this;
     if (this.orient === 'landscape') {
-      const top = clamp(h * 0.2, 140, 170);
+      // Stack core → L1 → L3 → RAM between the HUD/readout and the legend,
+      // shrinking the gaps (not the boxes) on short stages.
+      const box = { core: 62, l1: 112, l3: 92, ram: 50 };
+      const gap = [55, 62, 57];
+      const top = this.cfg.cores === 'coherence' ? 150 : 96;
+      const avail = h - 80 - top;
+      const fixed = box.core + box.l1 + box.l3 + box.ram;
+      const k = clamp((avail - fixed) / (gap[0] + gap[1] + gap[2]), 0.5, 1);
+      const used = fixed + k * (gap[0] + gap[1] + gap[2]);
+      let y = top + Math.max(0, (avail - used) / 2);
       const cw = Math.min(270, w * 0.3);
-      this.place('core', w * 0.28, top, Math.min(220, cw), 62);
-      this.place('core:1', w * 0.72, top, Math.min(220, cw), 62);
-      this.place('l1', w * 0.28, top + 142, cw, 112);
-      this.place('l1:1', w * 0.72, top + 142, cw, 112);
-      this.place('l3', w / 2, top + 306, Math.min(440, w * 0.46), 92);
-      this.place('ram', w / 2, top + 434, 240, 50);
+      const yCore = y + box.core / 2;
+      y += box.core + gap[0] * k;
+      const yL1 = y + box.l1 / 2;
+      y += box.l1 + gap[1] * k;
+      const yL3 = y + box.l3 / 2;
+      y += box.l3 + gap[2] * k;
+      const yRam = y + box.ram / 2;
+      this.place('core', w * 0.28, yCore, Math.min(220, cw), box.core);
+      this.place('core:1', w * 0.72, yCore, Math.min(220, cw), box.core);
+      this.place('l1', w * 0.28, yL1, cw, box.l1);
+      this.place('l1:1', w * 0.72, yL1, cw, box.l1);
+      this.place('l3', w / 2, yL3, Math.min(440, w * 0.46), box.l3);
+      this.place('ram', w / 2, yRam, 240, box.ram);
     } else {
       const lw = (w - 44) / 2;
       this.place('core', 16 + lw / 2, 104, lw, 48);

@@ -466,7 +466,7 @@ function SideReadouts({ sim, keys }: { sim: CacheSim; keys: ReadoutKey[] }) {
     const ram = sim.boxes.get('ram');
     if (!ram) return null;
     // Under the fan-out labels, clear of the title block in the corner
-    const top = ram.y + ram.h / 2 + 88;
+    const top = ram.y + ram.h / 2 + 80;
     return (
       <div className={css.anchored} style={{ left: Math.min(sim.w / 2, sim.w - 290 - 180), top, width: 350 }}>
         {keys.map((k) => renderReadout(k, sim, false))}
