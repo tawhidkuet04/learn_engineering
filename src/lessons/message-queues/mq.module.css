@@ -1,0 +1,185 @@
+/* ---------- stage text ---------- */
+.chipText {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.tiny {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--text-3);
+}
+
+.offset {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  fill: var(--text-3);
+}
+
+.flightLabel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- readout rows (inside the kit's Readout) ---------- */
+.wf {
+  display: grid;
+  grid-template-columns: auto minmax(24px, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 3px;
+}
+
+.wfLabel {
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.wfBar {
+  height: 6px;
+  border-radius: 2px;
+  background: rgba(143, 166, 201, 0.1);
+  overflow: hidden;
+}
+
+.wfBar i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: #45d5ff;
+  opacity: 0.85;
+}
+
+.wfBar i[data-state='ok'] {
+  background: #4be3a0;
+}
+
+.wfBar i[data-state='fail'] {
+  background: #ff4d6a;
+}
+
+.wfVal {
+  color: var(--text-1);
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.wfVal[data-state='fail'] {
+  color: #ff9aab;
+}
+
+.wfVal[data-state='wait'] {
+  color: var(--text-3);
+}
+
+.foot {
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px dashed rgba(143, 166, 201, 0.2);
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wrap {
+  white-space: normal;
+}
+
+.foot b {
+  font-weight: 500;
+  color: #ffd23f;
+}
+
+.foot b[data-tone='good'] {
+  color: #4be3a0;
+}
+
+.foot b[data-tone='bad'] {
+  color: #ff4d6a;
+}
+
+.table {
+  display: grid;
+  grid-template-columns: auto auto auto 1fr;
+  column-gap: 10px;
+  row-gap: 2px;
+  align-items: baseline;
+}
+
+.table > span {
+  white-space: nowrap;
+}
+
+.cDim {
+  color: var(--text-3);
+}
+
+.cOk {
+  color: #4be3a0;
+}
+
+.cBad {
+  color: #ff6b84;
+}
+
+.cHc {
+  color: #cdbdff;
+}
+
+.cWarn {
+  color: #ffc56b;
+}
+
+.rowNew {
+  animation: rowIn 500ms ease-out;
+}
+
+@keyframes rowIn {
+  from {
+    background: rgba(255, 210, 63, 0.18);
+  }
+}
+
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* ---------- panel pieces ---------- */
+.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-block;
+  min-width: 22px;
+  padding: 0 5px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  vertical-align: 1px;
+}
+
+.chipGhost {
+  border-style: dashed;
+  opacity: 0.85;
+}
