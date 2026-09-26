@@ -1,0 +1,106 @@
+/* =========================================================
+   Living Blueprint: design tokens
+   ========================================================= */
+:root {
+  /* ink: night-blueprint backgrounds */
+  --ink-0: #04070d;
+  --ink-1: #070c17;
+  --ink-2: #0c1322;
+  --ink-3: #121b30;
+  --node-fill: #0b1324;
+
+  /* linework */
+  --line-rgb: 143, 166, 201;
+  --rule: rgba(143, 166, 201, 0.12);
+  --rule-strong: rgba(143, 166, 201, 0.22);
+
+  /* text */
+  --text-1: #e8eef9;
+  --text-2: #a9b6cc;
+  --text-3: #6f7d97;
+
+  /* markup accent: highlighter yellow */
+  --accent: #ffd23f;
+  --accent-ink: #1b1500;
+
+  /* traffic signals */
+  --sig-req: #45d5ff;
+  --sig-res: #4be3a0;
+  --sig-heavy: #ff9a3c;
+  --sig-err: #ff4d6a;
+  --sig-hc: #b59bff;
+
+  --font-display: var(--font-newsreader), 'Iowan Old Style', Georgia, serif;
+  --font-sans: var(--font-plex-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--ink-0);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--ink-0);
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(255, 210, 63, 0.3);
+  color: #fff;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Words in narration that light up the stage */
+.term {
+  color: var(--text-1);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(255, 210, 63, 0.7);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+  cursor: help;
+  border-radius: 3px;
+  transition: background 150ms;
+}
+
+.term:hover,
+.term:focus-visible {
+  background: rgba(255, 210, 63, 0.13);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,394 @@
+/* ---------- algorithm "brain" under the load balancer ---------- */
+.brain {
+  position: absolute;
+  width: 252px;
+  padding: 9px 11px 10px;
+  border-radius: 10px;
+  background: rgba(10, 15, 28, 0.9);
+  border: 1px solid rgba(181, 155, 255, 0.32);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-2);
+  pointer-events: none !important;
+  transition: border-color 300ms;
+}
+
+.brainBelow {
+  transform: translateX(-50%);
+}
+
+.brainStrip {
+  left: 10px;
+  right: 10px;
+  bottom: 56px;
+  width: auto;
+  padding: 7px 10px 8px;
+  font-size: 10.5px;
+}
+
+.brainStrip .brainHead {
+  margin-bottom: 5px;
+}
+
+.brainStrip .rows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 14px;
+}
+
+.brainStrip .row {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.brainStrip .chipsSpaced {
+  margin-bottom: 11px;
+}
+
+.brainStrip .result {
+  margin-top: 5px;
+  padding-top: 4px;
+}
+
+.row {
+  display: contents;
+}
+
+.brainFlash {
+  border-color: rgba(181, 155, 255, 0.85);
+}
+
+.brainHead {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #cdbdff;
+  margin-bottom: 7px;
+}
+
+.brainHead::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  transform: rotate(45deg);
+  background: #b59bff;
+  flex: none;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.chip {
+  position: relative;
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid rgba(var(--line-rgb), 0.25);
+  color: var(--text-2);
+  font-size: 10.5px;
+}
+
+.chipNext {
+  border-color: #b59bff;
+  color: var(--text-1);
+  background: rgba(181, 155, 255, 0.14);
+}
+
+.chipLast {
+  border-color: rgba(var(--line-rgb), 0.45);
+  color: var(--text-1);
+}
+
+.chipLast::after {
+  content: 'last';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-top: 1px;
+}
+
+.chipNext::after {
+  content: 'next';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #cdbdff;
+  margin-top: 1px;
+}
+
+.chipsSpaced {
+  margin-bottom: 12px;
+}
+
+.rows {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 3px;
+}
+
+.rowLabel {
+  color: var(--text-2);
+}
+
+.rowMin {
+  color: var(--text-1);
+}
+
+.bar {
+  display: flex;
+  gap: 2px;
+  height: 7px;
+}
+
+.bar i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 1.5px;
+  background: rgba(181, 155, 255, 0.55);
+}
+
+.rowMin .bar i,
+.bar.min i {
+  background: #4be3a0;
+}
+
+.num {
+  color: var(--text-1);
+  text-align: right;
+  min-width: 1ch;
+}
+
+.result {
+  margin-top: 7px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(var(--line-rgb), 0.2);
+  color: var(--text-1);
+}
+
+.result b {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.dim {
+  color: var(--text-3);
+}
+
+.formula {
+  color: var(--text-1);
+}
+
+.formula em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+/* ---------- guided request card ---------- */
+.tour {
+  position: absolute;
+  width: 262px;
+  transform: translate(-50%, calc(-100% - 22px));
+  border-radius: 10px;
+  background: rgba(8, 12, 22, 0.95);
+  border: 1px solid rgba(69, 213, 255, 0.55);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 4px rgba(69, 213, 255, 0.06);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--text-2);
+  pointer-events: none !important;
+  animation: tourIn 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tourRes {
+  border-color: rgba(75, 227, 160, 0.6);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 4px rgba(75, 227, 160, 0.06);
+}
+
+.tour::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -22px;
+  width: 1px;
+  height: 22px;
+  background: linear-gradient(rgba(69, 213, 255, 0.6), rgba(69, 213, 255, 0));
+}
+
+.tourBelow {
+  transform: translate(-50%, 22px);
+}
+
+.tourBelow::after {
+  bottom: auto;
+  top: -22px;
+  background: linear-gradient(rgba(69, 213, 255, 0), rgba(69, 213, 255, 0.6));
+}
+
+@keyframes tourIn {
+  from {
+    opacity: 0;
+    margin-top: 6px;
+  }
+}
+
+.tourHead {
+  padding: 7px 11px 6px;
+  border-bottom: 1px solid rgba(var(--line-rgb), 0.16);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8fe9ff;
+}
+
+.tourRes .tourHead {
+  color: #8ff3c6;
+}
+
+.tourBody {
+  padding: 7px 11px 9px;
+}
+
+.tourLine {
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 4px;
+  margin: 0 -4px;
+  border-radius: 3px;
+}
+
+.tourLine b {
+  color: var(--text-1);
+  font-weight: 500;
+}
+
+.lineAdd {
+  background: rgba(75, 227, 160, 0.14);
+  color: #b6f7da;
+}
+
+.lineChange {
+  background: rgba(255, 210, 63, 0.13);
+  color: #ffe9a6;
+}
+
+.tourRule {
+  height: 1px;
+  margin: 6px 0;
+  background: rgba(var(--line-rgb), 0.16);
+}
+
+.tourNote {
+  margin-top: 5px;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+
+.progress {
+  height: 3px;
+  border-radius: 2px;
+  margin-top: 8px;
+  background: rgba(var(--line-rgb), 0.15);
+  overflow: hidden;
+}
+
+.progress i {
+  display: block;
+  height: 100%;
+  background: #45d5ff;
+}
+
+/* ---------- markup callouts ---------- */
+.callout {
+  position: absolute;
+  width: max-content;
+  max-width: 214px;
+  padding: 7px 10px 8px;
+  border-radius: 8px;
+  background: rgba(20, 17, 4, 0.92);
+  border: 1px solid rgba(255, 210, 63, 0.7);
+  color: #fff3c4;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.4;
+  pointer-events: none !important;
+  animation: calloutIn 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+}
+
+.callout b {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@keyframes calloutIn {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+
+.leader {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.3;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 380ms ease-out forwards;
+}
+
+.leaderDot {
+  fill: var(--accent);
+  animation: dotIn 300ms ease-out both;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes dotIn {
+  from {
+    opacity: 0;
+    r: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leader {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .callout,
+  .tour {
+    animation: none;
+  }
+}
