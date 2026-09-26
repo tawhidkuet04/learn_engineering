@@ -357,6 +357,7 @@ export function Playground({ sim }: { sim: WsSim }) {
 
       <div className={css.pgGroup}>
         <div className={css.pgLabel}>Scale out (WebSocket)</div>
+        <div className={css.segRow}>
         <div className={css.seg} role="group" aria-label="Servers">
           <button type="button" aria-pressed={c.servers === 1} disabled={!ws} onClick={() => sim.setServers(1)}>
             1 server
@@ -365,13 +366,14 @@ export function Playground({ sim }: { sim: WsSim }) {
             2 servers
           </button>
         </div>
-        <div className={css.seg} role="group" aria-label="Redis pub/sub" style={{ marginLeft: 8 }}>
+        <div className={css.seg} role="group" aria-label="Redis pub/sub">
           <button type="button" aria-pressed={c.backplane} disabled={!ws || c.servers !== 2} onClick={() => sim.setBackplane(true)}>
             Redis on
           </button>
           <button type="button" aria-pressed={!c.backplane} disabled={!ws || c.servers !== 2} onClick={() => sim.setBackplane(false)}>
             Redis off
           </button>
+        </div>
         </div>
         <p className={css.hint}>With two servers, Alice connects to ws-1 and Bob to ws-2.</p>
       </div>

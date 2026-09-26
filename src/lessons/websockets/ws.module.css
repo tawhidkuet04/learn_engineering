@@ -604,6 +604,12 @@
   font-weight: 600;
 }
 
+.segRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+}
+
 .seg button:disabled {
   opacity: 0.35;
   cursor: not-allowed;

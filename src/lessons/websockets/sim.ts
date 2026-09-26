@@ -1142,7 +1142,7 @@ export class WsSim extends Sim {
           tag: this.tagFor(q.id, 'sse200'),
           done: () => {
             q.sse = 'open';
-            this.fx({ kind: 'ring', at: { id: q.id }, color: PIPE, size: 1.1 });
+            this.pulse(q.id);
             for (const m of this.pendingFor(q.id)) this.ssePush(q, m);
             this.rev++;
           },
@@ -1292,7 +1292,7 @@ export class WsSim extends Sim {
     p.lastHeard = this.t;
     p.openVt = this.vt;
     if (hadTries && p.tries.length) p.tries[p.tries.length - 1].ok = true;
-    this.fx({ kind: 'ring', at: { id: p.id }, color: PIPE, size: 1.1 });
+    this.pulse(p.id);
     this.ver++;
     // Catch up on anything missed while away, then send what was queued.
     const missed = this.missingFor(p.id).filter((m) => !m.sent.has(p.id));
@@ -1803,20 +1803,37 @@ export class WsSim extends Sim {
     return m ? this.t - m.tSent : null;
   }
 
-  statusOf(pid: PersonId): { text: string; color: string } | null {
+  /** The status line in a chat window's header, with a short form for narrow windows. */
+  statusOf(pid: PersonId): { text: string; short: string; color: string } | null {
     const p = this.ppl.get(pid)!;
     const c = this.cfg;
     if (c.mode === 'ws') {
-      if (p.conn === 'open') return { text: 'connected', color: SIG.res };
-      if (p.conn === 'connecting') return { text: 'connecting…', color: SIG.warn };
-      if (p.conn === 'waiting') return { text: p.retryAt != null ? `retry in ${Math.max(0, p.retryAt - this.t).toFixed(1)} s` : 'waiting', color: SIG.warn };
-      return { text: 'offline', color: EMPTY };
+      if (p.conn === 'open') return { text: 'connected', short: 'connected', color: SIG.res };
+      if (p.conn === 'connecting') return { text: 'connecting…', short: 'connecting', color: SIG.warn };
+      if (p.conn === 'waiting') {
+        const left = p.retryAt != null ? Math.max(0, p.retryAt - this.t).toFixed(1) : null;
+        return { text: left ? `retry in ${left} s` : 'waiting', short: left ? `retry ${left}s` : 'waiting', color: SIG.warn };
+      }
+      return { text: 'offline', short: 'offline', color: EMPTY };
     }
     if (!c.receivers.includes(pid)) return null;
-    if (c.mode === 'sse') return p.sse === 'open' ? { text: 'stream open', color: SIG.res } : p.sse === 'opening' ? { text: 'connecting…', color: SIG.warn } : { text: 'no stream', color: EMPTY };
-    if (c.mode === 'short') return { text: `polls every ${c.interval} s`, color: SIG.req };
-    if (c.mode === 'long') return p.lp === 'held' ? { text: 'request waiting', color: SIG.req } : { text: 'asking…', color: SIG.req };
-    return { text: 'no request open', color: EMPTY };
+    if (c.mode === 'sse') {
+      if (p.sse === 'open') return { text: 'stream open', short: 'streaming', color: SIG.res };
+      if (p.sse === 'opening') return { text: 'connecting…', short: 'connecting', color: SIG.warn };
+      return { text: 'no stream', short: 'no stream', color: EMPTY };
+    }
+    if (c.mode === 'short') return { text: `polls every ${c.interval} s`, short: `every ${c.interval}s`, color: SIG.req };
+    if (c.mode === 'long') return p.lp === 'held' ? { text: 'request waiting', short: 'waiting', color: SIG.req } : { text: 'asking…', short: 'asking', color: SIG.req };
+    return { text: 'no request open', short: 'no request', color: EMPTY };
+  }
+
+  /** A pulse around a person's avatar (their connection just opened). */
+  private pulse(pid: PersonId) {
+    const b = this.boxes.get(pid);
+    if (!b) return;
+    const small = b.h < 112 || b.w < 172;
+    const hdr = small ? 24 : 30;
+    this.fx({ kind: 'ring', at: { id: pid, dx: -b.w / 2 + (small ? 14 : 17), dy: -b.h / 2 + hdr / 2 }, color: PIPE, size: 0.8 });
   }
 
   calloutRect(target: string): Rect | null {

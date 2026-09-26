@@ -103,14 +103,20 @@ function ChatWindow({ sim, pid, dim, glow }: { sim: WsSim; pid: PersonId; dim: b
         {meta.name}
       </text>
       <WifiGlyph x={b.w - 12} y={hdr / 2} ok={p.net} />
-      {st && (
-        <g>
-          <circle cx={b.w - 26 - st.text.length * (small ? 5.2 : 5.75) - 7} cy={hdr / 2} r={2.6} fill={st.color} />
-          <text className={css.status} x={b.w - 24} y={hdr / 2 + 3.3} textAnchor="end" fill={st.color} style={small ? { fontSize: 8.8 } : undefined}>
-            {st.text}
-          </text>
-        </g>
-      )}
+      {st &&
+        (() => {
+          const cw = small ? 5.2 : 5.75;
+          const avail = b.w - (ax + ar + 7 + meta.name.length * (small ? 6.8 : 7.4)) - 24 - 14;
+          const text = st.text.length * cw <= avail ? st.text : st.short;
+          return (
+            <g>
+              <circle cx={b.w - 26 - text.length * cw - 7} cy={hdr / 2} r={2.6} fill={st.color} />
+              <text className={css.status} x={b.w - 24} y={hdr / 2 + 3.3} textAnchor="end" fill={st.color} style={small ? { fontSize: 8.8 } : undefined}>
+                {text}
+              </text>
+            </g>
+          );
+        })()}
       <clipPath id={clipId}>
         <rect x={2} y={hdr + 1} width={b.w - 4} height={b.h - hdr - 3} />
       </clipPath>
@@ -790,7 +796,7 @@ function SeqScene({ sim }: { sim: WsSim }) {
     { id: 'wss', actor: 's', t0: 4.0, t1: 13.4, label: land ? 'same TCP socket' : 'WebSocket', color: PIPE },
   ];
   const notes: SeqNote[] = [
-    { id: 'n0', actor: 'c', t: 0.3, text: land ? 'new WebSocket(url)' : 'new WebSocket', color: SIG.text2 },
+    { id: 'n0', actor: 'c', t: 0.3, text: land ? 'new WebSocket(url)' : 'WebSocket()', color: SIG.text2 },
     { id: 'n1', actor: 'c', t: 4.0, text: land ? 'readyState: OPEN' : 'OPEN', color: PIPE },
     { id: 'n2', actor: 'c', t: 13.4, text: 'CLOSED', color: SIG.text2 },
   ];
