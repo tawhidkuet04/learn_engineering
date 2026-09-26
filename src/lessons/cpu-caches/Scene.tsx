@@ -11,7 +11,7 @@ import { LIST, type CacheSim, type ChartGeo, type Mesi } from './sim';
 import css from './cc.module.css';
 
 /** Identity colors for the levels (traffic keeps the signal colors). */
-export const LEVEL_COLOR: Record<LevelId, string> = { l1: SIG.res, l2: SIG.teal, l3: SIG.blue, ram: SIG.heavy };
+export const LEVEL_COLOR: Record<LevelId, string> = { l1: SIG.res, l2: SIG.lime, l3: SIG.blue, ram: SIG.heavy };
 export const MESI_COLOR: Record<Mesi, string> = { M: SIG.heavy, E: SIG.res, S: SIG.req, I: SIG.err };
 const MESI_NAME: Record<Mesi, string> = { M: 'Modified', E: 'Exclusive', S: 'Shared', I: 'Invalid' };
 
@@ -139,12 +139,12 @@ function WallScene({ sim, dim, glow }: { sim: CacheSim; dim: Pred; glow: Pred })
           {LIST.map((n, k) => {
             const has = W.cached.has(k);
             if (land) {
-              const y = 50 + k * 16.5;
+              const y = 58 + k * 19;
               return (
                 <g key={k}>
-                  <rect x={10} y={y - 11} width={cache.w - 20} height={14} rx={3} className={css.cacheSlot} data-on={has} />
-                  <text className={css.cacheText} x={16} y={y} data-on={has}>
-                    {has ? `${hex(n.addr)} · ${n.value}` : '—'}
+                  <rect x={12} y={y - 12} width={cache.w - 24} height={16} rx={3} className={css.cacheSlot} data-on={has} />
+                  <text className={css.cacheText} x={19} y={y} data-on={has}>
+                    {has ? `${hex(n.addr)}  value ${n.value}` : '—'}
                   </text>
                 </g>
               );
@@ -169,7 +169,18 @@ function WallScene({ sim, dim, glow }: { sim: CacheSim; dim: Pred; glow: Pred })
               4 GHz
             </text>
           )}
-          <Gauge x={14} y={land ? 58 : 36} w={core.w - 28} cycles={cycles} waiting={waiting} hit={W.hit} land={land} />
+          <Gauge x={14} y={land ? 62 : 38} w={core.w - 28} cycles={cycles} waiting={waiting} hit={W.hit} land={land} />
+          {land && (
+            <>
+              <line x1={14} y1={core.h - 36} x2={core.w - 14} y2={core.h - 36} className={css.coreRule} />
+              <text className={stage.mono} x={14} y={core.h - 16}>
+                running total
+              </text>
+              <text className={css.coreSum} x={core.w - 14} y={core.h - 15} textAnchor="end">
+                sum = {W.sum}
+              </text>
+            </>
+          )}
         </Card>
       )}
     </g>
@@ -201,29 +212,42 @@ function Gauge({ x, y, w, cycles, waiting, hit, land }: { x: number; y: number; 
   );
 }
 
-/** The list's next pointers: dashed arrows hopping around RAM. */
+/**
+ * The list's next pointers: dashed arrows hopping around RAM. Hops within a
+ * column bulge outward; hops across snake through the gap between columns.
+ */
 function ListArrows({ sim, alpha }: { sim: CacheSim; alpha: number }) {
+  const ram = sim.boxes.get('ram');
   const paths: ReactNode[] = [];
   for (let k = 0; k + 1 < LIST.length; k++) {
     const a = sim.boxes.get(`node:${k}`);
     const b = sim.boxes.get(`node:${k + 1}`);
-    if (!a || !b) continue;
-    const sx = a.x + a.w / 2 - 6;
-    const sy = a.y + (b.y > a.y ? a.h / 2 : -a.h / 2);
-    const ex = b.x + b.w / 2 - 10;
-    const ey = b.y + (b.y > a.y ? -b.h / 2 : b.h / 2);
-    const bend = (a.x === b.x ? 46 : 18) * (k % 2 ? -1 : 1);
-    const c1x = sx + bend;
-    const c2x = ex + bend;
-    const my = (sy + ey) / 2;
-    const ang = Math.atan2(ey - my, ex - c2x);
+    if (!a || !b || !ram) continue;
+    const aRight = a.x > ram.x;
+    const bRight = b.x > ram.x;
+    let d: string;
+    let ex: number;
+    let dir: number;
+    if (aRight === bRight) {
+      const s = aRight ? 1 : -1;
+      const sx = a.x + (s * a.w) / 2;
+      ex = b.x + (s * b.w) / 2;
+      const bulge = 14 + Math.abs(b.y - a.y) * 0.14;
+      d = `M${sx},${a.y} C${sx + s * bulge},${a.y} ${ex + s * bulge},${b.y} ${ex},${b.y}`;
+      dir = -s;
+    } else {
+      const s = aRight ? -1 : 1;
+      const sx = a.x + (s * a.w) / 2;
+      ex = b.x - (s * b.w) / 2;
+      const k2 = Math.abs(ex - sx) * 0.6;
+      d = `M${sx},${a.y} C${sx + s * k2},${a.y} ${ex - s * k2},${b.y} ${ex},${b.y}`;
+      dir = s;
+    }
+    const ey = b.y;
     paths.push(
       <g key={k}>
-        <path d={`M${sx},${sy} C${c1x},${my} ${c2x},${my} ${ex},${ey}`} className={css.listArrow} />
-        <polyline
-          points={`${ex - 6 * Math.cos(ang - 0.45)},${ey - 6 * Math.sin(ang - 0.45)} ${ex},${ey} ${ex - 6 * Math.cos(ang + 0.45)},${ey - 6 * Math.sin(ang + 0.45)}`}
-          className={css.listArrowHead}
-        />
+        <path d={d} className={css.listArrow} />
+        <polyline points={`${ex - dir * 6},${ey - 4} ${ex},${ey} ${ex - dir * 6},${ey + 4}`} className={css.listArrowHead} />
       </g>,
     );
   }
@@ -265,14 +289,16 @@ function ChainScene({ sim, dim, glow, mini }: { sim: CacheSim; dim: Pred; glow: 
           {[...slabs.map((s) => ({ x: s.b.x - s.b.w / 2, ns: LEVELS[s.id].ns })), { x: ramLeft, ns: LEVELS.ram.ns }].map((t) => (
             <g key={t.ns}>
               <line x1={t.x} y1={top - 28} x2={t.x} y2={top - 10} />
-              <text x={t.x} y={top - 33} textAnchor={t.ns === 100 ? 'end' : 'middle'} className={css.dimText}>
+              <text
+                x={t.ns === 1 ? t.x - 2 : t.ns === 4 ? t.x + 2 : t.x}
+                y={top - 33}
+                textAnchor={t.ns === 1 || t.ns === 100 ? 'end' : t.ns === 4 ? 'start' : 'middle'}
+                className={css.dimText}
+              >
                 {t.ns === 100 ? (land ? '100 ns round trip' : '100 ns') : t.ns}
               </text>
             </g>
           ))}
-          <text x={x0 - 4} y={top - 33} textAnchor="end" className={css.dimText}>
-            0
-          </text>
         </g>
       )}
       {/* core */}
@@ -334,7 +360,7 @@ function ChainScene({ sim, dim, glow, mini }: { sim: CacheSim; dim: Pred; glow: 
             </text>
             {!mini && (
               <text x={lx} y={labelY + (small ? 12 : 15)} textAnchor="middle" className={stage.mono} style={small ? { fontSize: 8.5 } : undefined}>
-                {small ? `${L.ns} ns` : `${L.size} · ${L.ns === 1 ? '~1' : L.ns === 4 ? '3–5' : '10–20'} ns`}
+                {small ? `${L.ns} ns` : `${L.size} · ${L.range}`}
               </text>
             )}
             {!small && (
@@ -457,8 +483,8 @@ function Chart({ sim }: { sim: CacheSim }) {
         ns
       </text>
       {!small && (
-        <text x={g.x + g.w} y={g.y + g.h + 34} textAnchor="end" className={css.axisText}>
-          working set: bytes your loop keeps touching (log scale) →
+        <text x={g.x} y={g.y + g.h + 36} className={css.axisText}>
+          working set: the bytes your loop keeps touching (log scale) →
         </text>
       )}
       <path d={curveD} className={css.curve} />
@@ -739,7 +765,7 @@ function L1Box({ sim, mid, dim, glow }: { sim: CacheSim; mid: 'a' | 'b'; dim?: b
               </text>
             )}
             {isOut && sg.tags && (
-              <text x={r.x + r.w + 8} y={r.y + r.h / 2 + (land ? 15 : 12)} className={css.outTag}>
+              <text x={box.x + box.w / 2 - 10} y={r.y + r.h / 2 + 3} textAnchor="end" className={css.outTag}>
                 next out
               </text>
             )}
@@ -820,16 +846,16 @@ function CoresScene({ sim, dim, glow }: { sim: CacheSim; dim: Pred; glow: Pred }
   const l1b = sim.boxes.get('l1:1');
   const l3 = sim.boxes.get('l3');
   const ram = sim.boxes.get('ram');
-  const coreSub = (i: 0 | 1) => (mode === 'coherence' ? (i === 0 ? 'reads, then writes x' : 'reads x') : i === 0 ? 'thread 0: a++ forever' : 'thread 1: b++ forever');
+  const coreSub = (i: 0 | 1) => (mode === 'coherence' ? (i === 0 ? 'reads, then writes x' : 'reads x') : i === 0 ? 'thread 0: a++' : 'thread 1: b++');
   const coreCard = (b: Box | undefined, i: 0 | 1, id: string) =>
     b && (
       <Card box={b} dim={dim(id)} glow={glow(id)}>
-        <Title x={12} y={land ? 25 : 19} text={`core ${i}`} size={land ? undefined : 11} />
-        <text className={stage.mono} x={12} y={land ? 42 : 34} style={land ? undefined : { fontSize: 8 }}>
+        <Title x={12} y={land ? 26 : 20} text={`core ${i}`} size={land ? undefined : 11} />
+        <text className={stage.mono} x={12} y={land ? 43 : 35} style={land ? undefined : { fontSize: 8.5 }}>
           {coreSub(i)}
         </text>
         {mode !== 'coherence' && (
-          <text className={css.counter} x={b.w - 12} y={land ? 38 : 30} textAnchor="end" style={{ fill: i === 0 ? SIG.pink : SIG.teal, fontSize: land ? 18 : 13 }}>
+          <text className={css.counter} x={b.w - 12} y={b.h / 2 + (land ? 7 : 5)} textAnchor="end" style={{ fill: i === 0 ? SIG.pink : SIG.teal, fontSize: land ? 19 : 13 }}>
             {i === 0 ? 'a' : 'b'} = {C.cnt[i]}
           </text>
         )}
@@ -838,23 +864,30 @@ function CoresScene({ sim, dim, glow }: { sim: CacheSim; dim: Pred; glow: Pred }
   const l1Card = (b: Box | undefined, i: 0 | 1, id: string) => {
     if (!b) return null;
     const pad = 12;
-    const cw = (b.w - pad * 2 - 36) / 8;
-    const stripY = land ? 44 : 34;
+    const badge = land ? 26 : 20;
+    const cw = (b.w - pad * 2 - badge - 10) / 8;
+    const stripY = land ? 42 : 30;
+    const sh = land ? 28 : 22;
     const state: Mesi = mode === 'padded' ? (i === 0 ? C.mesi[0] : C.mesiB[1]) : C.mesi[i];
     const kind = mode === 'coherence' ? 'x' : mode === 'packed' ? 'ab' : i === 0 ? 'a' : 'b';
     const val = mode === 'coherence' ? (i === 0 ? C.x.c0 : C.x.c1) : null;
+    const had = C.had[i];
+    let note = MESI_NAME[state];
+    if (state === 'I') note = had ? (land ? 'Invalid · copy thrown out' : 'Invalid · dropped') : 'Invalid · no copy';
+    else if (mode === 'coherence' && val != null) note = `${MESI_NAME[state]} · x = ${val}`;
+    else if (mode === 'padded') note = land ? 'Modified · stays here' : 'Modified';
     return (
       <Card box={b} dim={dim(id)} glow={glow(id)} tone="rgba(75,227,160,0.5)">
-        <Title x={12} y={land ? 22 : 16} text={`L1 · core ${i}`} size={land ? undefined : 10.5} />
+        <Title x={12} y={land ? 23 : 17} text={`L1 · core ${i}`} size={land ? undefined : 10.5} />
         {land && (
-          <text className={stage.mono} x={b.w - 12} y={22} textAnchor="end">
+          <text className={stage.mono} x={b.w - 12} y={23} textAnchor="end">
             private
           </text>
         )}
-        <LineStrip x={pad} y={stripY} cw={cw} h={land ? 26 : 20} kind={kind} state={state} val={val} cnt={C.cnt} land={land} />
-        <MesiBadge x={pad + cw * 8 + 8} y={stripY} h={land ? 26 : 20} state={state} land={land} />
-        <text className={css.mesiName} x={pad} y={stripY + (land ? 44 : 34)} style={{ fill: MESI_COLOR[state] }}>
-          {state === 'I' && mode === 'coherence' && val == null && C.act < 1 ? 'no copy yet' : MESI_NAME[state]}
+        <LineStrip x={pad} y={stripY} cw={cw} h={sh} kind={kind} state={state} struck={state === 'I' && had} />
+        <MesiBadge x={b.w - pad - badge} y={stripY} w={badge} h={sh} state={state} />
+        <text className={css.mesiName} x={pad} y={stripY + sh + (land ? 20 : 16)} style={{ fill: MESI_COLOR[state], fontSize: land ? undefined : 8 }}>
+          {note}
         </text>
       </Card>
     );
@@ -919,37 +952,30 @@ function Holders({ sim, x, y, w, land }: { sim: CacheSim; x: number; y: number; 
   );
 }
 
-function LineStrip({ x, y, cw, h, kind, state, val, cnt, land }: { x: number; y: number; cw: number; h: number; kind: 'x' | 'ab' | 'a' | 'b'; state: Mesi; val: number | null; cnt: [number, number]; land: boolean }) {
+/** One 64-byte line as 8 cells. The variables the story is about are colored; padding is hatched. */
+function LineStrip({ x, y, cw, h, kind, state, struck }: { x: number; y: number; cw: number; h: number; kind: 'x' | 'ab' | 'a' | 'b'; state: Mesi; struck: boolean }) {
   const invalid = state === 'I';
   const cells: ReactNode[] = [];
   for (let k = 0; k < 8; k++) {
     let label = '';
     let color: string | null = null;
-    let pad = false;
+    const pad = (kind === 'a' || kind === 'b') && k > 0;
     if (kind === 'x' && k === 0) {
-      label = invalid || val == null ? 'x' : `x=${val}`;
+      label = 'x';
       color = SIG.text;
-    }
-    if (kind === 'ab' && k === 0) {
-      label = land ? `a=${cnt[0]}` : 'a';
-      color = SIG.pink;
-    }
-    if (kind === 'ab' && k === 1) {
-      label = land ? `b=${cnt[1]}` : 'b';
-      color = SIG.teal;
-    }
-    if ((kind === 'a' || kind === 'b') && k === 0) {
+    } else if (kind === 'ab' && k < 2) {
+      label = k === 0 ? 'a' : 'b';
+      color = k === 0 ? SIG.pink : SIG.teal;
+    } else if ((kind === 'a' || kind === 'b') && k === 0) {
       label = kind;
       color = kind === 'a' ? SIG.pink : SIG.teal;
     }
-    if ((kind === 'a' || kind === 'b') && k > 0) pad = true;
-    const wide = kind === 'x' || (kind === 'ab' && land);
     cells.push(
       <g key={k}>
-        <rect x={x + k * cw + 0.5} y={y} width={cw - 1} height={h} rx={2} className={css.coCell} data-pad={pad} style={color && !invalid ? { fill: color, fillOpacity: 0.16, stroke: color } : undefined} />
+        <rect x={x + k * cw + 0.5} y={y} width={cw - 1} height={h} rx={2} className={css.coCell} style={color && !invalid ? { fill: color, fillOpacity: 0.16, stroke: color } : undefined} />
         {pad && <rect x={x + k * cw + 0.5} y={y} width={cw - 1} height={h} rx={2} fill="url(#kit-hatch-dim)" />}
         {label && (
-          <text x={x + k * cw + cw / 2} y={y + h / 2 + 3.5} textAnchor="middle" className={css.coCellText} style={{ fill: invalid ? 'var(--text-3)' : (color ?? undefined), fontSize: wide && cw < 34 ? 8 : undefined }}>
+          <text x={x + k * cw + cw / 2} y={y + h / 2 + 4} textAnchor="middle" className={css.coCellText} style={{ fill: invalid ? 'var(--text-3)' : (color ?? undefined) }}>
             {label}
           </text>
         )}
@@ -957,19 +983,19 @@ function LineStrip({ x, y, cw, h, kind, state, val, cnt, land }: { x: number; y:
     );
   }
   return (
-    <g opacity={invalid ? 0.45 : 1}>
+    <g opacity={invalid ? 0.42 : 1}>
       {cells}
-      {invalid && <line x1={x - 2} y1={y + h / 2} x2={x + 8 * cw + 2} y2={y + h / 2} stroke={SIG.err} strokeWidth={1.4} opacity={0.8} />}
+      {struck && <line x1={x - 3} y1={y + h / 2} x2={x + 8 * cw + 3} y2={y + h / 2} stroke={SIG.err} strokeWidth={1.4} opacity={0.85} />}
     </g>
   );
 }
 
-function MesiBadge({ x, y, h, state, land }: { x: number; y: number; h: number; state: Mesi; land: boolean }) {
+function MesiBadge({ x, y, w, h, state }: { x: number; y: number; w: number; h: number; state: Mesi }) {
   const c = MESI_COLOR[state];
   return (
     <g transform={`translate(${x},${y})`}>
-      <rect width={land ? 26 : 20} height={h} rx={5} fill={c} fillOpacity={0.16} stroke={c} strokeWidth={1.2} />
-      <text x={land ? 13 : 10} y={h / 2 + 4.5} textAnchor="middle" className={css.mesiLetter} style={{ fill: c }}>
+      <rect width={w} height={h} rx={5} fill={c} fillOpacity={0.16} stroke={c} strokeWidth={1.2} />
+      <text x={w / 2} y={h / 2 + 4.5} textAnchor="middle" className={css.mesiLetter} style={{ fill: c }}>
         {state}
       </text>
     </g>

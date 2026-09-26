@@ -36,7 +36,7 @@ export type HudKey =
   | 'xfers'
   | 'nsinc';
 
-export type ReadoutKey = 'access' | 'pf' | 'human' | 'mix' | 'mesi' | 'fs';
+export type ReadoutKey = 'access' | 'pf' | 'human' | 'levels' | 'mix' | 'mesi' | 'fs';
 
 const pct = (f: number) => `${Math.round(f * 100)}%`;
 
@@ -48,6 +48,7 @@ function hudItems(sim: CacheSim, keys: HudKey[]): HudItem[] {
   const out: HudItem[] = [];
   const m = sim.ma;
   const W = sim.wall;
+  const land = sim.orient === 'landscape';
   for (const k of keys) {
     switch (k) {
       case 'cycles': {
@@ -57,21 +58,21 @@ function hudItems(sim: CacheSim, keys: HudKey[]): HudItem[] {
       }
       case 'waiting': {
         const total = W.waitNs + W.workNs;
-        out.push({ label: 'Time spent waiting', value: total ? `${((W.waitNs / total) * 100).toFixed(1)}%` : '—', tone: total ? (W.waitNs / total > 0.9 ? 'bad' : 'warn') : undefined });
+        out.push({ label: 'Waiting', value: total ? `${((W.waitNs / total) * 100).toFixed(1)}%` : '—', unit: total && land ? 'of the time' : undefined, tone: total ? (W.waitNs / total > 0.9 ? 'bad' : 'warn') : undefined });
         break;
       }
       case 'pass': {
         const last = W.passes[W.passes.length - 1];
-        out.push({ label: 'Last walk of the list', value: last != null ? fmtNs(last, true) : '—' });
+        out.push({ label: 'Whole list', value: last != null ? fmtNs(last, true) : W.inLoad || W.passNs ? `${fmtNs(W.passNs, true)}…` : '—' });
         break;
       }
       case 'passes': {
         const p = W.passes;
         const first = p.length >= 1 ? p[0] : null;
         const second = p.length >= 2 ? p[1] : null;
-        out.push({ label: 'Walk 1 · cold cache', value: first != null ? fmtNs(first, true) : W.pass === 0 ? `${fmtNs(W.passNs, true)}…` : '—', tone: first != null ? 'warn' : undefined });
+        out.push({ label: land ? 'Walk 1 · cold' : 'Walk 1', value: first != null ? fmtNs(first, true) : W.pass === 0 ? `${fmtNs(W.passNs, true)}…` : '—', tone: first != null ? 'warn' : undefined });
         out.push({
-          label: 'Walk 2 · warm cache',
+          label: land ? 'Walk 2 · warm' : 'Walk 2',
           value: second != null ? fmtNs(second, true) : W.pass === 1 ? `${fmtNs(W.passNs, true)}…` : '—',
           tone: second != null ? 'good' : undefined,
         });
@@ -83,21 +84,21 @@ function hudItems(sim: CacheSim, keys: HudKey[]): HudItem[] {
         out.push({
           label: L.busy ? 'Loading from' : 'Last load',
           value: lvl ? LEVELS[lvl].name : '—',
-          unit: lvl ? `${LEVELS[lvl].ns} ns · ${LEVELS[lvl].ns * 4} cycles` : undefined,
+          unit: lvl ? (land ? `${LEVELS[lvl].ns} ns · ${LEVELS[lvl].ns * 4} cycles` : `${LEVELS[lvl].ns} ns`) : undefined,
           tone: lvl === 'ram' ? 'warn' : lvl ? 'good' : undefined,
         });
         break;
       }
       case 'stopwatch': {
         const ns = sim.ladElapsed();
-        out.push({ label: 'If 1 ns were 1 second', value: ns ? human(ns) : '—', wide: true, tone: ns >= 100 ? 'warn' : undefined });
+        out.push({ label: land ? 'If 1 ns took 1 second' : 'Human time', value: ns ? human(ns) : '—', wide: land, tone: ns >= 100 ? 'warn' : undefined });
         break;
       }
       case 'hits':
         out.push({ label: 'L1 hits', value: m.hits, tone: m.hits ? 'good' : undefined });
         break;
       case 'misses':
-        out.push({ label: 'Misses → RAM', value: m.misses, tone: m.misses ? 'warn' : undefined });
+        out.push({ label: 'Misses', value: m.misses, unit: land ? '→ RAM' : undefined, tone: m.misses ? 'warn' : undefined });
         break;
       case 'rate': {
         const n = m.accesses;
@@ -105,27 +106,27 @@ function hudItems(sim: CacheSim, keys: HudKey[]): HudItem[] {
         break;
       }
       case 'time':
-        out.push({ label: 'Time in loads', value: fmtNs(m.ns, true) });
+        out.push({ label: 'Time', value: fmtNs(m.ns, true) });
         break;
       case 'pf':
-        out.push({ label: 'Prefetched lines', value: m.prefetches, tone: m.prefetches ? 'good' : undefined });
+        out.push({ label: 'Prefetched', value: m.prefetches, unit: land ? 'lines' : undefined, tone: m.prefetches ? 'good' : undefined });
         break;
       case 'nspa': {
         const n = m.accesses;
-        out.push({ label: 'Avg per load', value: n ? (m.ns / n).toFixed(1) : '—', unit: 'ns' });
+        out.push({ label: 'Per load', value: n ? (m.ns / n).toFixed(1) : '—', unit: 'ns' });
         break;
       }
       case 'rows':
       case 'cols': {
         const mm = k === 'rows' ? sim.ma : sim.mb;
-        out.push({ label: k === 'rows' ? 'Row by row' : 'Column by column', value: fmtNs(mm.ns, true), unit: mm.finished ? 'done' : undefined, tone: k === 'rows' ? 'good' : 'warn' });
+        out.push({ label: k === 'rows' ? 'Rows' : 'Columns', value: fmtNs(mm.ns, true), unit: mm.finished && land ? 'done' : undefined, tone: k === 'rows' ? 'good' : 'warn' });
         break;
       }
       case 'ratio': {
         const a = sim.ma;
         const b = sim.mb;
         const done = a.finished && b.finished;
-        out.push({ label: 'Columns ÷ rows', value: done ? `${(b.ns / Math.max(1, a.ns)).toFixed(1)}×` : '…', tone: done ? 'bad' : undefined });
+        out.push({ label: land ? 'Columns ÷ rows' : 'Ratio', value: done ? `${(b.ns / Math.max(1, a.ns)).toFixed(1)}×` : '…', tone: done ? 'bad' : undefined });
         break;
       }
       case 'ws':
@@ -133,31 +134,35 @@ function hudItems(sim: CacheSim, keys: HudKey[]): HudItem[] {
         break;
       case 'avg': {
         const ns = avgNs(sim.cfg.ws);
-        out.push({ label: 'Average load', value: ns < 10 ? ns.toFixed(1) : Math.round(ns), unit: 'ns', tone: ns > 40 ? 'bad' : ns > 8 ? 'warn' : 'good' });
+        out.push({ label: 'Avg load', value: ns < 10 ? ns.toFixed(1) : Math.round(ns), unit: 'ns', tone: ns > 40 ? 'bad' : ns > 8 ? 'warn' : 'good' });
         break;
       }
       case 'fits': {
         const f = fitsIn(sim.cfg.ws);
-        out.push({ label: 'Fits in', value: f === 'ram' ? 'nothing' : LEVELS[f].name, unit: f === 'ram' ? 'RAM only' : undefined, tone: f === 'ram' ? 'bad' : 'good' });
+        out.push({ label: 'Fits in', value: f === 'ram' ? 'RAM' : LEVELS[f].name, unit: f === 'ram' && land ? 'no cache' : undefined, tone: f === 'ram' ? 'bad' : 'good' });
         break;
       }
       case 'incA':
-        out.push({ label: 'Thread 0 · a', value: sim.co.cnt[0] });
+        out.push({ label: land ? 'Thread 0 · a' : 'a', value: sim.co.cnt[0] });
         break;
       case 'incB':
-        out.push({ label: 'Thread 1 · b', value: sim.co.cnt[1] });
+        out.push({ label: land ? 'Thread 1 · b' : 'b', value: sim.co.cnt[1] });
         break;
       case 'xfers':
-        out.push({ label: 'Line transfers', value: sim.co.transfers, tone: sim.co.transfers ? 'bad' : 'good' });
+        out.push({ label: 'Transfers', value: sim.co.transfers, tone: sim.co.transfers ? 'bad' : 'good' });
         break;
       case 'nsinc': {
         const v = sim.nsPerInc();
-        out.push({ label: 'Per increment', value: v == null ? '—' : v < 2 ? v.toFixed(1) : Math.round(v), unit: 'ns', tone: v == null ? undefined : v > 3 ? 'bad' : 'good' });
+        out.push({ label: land ? 'Per increment' : 'Per a++', value: v == null ? '—' : v < 2 ? v.toFixed(1) : Math.round(v), unit: 'ns', tone: v == null ? undefined : v > 3 ? 'bad' : 'good' });
         break;
       }
     }
   }
-  return out;
+  if (land) return out;
+  // Phones: one row of chips, so the drawing below stays clear. The counters
+  // are already on the core cards there.
+  const skip = sim.cfg.view === 'cores' ? new Set(['Thread 0 · a', 'Thread 1 · b', 'a', 'b']) : new Set<string>();
+  return out.filter((it) => !skip.has(it.label)).slice(0, 3);
 }
 
 /* ------------------------------------------------------------------ */
@@ -199,7 +204,7 @@ function AccessReadout({ sim, compact }: { sim: CacheSim; compact?: boolean }) {
     ) : (
       <span className={css.warn}>arriving · waited {Math.round(op.ns)} ns</span>
     );
-  const formula = sim.cfg.dims === 2 ? `(${Math.floor(e / m.cols)}·16 + ${e % m.cols})·8` : `${e}·8`;
+  const formula = sim.cfg.dims === 2 ? `(${Math.floor(e / m.cols)}·16+${e % m.cols})·8` : `${e}·8`;
   if (compact) {
     return (
       <Ro head={`load ${name}`}>
@@ -268,7 +273,7 @@ function PfReadout({ sim, compact }: { sim: CacheSim; compact?: boolean }) {
         <span className={css.dim}>used before needed</span>
         <span>{m.pfUsed}</span>
       </div>
-      <div className={css.result}>{on ? 'fetches the next 2 lines before you ask' : 'every new line stalls for a full trip'}</div>
+      <div className={css.result}>{on ? 'fetches the next 2 lines before you ask' : 'each new line waits a full trip'}</div>
     </Ro>
   );
 }
@@ -290,6 +295,25 @@ function HumanTable({ sim, compact }: { sim: CacheSim; compact?: boolean }) {
             </div>
           );
         })}
+      </div>
+    </Ro>
+  );
+}
+
+function LevelsReadout({ sim }: { sim: CacheSim }) {
+  const L = sim.lad;
+  const lvl = L.busy ? L.level : L.last?.level;
+  return (
+    <Ro head="the hierarchy">
+      <div className={css.table3}>
+        {LEVEL_IDS.map((id) => (
+          <div key={id} className={cx(css.tr4, lvl === id && css.trOn)}>
+            <span style={{ color: LEVEL_COLOR[id] }}>{LEVELS[id].name}</span>
+            <span>{LEVELS[id].size}</span>
+            <span className={css.dim}>{LEVELS[id].short}</span>
+            <em>{LEVELS[id].range}</em>
+          </div>
+        ))}
       </div>
     </Ro>
   );
@@ -364,6 +388,8 @@ function renderReadout(k: ReadoutKey, sim: CacheSim, compact: boolean) {
       return <PfReadout key={k} sim={sim} compact={compact} />;
     case 'human':
       return <HumanTable key={k} sim={sim} compact={compact} />;
+    case 'levels':
+      return <LevelsReadout key={k} sim={sim} />;
     case 'mix':
       return <MixReadout key={k} sim={sim} compact={compact} />;
     case 'mesi':
@@ -429,9 +455,9 @@ function SideReadouts({ sim, keys }: { sim: CacheSim; keys: ReadoutKey[] }) {
   if (v === 'grid') {
     const l1 = sim.boxes.get('l1');
     if (!l1) return null;
-    const x = Math.max(l1.x, 138);
+    const x = Math.max(l1.x, 152);
     return (
-      <div className={css.anchored} style={{ left: x, top: l1.y + l1.h / 2 + 18, width: 262 }}>
+      <div className={css.anchored} style={{ left: x, top: l1.y + l1.h / 2 + 18, width: 280 }}>
         {keys.map((k) => renderReadout(k, sim, false))}
       </div>
     );
@@ -439,9 +465,10 @@ function SideReadouts({ sim, keys }: { sim: CacheSim; keys: ReadoutKey[] }) {
   if (v === 'ladder') {
     const ram = sim.boxes.get('ram');
     if (!ram) return null;
-    const top = ram.y + ram.h / 2 + 30;
+    // Under the fan-out labels, clear of the title block in the corner
+    const top = ram.y + ram.h / 2 + 88;
     return (
-      <div className={css.anchored} style={{ left: sim.w * 0.62, top, width: 340 }}>
+      <div className={css.anchored} style={{ left: Math.min(sim.w / 2, sim.w - 290 - 180), top, width: 350 }}>
         {keys.map((k) => renderReadout(k, sim, false))}
       </div>
     );
@@ -479,13 +506,15 @@ function Prompts({ sim }: { sim: CacheSim }) {
   if (!q || !a) return null;
   const land = sim.orient === 'landscape';
   if ('e' in a) {
+    // Above the RAM box, lined up with the cell, so the grid itself stays visible.
     const g = sim.gridGeo(a.m);
-    if (!g) return null;
+    const ram = sim.boxes.get(a.m === 'a' ? 'ram' : 'ram:b');
+    if (!g || !ram) return null;
     const r = sim.cellRect(g, a.e);
     const text = q.ask ?? '';
     const half = (text.length * 6.7 + 22) / 2;
     return (
-      <StagePrompt x={Math.min(Math.max(r.x + r.w / 2, half + 8), sim.w - half - 8)} y={r.y - 8}>
+      <StagePrompt x={Math.min(Math.max(r.x + r.w / 2, half + 8), sim.w - half - 8)} y={ram.y - ram.h / 2 - 8}>
         {text}
       </StagePrompt>
     );

@@ -112,6 +112,8 @@ interface CoresState {
   mesi: [Mesi, Mesi];
   /** Padded mode: the second core's own line */
   mesiB: [Mesi, Mesi];
+  /** Has each core held a copy (so an Invalid line was thrown out, not never there)? */
+  had: [boolean, boolean];
   l3: boolean;
   x: { c0: number | null; c1: number | null; l3: number | null; ram: number };
   act: number;
@@ -252,6 +254,7 @@ export class CacheSim extends Sim {
     return {
       mesi: warm ? ['M', 'I'] : ['I', 'I'],
       mesiB: padded ? ['I', 'M'] : ['I', 'I'],
+      had: [warm, padded],
       l3: warm,
       x: { c0: null, c1: null, l3: null, ram: 0 },
       act: 0,
@@ -410,19 +413,20 @@ export class CacheSim extends Sim {
     const { w, h } = this;
     const land = this.orient === 'landscape';
     if (land) {
-      const cy = h * 0.46;
-      const cx = Math.max(150, w * 0.17);
-      this.place('core', cx, cy, 210, 156);
-      if (this.boxes.has('cache')) this.place('cache', cx + 105 + 34 + 62, cy, 124, 156);
-      const rw = Math.min(300, w * 0.32);
-      const rh = 330;
-      const rx = w - Math.max(40, w * 0.04) - rw / 2;
+      const cy = clamp(h * 0.47, 250, h - 290);
+      const coreW = clamp(w * 0.25, 200, 250);
+      const cx = 36 + coreW / 2;
+      this.place('core', cx, cy, coreW, 180);
+      if (this.boxes.has('cache')) this.place('cache', cx + coreW / 2 + 40 + 78, cy, 156, 180);
+      const rw = clamp(w * 0.4, 330, 410);
+      const rh = clamp(h * 0.56, 360, 440);
+      const rx = w - 36 - rw / 2;
       this.place('ram', rx, cy, rw, rh);
-      const nw = Math.min(118, rw * 0.4);
-      const cols = [rx - rw * 0.23, rx + rw * 0.23];
-      const top = cy - rh / 2 + 62;
-      const step = (rh - 84) / 6;
-      this.placeNodes(cols, top, step, nw, 34);
+      const nw = Math.min(124, rw * 0.32);
+      const cols = [rx - rw * 0.25, rx + rw * 0.25];
+      const top = cy - rh / 2 + 70;
+      const step = (rh - 100) / 6;
+      this.placeNodes(cols, top, step, nw, 36);
     } else {
       this.place('core', w / 2, 122, Math.min(230, w - 40), 88);
       if (this.boxes.has('cache')) this.place('cache', w / 2, 214, Math.min(230, w - 40), 48);
@@ -430,8 +434,8 @@ export class CacheSim extends Sim {
       const rh = 196;
       const ry = h - 64 - 22 - rh / 2;
       this.place('ram', w / 2, ry, rw, rh);
-      const nw = Math.min(128, rw * 0.4);
-      this.placeNodes([w / 2 - rw * 0.24, w / 2 + rw * 0.24], ry - rh / 2 + 42, (rh - 52) / 6, nw, 22);
+      const nw = Math.min(128, rw * 0.36);
+      this.placeNodes([w / 2 - rw * 0.26, w / 2 + rw * 0.26], ry - rh / 2 + 42, (rh - 52) / 6, nw, 22);
     }
   }
 
@@ -445,7 +449,9 @@ export class CacheSim extends Sim {
   private layoutChain(mini: boolean) {
     const { w, h } = this;
     const land = this.orient === 'landscape';
-    const s = mini ? 0.7 : 1;
+    const human = this.cfg.human;
+    // Phones get a taller chain when there's no table to fit underneath.
+    const s = mini ? 0.7 : human ? 1 : land ? 1.2 : 1.4;
     const small = !land;
     const coreW = (small ? 72 : 128) * (mini ? 0.72 : 1);
     const coreH = (small ? 84 : 150) * s;
@@ -457,7 +463,7 @@ export class CacheSim extends Sim {
       l3: { w: small ? 13 : 20, h: (small ? 86 : 160) * s },
     };
     const margin = small ? 16 : 44;
-    const cy = mini ? (small ? 112 : 168) : small ? 196 : h * 0.38;
+    const cy = mini ? (small ? 112 : 168) : small ? (human ? 176 : 210) : human ? clamp(h * 0.31, 200, 260) : h * 0.4;
     const coreX = margin + coreW / 2;
     const ramLeft = w - margin - ramW;
     const x0 = coreX + coreW / 2;
@@ -470,8 +476,15 @@ export class CacheSim extends Sim {
     }
     this.place('ram', ramLeft + ramW / 2, cy, ramW, ramH);
     if (this.boxes.has('chart')) {
-      if (land) this.place('chart', w / 2 + 14, cy + 290, Math.min(w - 170, 760), Math.min(h - cy - 190, 330));
-      else this.place('chart', w / 2 + 10, 300, w - 64, 176);
+      if (land) {
+        const top = cy + ramH / 2 + 62;
+        const bottom = h - 138;
+        this.place('chart', w / 2 + 14, (top + bottom) / 2, Math.min(w - 170, 760), Math.max(160, bottom - top));
+      } else {
+        const top = cy + ramH / 2 + 62;
+        const bottom = h - 64 - 76 - 36;
+        this.place('chart', w / 2 + 10, (top + bottom) / 2, w - 64, Math.max(120, bottom - top));
+      }
     }
   }
 
@@ -481,54 +494,58 @@ export class CacheSim extends Sim {
     const ways = this.cfg.ways;
     const rows = this.ma.rows;
     if (land) {
-      const colX = clamp(w * 0.18, 140, 205);
-      const tags = true;
+      const colX = clamp(w * 0.18, 150, 205);
       const rowH = ways <= 6 ? 28 : 22;
-      this.slotSpec = { cw: 11, ch: ways <= 6 ? 13 : 11, rowH, headH: 38, horizontal: false, ncol: 1, tags };
+      this.slotSpec = { cw: 11, ch: ways <= 6 ? 13 : 11, rowH, headH: 38, horizontal: false, ncol: 1, tags: true };
       const l1H = 38 + ways * rowH + 8;
-      const l1W = 196;
-      const leftEdge = colX + l1W / 2 + 64;
+      const l1W = 224;
+      const leftEdge = colX + l1W / 2 + 56;
       const padL = 74;
       const padR = 16;
       const cw = Math.floor(clamp((w - 30 - leftEdge - padL - padR - 8) / 16, 16, 31));
+      const ch = Math.round(cw * 1.1);
       const lg = Math.max(5, Math.round(cw * 0.26));
       const rg = Math.max(3, Math.round(cw * 0.16));
-      this.cell = { cw, ch: cw, lg, rg, padL, padT: this.cfg.dims === 2 ? 44 : 38, padR, padB: 14 };
+      this.cell = { cw, ch, lg, rg, padL, padT: this.cfg.dims === 2 ? 56 : 40, padR, padB: 14 };
       const gw = 16 * cw + lg;
-      const gh = rows * cw + (rows - 1) * rg;
+      const gh = rows * ch + (rows - 1) * rg;
       const rw = gw + padL + padR;
       const rh = gh + this.cell.padT + this.cell.padB;
       const rx = w - 30 - rw / 2;
-      const ry = clamp(h * 0.47, 118 + rh / 2, h - 110 - rh / 2);
+      const ry = clamp(h * 0.47, 124 + rh / 2, h - 110 - rh / 2);
       this.place('ram', rx, ry, rw, rh);
-      const coreY = Math.max(150, ry - rh / 2 + 10);
-      this.place('core', colX, coreY, 150, 64);
-      this.place('l1', colX, Math.max(coreY + 64 + l1H / 2, ry - 10), l1W, l1H);
+      const coreY = Math.max(150, ry - rh / 2 + 12);
+      this.place('core', colX, coreY, 160, 64);
+      this.place('l1', colX, Math.max(coreY + 64 + l1H / 2, ry - 12), l1W, l1H);
     } else {
       const ncol = ways > 5 ? 2 : 1;
       const per = Math.ceil(ways / ncol);
       const rowH = 16;
-      const l1W = ncol === 2 ? w - 32 : Math.min(200, w * 0.54);
+      const l1W = ncol === 2 ? w - 32 : Math.min(210, w * 0.57);
       this.slotSpec = { cw: ncol === 2 ? 8 : 9, ch: 10, rowH, headH: 22, horizontal: false, ncol, tags: ncol === 1 };
       const l1H = 22 + per * rowH + 6;
       const cw = Math.floor(clamp((w - 32 - 16 - 6) / 16, 12, 22));
       const lg = 5;
       const rg = 3;
-      const ch = Math.min(cw, 17);
+      const top = 74;
+      const coreBelow = ncol === 2;
+      const ramTop = (coreBelow ? top + 50 : top) + l1H + 24;
+      const avail = h - 56 - 80 - ramTop - 10;
+      const ch = Math.floor(clamp((avail - 32 - (rows - 1) * rg) / rows, 12, 22));
       this.cell = { cw, ch, lg, rg, padL: 8, padT: 24, padR: 8, padB: 8 };
       const gw = 16 * cw + lg;
       const gh = rows * ch + (rows - 1) * rg;
       const rw = gw + 16;
       const rh = gh + 32;
-      if (ncol === 1) {
-        this.place('core', 16 + 52, 74 + l1H / 2 - 8, 104, 48);
-        this.place('l1', w - 16 - l1W / 2, 74 + l1H / 2, l1W, l1H);
+      if (!coreBelow) {
+        const coreW = w - 32 - l1W - 12;
+        this.place('core', 16 + coreW / 2, top + l1H / 2, coreW, 52);
+        this.place('l1', w - 16 - l1W / 2, top + l1H / 2, l1W, l1H);
       } else {
-        this.place('core', w / 2, 92, 150, 40);
-        this.place('l1', w / 2, 128 + l1H / 2, l1W, l1H);
+        this.place('core', w / 2, top + 18, 160, 36);
+        this.place('l1', w / 2, top + 50 + l1H / 2, l1W, l1H);
       }
-      const top = (ncol === 1 ? 74 : 128) + l1H + 26;
-      this.place('ram', w / 2, top + rh / 2, rw, rh);
+      this.place('ram', w / 2, ramTop + rh / 2, rw, rh);
     }
   }
 
@@ -538,17 +555,17 @@ export class CacheSim extends Sim {
     const rows = this.ma.rows;
     if (land) {
       const half = w / 2;
-      const cw = Math.floor(clamp((half - 60 - 16 - 6) / 16, 12, 23));
+      const cw = Math.floor(clamp((half - 58 - 16 - 6) / 16, 12, 26));
       const lg = Math.max(4, Math.round(cw * 0.26));
       const rg = Math.max(3, Math.round(cw * 0.16));
       this.cell = { cw, ch: cw, lg, rg, padL: 8, padT: 30, padR: 8, padB: 10 };
-      this.slotSpec = { cw: Math.max(6, Math.min(9, Math.floor(cw * 0.4))), ch: 12, rowH: 0, headH: 0, horizontal: true, ncol: 1, tags: false };
+      this.slotSpec = { cw: Math.max(6, Math.min(10, Math.floor(cw * 0.4))), ch: 13, rowH: 0, headH: 0, horizontal: true, ncol: 1, tags: false };
       const gw = 16 * cw + lg;
       const gh = rows * cw + (rows - 1) * rg;
       const rw = gw + 16;
       const rh = gh + 40;
       const l1W = 4 * (8 * this.slotSpec.cw) + 3 * 10 + 20;
-      const cy = clamp(h * 0.47, 250, h - 190);
+      const cy = clamp(h * 0.5, 250, h - 200);
       for (const [id, x] of [
         ['', w * 0.26],
         [':b', w * 0.74],
@@ -581,21 +598,22 @@ export class CacheSim extends Sim {
   private layoutCores() {
     const { w, h } = this;
     if (this.orient === 'landscape') {
-      const top = clamp(h * 0.2, 130, 170);
-      this.place('core', w * 0.29, top, 176, 60);
-      this.place('core:1', w * 0.71, top, 176, 60);
-      this.place('l1', w * 0.29, top + 138, 236, 104);
-      this.place('l1:1', w * 0.71, top + 138, 236, 104);
-      this.place('l3', w / 2, top + 300, Math.min(420, w * 0.44), 92);
-      this.place('ram', w / 2, top + 432, 240, 50);
+      const top = clamp(h * 0.2, 140, 170);
+      const cw = Math.min(270, w * 0.3);
+      this.place('core', w * 0.28, top, Math.min(220, cw), 62);
+      this.place('core:1', w * 0.72, top, Math.min(220, cw), 62);
+      this.place('l1', w * 0.28, top + 142, cw, 112);
+      this.place('l1:1', w * 0.72, top + 142, cw, 112);
+      this.place('l3', w / 2, top + 306, Math.min(440, w * 0.46), 92);
+      this.place('ram', w / 2, top + 434, 240, 50);
     } else {
       const lw = (w - 44) / 2;
-      this.place('core', 16 + lw / 2, 96, lw, 46);
-      this.place('core:1', w - 16 - lw / 2, 96, lw, 46);
-      this.place('l1', 16 + lw / 2, 190, lw, 86);
-      this.place('l1:1', w - 16 - lw / 2, 190, lw, 86);
-      this.place('l3', w / 2, 304, w - 40, 70);
-      this.place('ram', w / 2, 382, 190, 38);
+      this.place('core', 16 + lw / 2, 104, lw, 48);
+      this.place('core:1', w - 16 - lw / 2, 104, lw, 48);
+      this.place('l1', 16 + lw / 2, 198, lw, 88);
+      this.place('l1:1', w - 16 - lw / 2, 198, lw, 88);
+      this.place('l3', w / 2, 308, w - 40, 70);
+      this.place('ram', w / 2, 384, 190, 38);
     }
   }
 
@@ -861,10 +879,10 @@ export class CacheSim extends Sim {
     if (!op || this.cfg.view !== 'grid' || this.cfg.pace === 'true') return;
     this.send({ from: 'l1', to: 'core', dur: Math.min(0.16, this.paceOf().hit * 0.45), color: SIG.res, r: 3.4, lane: 3 });
     const g = this.gridGeo('a');
-    if (!g || this.cfg.pace !== 'slow') return;
+    if (!g || this.cfg.pace !== 'slow' || op.kind === 'hit') return;
     const r = this.cellRect(g, op.e);
-    const text = op.kind === 'hit' ? 'hit · 1 ns' : op.kind === 'miss' ? 'miss · 100 ns' : `waited ${Math.round(op.ns)} ns`;
-    this.fx({ kind: 'text', at: { x: r.x + r.w / 2, y: r.y - 4 }, text, color: op.kind === 'hit' ? SIG.res : SIG.heavy, dur: 1.1 });
+    const row0 = op.e < g.cols;
+    this.fx({ kind: 'text', at: { x: r.x + r.w / 2, y: row0 ? r.y + r.h + 22 : r.y - 4 }, text: 'miss · 100 ns', color: SIG.heavy, dur: 1.2 });
   }
 
   private askGrid(m: Machine) {
@@ -969,7 +987,7 @@ export class CacheSim extends Sim {
         dur: near,
         color: SIG.req,
         onArrive: () => {
-          this.say('cache', 'not here', SIG.heavy, 0.9);
+          if (this.orient === 'landscape') this.say('cache', 'miss', SIG.heavy, 0.9);
           this.send({
             from: 'cache',
             to: `node:${k}`,
@@ -1012,7 +1030,6 @@ export class CacheSim extends Sim {
     W.waitNs += W.loadNs;
     W.workNs += 0.25;
     W.sum += LIST[W.k].value;
-    this.say('core', `sum = ${W.sum}`, SIG.text2, 0.9);
     this.rev++;
     this.after(0.2, () => this.wallNext());
   }
@@ -1036,7 +1053,7 @@ export class CacheSim extends Sim {
         W.cached.clear();
         W.pass = 0;
         W.passes = [];
-        this.say('cache', 'flushed', SIG.dim, 1);
+        if (this.orient === 'landscape') this.say('cache', 'cache flushed', SIG.text2, 1.2);
         this.rev++;
       });
     }
@@ -1158,6 +1175,12 @@ export class CacheSim extends Sim {
     else if (this.cfg.cores === 'packed') this.fsBurst();
   }
 
+  private setMesi(m: [Mesi, Mesi]) {
+    const C = this.co;
+    C.mesi = m;
+    C.had = [C.had[0] || m[0] !== 'I', C.had[1] || m[1] !== 'I'];
+  }
+
   /** The scripted MESI walk-through, one act at a time. */
   private coAct(i: number) {
     const C = this.co;
@@ -1167,6 +1190,7 @@ export class CacheSim extends Sim {
     switch (i) {
       case 0:
         C.mesi = ['I', 'I'];
+        C.had = [false, false];
         C.l3 = false;
         C.x = { c0: null, c1: null, l3: null, ram: 0 };
         C.log = 'x = 0 lives in RAM. Neither core has a copy.';
@@ -1182,7 +1206,7 @@ export class CacheSim extends Sim {
                 C.x.l3 = 0;
                 this.rev++;
                 this.hop('l3', 'l1', SIG.res, undefined, 14, () => {
-                  C.mesi = ['E', C.mesi[1]];
+                  this.setMesi(['E', C.mesi[1]]);
                   C.x.c0 = 0;
                   C.log = 'Core 0 holds the only copy: Exclusive (E).';
                   this.rev++;
@@ -1198,11 +1222,11 @@ export class CacheSim extends Sim {
         this.hop('core:1', 'l1:1', SIG.req, 'read x', 8, () =>
           this.hop('l1:1', 'l3', SIG.req, undefined, 14, () => {
             this.hop('l3', 'l1', SIG.hc, 'now shared', 14, () => {
-              C.mesi = ['S', C.mesi[1]];
+              this.setMesi(['S', C.mesi[1]]);
               this.rev++;
             });
             this.hop('l3', 'l1:1', SIG.res, 'x = 0', 14, () => {
-              C.mesi = [C.mesi[0], 'S'];
+              this.setMesi([C.mesi[0], 'S']);
               C.x.c1 = 0;
               C.log = 'Both cores hold a clean copy: Shared (S).';
               this.rev++;
@@ -1216,13 +1240,13 @@ export class CacheSim extends Sim {
         this.hop('core', 'l1', SIG.heavy, 'x = 1', 8, () =>
           this.hop('l1', 'l3', SIG.hc, 'invalidate', 14, () =>
             this.hop('l3', 'l1:1', SIG.hc, 'invalidate', 14, () => {
-              C.mesi = [C.mesi[0], 'I'];
+              this.setMesi([C.mesi[0], 'I']);
               C.x.c1 = null;
               C.log = 'Core 1’s copy is now Invalid (I).';
               this.rev++;
               this.hop('l1:1', 'l3', SIG.hc, 'ack', 14, () =>
                 this.hop('l3', 'l1', SIG.hc, 'ack', 14, () => {
-                  C.mesi = ['M', 'I'];
+                  this.setMesi(['M', 'I']);
                   C.x.c0 = 1;
                   C.log = 'Core 0 writes: Modified (M). RAM is now stale.';
                   this.rev++;
@@ -1239,11 +1263,11 @@ export class CacheSim extends Sim {
           this.hop('l1:1', 'l3', SIG.req, undefined, 14, () =>
             this.hop('l3', 'l1', SIG.hc, 'give it up', 14, () =>
               this.hop('l1', 'l3', SIG.res, 'x = 1', 14, () => {
-                C.mesi = ['S', 'I'];
+                this.setMesi(['S', 'I']);
                 C.x.l3 = 1;
                 this.rev++;
                 this.hop('l3', 'l1:1', SIG.res, 'x = 1', 14, () => {
-                  C.mesi = ['S', 'S'];
+                  this.setMesi(['S', 'S']);
                   C.x.c1 = 1;
                   C.log = 'Both Shared again, both see x = 1.';
                   this.rev++;
@@ -1314,7 +1338,7 @@ export class CacheSim extends Sim {
           explain: (p) =>
             p === 'hit'
               ? `Its copy was invalidated when the other core wrote. The line has to come back across the chip: another 40 ns or so.`
-              : `Right. Its copy was invalidated, so it must win the line back. Each write steals the line from the other core.`,
+              : `Its copy was invalidated by the other core’s write, so it has to win the line back: another trip across the chip. Every write steals the line.`,
           resolve: () => {
             this.asking = null;
             go();
@@ -1333,11 +1357,11 @@ export class CacheSim extends Sim {
     C.xfer = { from, vt: this.vt };
     this.hop(req, 'l3', SIG.hc, 'want to write', 10, () =>
       this.hop('l3', own, SIG.hc, 'invalidate', 10, () => {
-        C.mesi = from === 0 ? ['I', C.mesi[1]] : [C.mesi[0], 'I'];
+        this.setMesi(from === 0 ? ['I', C.mesi[1]] : [C.mesi[0], 'I']);
         this.rev++;
         this.hop(own, 'l3', SIG.res, 'line', 10, () =>
           this.hop('l3', req, SIG.res, 'line', 10, () => {
-            C.mesi = to === 0 ? ['M', 'I'] : ['I', 'M'];
+            this.setMesi(to === 0 ? ['M', 'I'] : ['I', 'M']);
             C.owner = to;
             C.transfers++;
             C.xfer = null;

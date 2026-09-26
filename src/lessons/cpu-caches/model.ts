@@ -19,16 +19,20 @@ export interface Level {
   name: string;
   size: string;
   where: string;
+  short: string;
+  /** The model's single number… */
   ns: number;
+  /** …and the honest range */
+  range: string;
   /** Capacity in bytes for the model (typical desktop) */
   bytes: number;
 }
 
 export const LEVELS: Record<LevelId, Level> = {
-  l1: { id: 'l1', name: 'L1', size: '32–64 KB', where: 'per core', ns: 1, bytes: 32 * 1024 },
-  l2: { id: 'l2', name: 'L2', size: '1–2 MB', where: 'per core', ns: 4, bytes: 1024 * 1024 },
-  l3: { id: 'l3', name: 'L3', size: '32 MB', where: 'shared', ns: 15, bytes: 32 * 1024 * 1024 },
-  ram: { id: 'ram', name: 'RAM', size: '16–64 GB', where: 'off-chip', ns: 100, bytes: Infinity },
+  l1: { id: 'l1', name: 'L1', size: '32–64 KB', where: 'per core', short: 'per core', ns: 1, range: '~1 ns', bytes: 32 * 1024 },
+  l2: { id: 'l2', name: 'L2', size: '1–2 MB', where: 'per core', short: 'per core', ns: 4, range: '3–5 ns', bytes: 1024 * 1024 },
+  l3: { id: 'l3', name: 'L3', size: 'tens of MB', where: 'shared by all cores', short: 'shared', ns: 15, range: '10–20 ns', bytes: 32 * 1024 * 1024 },
+  ram: { id: 'ram', name: 'RAM', size: '16–64 GB', where: 'off-chip', short: 'off-chip', ns: 100, range: '80–100 ns', bytes: Infinity },
 };
 
 /** The "latency numbers" table, with the human-scale column (1 ns → 1 s). */

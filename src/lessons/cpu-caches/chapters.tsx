@@ -89,7 +89,7 @@ for (struct node *p = head; p != NULL; p = p->next)
         ),
         hud: ['passes', 'cycles'],
         legend: [LG.req, LG.data],
-        callouts: [{ target: 'wide:cache', text: <>the cache: <b>~1 ns</b> away</>, dir: 'up' }],
+        callouts: [{ target: 'wide:cache', text: <>the cache: <b>~1 ns</b> away</>, dir: 'down' }],
         code: {
           title: 'list.c',
           lang: 'c',
@@ -133,6 +133,7 @@ for (int pass = 0; pass < 2; pass++)
           </>
         ),
         hud: ['last'],
+        strip: 'levels',
         legend: [LG.req, LG.data],
         callouts: [{ target: 'wide:ram', text: <>RAM is <b>100× farther</b> than L1</>, dir: 'down' }],
         code: {
@@ -229,7 +230,6 @@ L2 cache:   8 MiB (8 instances)     # 1 MiB per core
         side: ['access'],
         strip: 'access',
         legend: [LG.cursor, LG.req, LG.fill],
-        callouts: [{ target: 'wide:slots', text: <>4 slots, each one <b>whole line</b></>, dir: 'down' }],
         code: {
           title: 'lines.c',
           lang: 'c',
@@ -758,7 +758,7 @@ struct {
               apply: (s) => s.setCores('padded'),
               note: (
                 <>
-                  Both counters race ahead at L1 speed, about <strong>10× faster</strong> each in this model.
+                  Both counters race ahead at L1 speed, about <strong>12× faster</strong> each in this model.
                 </>
               ),
             },

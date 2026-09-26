@@ -100,6 +100,19 @@
   fill: rgba(143, 166, 201, 0.14);
 }
 
+.coreRule {
+  stroke: rgba(143, 166, 201, 0.16);
+  stroke-width: 1;
+}
+
+.coreSum {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  fill: var(--text-1);
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---------- chapter 2: the hierarchy ---------- */
 .bus {
   stroke: rgba(143, 166, 201, 0.3);
@@ -339,9 +352,8 @@
 
 .mesiName {
   font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.02em;
 }
 
 .mesiLetter {
@@ -533,6 +545,22 @@
   margin: 0 -6px;
   border-radius: 4px;
   color: var(--text-2);
+}
+
+.tr4 {
+  display: grid;
+  grid-template-columns: 34px 1fr 64px 70px;
+  gap: 8px;
+  padding: 1px 6px;
+  margin: 0 -6px;
+  border-radius: 4px;
+  color: var(--text-1);
+}
+
+.tr4 em {
+  font-style: normal;
+  color: var(--text-1);
+  text-align: right;
 }
 
 .anchoredFull .tr {
