@@ -543,7 +543,7 @@ fib(50);   // ${commas(fibCalls(50))} calls: minutes, even on a fast machine`,
       {
         id: 'memoization',
         title: 'Memoize: remember answers',
-        cfg: { view: 'fib', n: 6, memo: false },
+        cfg: { view: 'fib', n: 6, memo: false, fast: true },
         body: (
           <>
             <p>
@@ -854,7 +854,7 @@ new Set(arr).size !== arr.length;`,
       {
         id: 'playground',
         title: 'Playground',
-        cfg: { view: 'lapse', n: 1000, lanes: ['n', 'nlogn', 'n2', 'exp'], loop: false },
+        cfg: { view: 'lapse', n: 20, lanes: ['n', 'nlogn', 'n2', 'exp'], loop: false },
         body: (
           <p>
             Race any growth rates on any input size. Pick the racers and an n, and the clock restarts from a nanosecond. Then try the challenges.

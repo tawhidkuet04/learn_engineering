@@ -31,6 +31,8 @@ export interface Cfg {
   binary: BinaryMode;
   merge: MergeMode;
   memo: boolean;
+  /** fib: draw the first tree quickly */
+  fast: boolean;
   chart: ChartMode;
   log: boolean;
   lanes: ClassId[];
@@ -47,6 +49,7 @@ export const DEFAULTS: Cfg = {
   binary: 'array',
   merge: 'split',
   memo: false,
+  fast: false,
   chart: 'classes',
   log: false,
   lanes: ['c1', 'logn', 'n', 'nlogn', 'n2', 'exp'],
@@ -102,7 +105,7 @@ export class BigOSim extends Sim {
         this.grid.reset(c.n);
         break;
       case 'fib':
-        this.fib.reset(c.n, c.memo);
+        this.fib.reset(c.n, c.memo, c.fast);
         break;
       case 'chart':
         this.chart.reset(c.chart, c.n, c.log);

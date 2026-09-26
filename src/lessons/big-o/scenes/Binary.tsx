@@ -70,7 +70,7 @@ function ArrayView({ sim, hl }: { sim: BigOSim; hl: string | null }) {
             <text className={small ? css.cellTextSm : css.cellText} x={c.x + c.w / 2} y={c.y + c.h / 2 + (small ? 3.5 : 4.5)} textAnchor="middle" style={{ fill: text, fontSize: small ? 10.5 : undefined }}>
               {b.arr[i]}
             </text>
-            {(land || i % 8 === 0) && (
+            {land && (
               <text className={css.mono} x={c.x + c.w / 2} y={c.y - 6} textAnchor="middle" style={{ fontSize: 8 }}>
                 {i}
               </text>
@@ -189,6 +189,7 @@ function BigView({ sim }: { sim: BigOSim }) {
       {/* the whole array, zoomed to the live range */}
       <g clipPath={`url(#${clip})`}>
         <rect x={X(0)} y={g.by} width={X(b.N) - X(0)} height={g.bh} fill="url(#kit-hatch-dim)" stroke="rgba(143,166,201,0.3)" />
+        <rect x={X(b.bLo)} y={g.by} width={Math.max(2, X(b.bHi + 1) - X(b.bLo))} height={g.bh} rx={4} fill="var(--node-fill)" />
         <rect x={X(b.bLo)} y={g.by} width={Math.max(2, X(b.bHi + 1) - X(b.bLo))} height={g.bh} rx={4} fill={found ? 'rgba(75,227,160,0.2)' : 'rgba(196,242,90,0.13)'} stroke={found ? SIG.res : RANGE} strokeWidth={1.3} />
         {Array.from({ length: 15 }, (_, i) => (
           <line key={i} x1={g.bx0 + ((i + 1) / 16) * W} x2={g.bx0 + ((i + 1) / 16) * W} y1={g.by + g.bh - 6} y2={g.by + g.bh} stroke="rgba(143,166,201,0.25)" />
@@ -233,7 +234,13 @@ function BigView({ sim }: { sim: BigOSim }) {
             <text className={css.mono} x={x + 6} y={y + L.chH / 2 + 3.5} style={{ fontSize: land ? 8.5 : 7.5, fill: 'var(--text-3)' }}>
               {i}
             </text>
-            <text className={css.monoStrong} x={x + L.cw - 6} y={y + L.chH / 2 + 4} textAnchor="end" style={{ fontSize: land ? 11 : 9.5, fill: last ? RANGE : 'var(--text-1)' }}>
+            <text
+              className={css.monoStrong}
+              x={x + L.cw - 6}
+              y={y + L.chH / 2 + 4}
+              textAnchor="end"
+              style={{ fontSize: land ? (s >= 1e8 ? 9.5 : 11) : 9.5, fill: last ? RANGE : 'var(--text-1)' }}
+            >
               {land ? commas(s) : compact(s)}
             </text>
           </g>

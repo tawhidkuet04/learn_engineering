@@ -1,11 +1,11 @@
 'use client';
 
 import type { CSSProperties, ReactNode } from 'react';
-import { CodeTrace } from '@/components/stage/CodeTrace';
+import { highlightLine } from '@/components/lesson/CodeBlock';
 import { Hud, type HudItem } from '@/components/stage/chrome';
 import { StagePrompt } from '@/components/stage/overlays';
 import { SIG } from '@/lib/sim/colors';
-import { bigGeo, binaryCells, classifyGeo, frame, raceGeo, scanGeo } from './layout';
+import { bigGeo, binaryCells, classifyGeo, frame, racePanel, raceGeo, scanGeo } from './layout';
 import { CLASSES, commas, fibCalls, fmtCountLg, fmtTimeLg, memoCalls } from './model';
 import type { BigOSim } from './sim';
 import css from './bigo.module.css';
@@ -187,7 +187,7 @@ function ScanReadout({ sim, compact }: { sim: BigOSim; compact: boolean }) {
         <span>{best ? `${best.steps} step` : '—'}</span>
       </div>
       <div className={css.row2}>
-        <Tag c={SIG.req}>average ({avgRuns} run{avgRuns === 1 ? '' : 's'})</Tag>
+        <Tag c={SIG.warn}>average ({avgRuns} run{avgRuns === 1 ? '' : 's'})</Tag>
         <span>{avg != null ? `${avg.toFixed(1)} steps` : '—'}</span>
       </div>
       <div className={css.row2}>
@@ -197,6 +197,67 @@ function ScanReadout({ sim, compact }: { sim: BigOSim; compact: boolean }) {
       <div className={css.result}>
         Big-O quotes the <b>worst case</b>: n steps, O(n)
       </div>
+    </Ro>
+  );
+}
+
+function SpaceReadout({ sim, compact }: { sim: BigOSim; compact: boolean }) {
+  const r = sim.race;
+  const n = r.n;
+  const nested = r.lanes.find((l) => l.id === 'nested');
+  const set = r.lanes.find((l) => l.id === 'set');
+  const used = set ? r.memUsed(set) : 0;
+  if (compact) {
+    return (
+      <Ro head={`time vs extra memory · n = ${commas(n)}`}>
+        <div className={css.row2}>
+          <Tag c={CLASSES.n2.color}>nested</Tag>
+          <span>
+            {fmtCountLg(Math.log10(Math.max(1, (n * (n - 1)) / 2)))} steps · 2 vars
+          </span>
+        </div>
+        <div className={css.row2}>
+          <Tag c={CLASSES.n.color}>Set</Tag>
+          <span>
+            {fmtCountLg(Math.log10(2 * n))} steps · {commas(used)} stored
+          </span>
+        </div>
+      </Ro>
+    );
+  }
+  return (
+    <Ro head={`time vs extra memory · n = ${commas(n)}`}>
+      <div className={css.tbl4}>
+        <span className={css.tblHead} />
+        <span className={css.tblHead}>steps (time)</span>
+        <span className={css.tblHead}>extra memory</span>
+        <span className={css.tblHead}>Big-O</span>
+        <Tag c={CLASSES.n2.color}>Nested loops</Tag>
+        <span>
+          {fmtCountLg(Math.log10(Math.max(1, (n * (n - 1)) / 2)))} <span className={css.dim}>= n(n−1)/2</span>
+        </span>
+        <span>
+          2 variables <span className={css.dim}>(i, j)</span>
+        </span>
+        <span>
+          <b className={css.warn}>O(n²)</b> time · <b className={css.good}>O(1)</b> space
+        </span>
+        <Tag c={CLASSES.n.color}>Set</Tag>
+        <span>
+          {fmtCountLg(Math.log10(2 * n))} <span className={css.dim}>= 2n</span>
+        </span>
+        <span>
+          {commas(used)} <span className={css.dim}>of {commas(n)} items</span>
+        </span>
+        <span>
+          <b className={css.good}>O(n)</b> time · <b className={css.warn}>O(n)</b> space
+        </span>
+      </div>
+      {nested && nested.finishedAt == null && set && set.finishedAt != null && (
+        <div className={css.result}>
+          the Set finished first; nested loops still at <b>{fmtCountLg(Math.log10(Math.max(1, nested.done)))}</b> comparisons
+        </div>
+      )}
     </Ro>
   );
 }
@@ -440,7 +501,16 @@ export function StageOverlay({ sim, hud = [] }: { sim: BigOSim; hud?: HudKey[] }
   let anchored: ReactNode = null;
   let strip: ReactNode = null;
 
-  if (v === 'scan') {
+  if (v === 'race' && sim.race.preset === 'space') {
+    if (land) {
+      const p = racePanel(sim);
+      anchored = (
+        <div className={css.anchored} style={{ left: (p.x0 + p.x1) / 2, top: p.y0, width: Math.min(640, p.x1 - p.x0), transform: 'translateX(-50%)' }}>
+          <SpaceReadout sim={sim} compact={false} />
+        </div>
+      );
+    } else strip = <SpaceReadout sim={sim} compact />;
+  } else if (v === 'scan') {
     if (land) {
       const g = scanGeo(sim, sim.scan.n);
       if (sim.scan.mode === 'search') {
@@ -495,14 +565,55 @@ export function StageOverlay({ sim, hud = [] }: { sim: BigOSim; hud?: HudKey[] }
   );
 }
 
+/** The snippet under test, larger than the kit's CodeTrace so it reads from across the room. */
 function ClassifyCode({ sim }: { sim: BigOSim }) {
   const cl = sim.classify;
   const s = cl.snippet;
   const g = classifyGeo(sim).code;
+  const land = sim.orient === 'landscape';
   const [line, text] = s.mark;
+  const lines = s.code.split('\n');
+  const verdict = cl.verdict;
   return (
-    <div key={s.id} style={{ position: 'absolute', left: 0, top: 0 }}>
-      <CodeTrace x={g.x} y={g.y} w={g.w} title={s.file} code={s.code} active={cl.revealed ? line : null} marks={cl.revealed ? { [line]: text } : {}} />
+    <div key={s.id} className={css.code} style={{ left: g.x, top: g.y, width: g.w }}>
+      <div className={css.codeHead}>
+        <span className={css.codeDots} aria-hidden>
+          <i />
+          <i />
+          <i />
+        </span>
+        {s.file}
+        {cl.revealed && (
+          <span className={css.codeVerdict} style={{ color: CLASSES[s.answer].color }}>
+            {verdict === false ? 'answer: ' : ''}
+            {CLASSES[s.answer].big}
+          </span>
+        )}
+      </div>
+      <pre className={css.codePre} style={land ? undefined : { fontSize: 10.5 }}>
+        {lines.map((l, i) => {
+          const n = i + 1;
+          const on = cl.revealed && n === line;
+          return (
+            <div key={i} className={css.codeLine} data-active={on}>
+              <span className={css.codeNum}>{on ? '▶' : n}</span>
+              <span className={css.codeText}>
+                {highlightLine(l, 'js')}
+                {l === '' ? ' ' : null}
+              </span>
+              {on && land && <span className={css.codeMark}>{text}</span>}
+            </div>
+          );
+        })}
+        {cl.revealed && !land && (
+          <div className={css.codeLine}>
+            <span className={css.codeNum} />
+            <span className={css.codeMark}>
+              line {line}: {text}
+            </span>
+          </div>
+        )}
+      </pre>
     </div>
   );
 }
@@ -533,7 +644,7 @@ function Prompts({ sim }: { sim: BigOSim }) {
       const idx = r.lanes.findIndex((l) => l.id === r.asking);
       const g = geos[idx];
       if (g) {
-        const text = land ? q.ask : q.ask.replace(/ steps at n = \d+\. At n = (\d+)\?/, ' → n = $1?');
+        const text = land ? q.ask : q.ask.replace(/ steps at n = (\d+)\. At n = (\d+)\?/, ' at n=$1 → n=$2?');
         return (
           <StagePrompt x={fit(text, (g.tx0 + g.tx1) / 2)} y={g.ty - (land ? 16 : 22)}>
             {text}

@@ -79,16 +79,20 @@ export class FibEngine {
 
   constructor(private sim: BigOSim) {}
 
+  /** Reveal the first tree quickly (the memoization step starts from a finished tree) */
+  fast = false;
+
   get rate() {
-    return this.memo ? 3 : 4;
+    return this.fast ? 16 : this.memo ? 3 : 4;
   }
 
-  reset(n: number, memo: boolean) {
+  reset(n: number, memo: boolean, fast = false) {
     this.clearBoxes();
     this.memo = memo;
+    this.fast = fast;
     this.build(n);
     this.revealed = 0;
-    this.t = -0.5;
+    this.t = fast ? 0 : -0.5;
     this.sim.rev++;
   }
 
@@ -165,7 +169,10 @@ export class FibEngine {
   }
 
   update(dt: number) {
-    if (this.done) return;
+    if (this.done) {
+      this.fast = false;
+      return;
+    }
     this.t += dt;
     const want = Math.min(this.active.length, Math.floor(Math.max(0, this.t) * this.rate) + 1);
     while (this.revealed < want) {

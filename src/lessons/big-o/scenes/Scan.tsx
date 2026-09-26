@@ -33,7 +33,8 @@ export function ScanScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
         let stroke = 'rgba(143,166,201,0.5)';
         let text = 'var(--text-1)';
         if (visited) {
-          fill = 'rgba(69,213,255,0.07)';
+          fill = 'rgba(69,213,255,0.12)';
+          stroke = 'rgba(69,213,255,0.38)';
           text = 'var(--text-2)';
         }
         if (isMax) {
@@ -58,12 +59,9 @@ export function ScanScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
           </g>
         );
       })}
-      {hl === 'array' && (
-        <rect x={g.cells[0].x - 6} y={g.arrY - 6} width={g.cells[g.cells.length - 1].x + g.cw - g.cells[0].x + 12} height={g.ch + 12} rx={9} fill="none" stroke="var(--accent)" strokeDasharray="3 3" />
-      )}
       {/* pointer */}
       {s.i >= 0 && s.i < s.n && (
-        <Pointer x={g.cells[s.i].x + g.cw / 2} y={g.arrY + g.ch + 4} label={land ? `i = ${s.i}` : `${s.i}`} done={!running} />
+        <Pointer x={g.cells[s.i].x + g.cw / 2} y={g.cells[s.i].y + g.ch + 4} label={land ? `i = ${s.i}` : `${s.i}`} done={!running} />
       )}
       <Register sim={sim} g={g} />
       {s.mode === 'max' && <DotsChart sim={sim} g={g} glow={hl === 'dots'} />}
@@ -144,8 +142,8 @@ function DotsChart({ sim, g, glow }: { sim: BigOSim; g: ScanGeo; glow: boolean }
         </g>
       ))}
       <path className={css.axis} d={`M${x0},${y0 - 4} V${y1} H${x1 + 4}`} />
-      <text className={css.caps} x={x1} y={y1 + (land ? 27 : 22)} textAnchor="end">
-        input size n →
+      <text className={css.caps} x={x1} y={y1 + (land ? 28 : 27)} textAnchor="end">
+        {land ? 'input size n →' : 'n →'}
       </text>
       <text className={css.caps} x={x0 + 6} y={y0 + 2}>
         steps

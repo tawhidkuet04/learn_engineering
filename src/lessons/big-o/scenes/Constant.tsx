@@ -66,7 +66,7 @@ export function ConstantScene({ sim, hl }: { sim: BigOSim; hl: string | null }) 
   const resize = Math.max(0, 1 - (sim.vt - k.changedVt) / 0.7);
 
   /* ---------------- row A: arr[6] ---------------- */
-  const aY = land ? f.y0 + 118 : f.y0 + 96;
+  const aY = land ? f.y0 + 142 : f.y0 + 96;
   const chipA = land ? { x: f.x0 + 4, y: aY - 22, w: 150, h: 44 } : { x: f.x0 + 2, y: f.y0 + 20, w: 118, h: 34 };
   const stripX0 = land ? f.x0 + 230 : f.x0 + 2;
   const stripX1 = f.x1 - (land ? 8 : 2);
@@ -83,7 +83,7 @@ export function ConstantScene({ sim, hl }: { sim: BigOSim; hl: string | null }) 
   }
 
   /* ---------------- row B: set.has("carol") ---------------- */
-  const bTop = land ? f.y0 + 300 : f.y0 + 214;
+  const bTop = land ? f.y0 + 330 : f.y0 + 214;
   const chipB = land ? { x: f.x0 + 4, y: bTop, w: 196, h: 44 } : { x: f.x0 + 2, y: bTop, w: 170, h: 34 };
   const hashBox = land ? { x: f.x0 + 250, y: bTop - 6, w: 250, h: 56 } : { x: f.x1 - 158, y: bTop - 4, w: 156, h: 42 };
   const bY = land ? bTop + 150 : bTop + 128;

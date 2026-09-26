@@ -27,16 +27,16 @@ export function LapseScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
       <line x1={g.tx0} x2={g.tx1} y1={g.rulerY} y2={g.rulerY} stroke="rgba(143,166,201,0.45)" />
       {ticks.map((t, i) => {
         const x = X(t.lg);
-        const up = land ? i % 2 === 0 : true;
         const universe = t.lg === UNIVERSE_LG_NS;
+        const row = universe && land ? 2 : land ? i % 2 : 0;
         return (
           <g key={t.label}>
             <line x1={x} x2={x} y1={g.rulerY - 4} y2={g.rulerY + 4} stroke={universe ? SIG.err : 'rgba(143,166,201,0.6)'} />
             <line x1={x} x2={x} y1={g.rulerY + 4} y2={bottom} stroke={universe ? 'rgba(255,77,106,0.35)' : 'rgba(143,166,201,0.07)'} strokeDasharray={universe ? '3 4' : undefined} />
             <text
               className={css.mono}
-              x={universe && land ? x - 2 : x}
-              y={g.rulerY - (up ? 9 : 21)}
+              x={universe && land ? x + 3 : x}
+              y={g.rulerY - 9 - row * 12}
               textAnchor={universe ? 'end' : i === 0 ? 'start' : 'middle'}
               style={{ fontSize: land ? 9.5 : 8.5, fill: universe ? SIG.err : t.major ? 'var(--text-2)' : undefined }}
             >
@@ -61,7 +61,8 @@ export function LapseScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
         const flash = dv != null ? Math.max(0, 1 - (sim.vt - dv) / 0.8) : 0;
         const glow = hl === `lane:${id}`;
         const timeText = done ? fmtTimeLg(fin) : beyond && !lp.running ? 'never' : '';
-        const steps = fmtCountLg(Math.min(fin, Math.max(0, play)));
+        const lgNow = done || beyond ? fin : Math.min(fin, Math.max(0, play));
+        const stepsText = `${beyond ? 'needs ' : ''}${fmtCountLg(lgNow)} step${lgNow < 1e-9 ? '' : 's'}`;
         return (
           <g key={id}>
             {land ? (
@@ -107,13 +108,13 @@ export function LapseScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
                   {timeText || (lp.running ? '…' : '')}
                 </text>
                 <text className={css.mono} x={L.valX} y={L.ty + 14} textAnchor="end">
-                  {beyond ? `${fmtCountLg(fin)} steps` : `${done ? fmtCountLg(fin) : steps} steps`}
+                  {stepsText}
                 </text>
               </g>
             )}
             {!land && (
               <text className={css.mono} x={L.valX} y={L.ty + 19} textAnchor="end" style={{ fontSize: 9 }}>
-                {beyond ? `${fmtCountLg(fin)} steps` : `${done ? fmtCountLg(fin) : steps} steps`}
+                {stepsText}
               </text>
             )}
           </g>

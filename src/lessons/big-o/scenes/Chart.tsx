@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { SIG } from '@/lib/sim/colors';
 import type { Curve } from '../engine/chart';
 import { plotGeo, type PlotGeo } from '../layout';
-import { commas, fmtCountLg, sup } from '../model';
+import { commas, sup } from '../model';
 import type { BigOSim } from '../sim';
 import css from '../bigo.module.css';
 
@@ -40,7 +40,7 @@ export function chartScale(sim: BigOSim, p: PlotGeo) {
     at(curve: Curve, u: number) {
       const nLin = Math.max(u * X, 1e-9);
       const nLog = 10 ** (u * lgX2);
-      const a = yLin(curve.lg(Math.max(1, nLin)));
+      const a = yLin(curve.lg(nLin));
       const b = yLog(curve.lg(nLog));
       return { x: p.x0 + u * W, y: Math.max(p.y0 - 4000, a + (b - a) * m) };
     },
@@ -83,6 +83,9 @@ export function ChartScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
   const H = p.y1 - p.y0;
   const curves = c.curves;
   const clipId = 'bigo-plot-clip';
+  const N = c.nNow;
+  const cx = s.xOf(N);
+  const nearCursor = (x: number) => Math.abs(x - cx) < 34;
 
   /* ---------- gridlines & ticks (crossfaded between linear and log) ---------- */
   const grid: ReactNode[] = [];
@@ -93,11 +96,12 @@ export function ChartScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
     for (let v = xs; v <= s.X * 1.0001; v += xs) {
       const x = p.x0 + (v / s.X) * W;
       grid.push(<line key={`lx${v}`} className={css.gridline} x1={x} x2={x} y1={p.y0} y2={p.y1} opacity={linA} />);
-      grid.push(
-        <text key={`lxt${v}`} className={css.mono} x={x} y={p.y1 + 14} textAnchor="middle" opacity={linA} style={{ fontSize: 9 }}>
-          {shortNum(v)}
-        </text>,
-      );
+      if (!nearCursor(x))
+        grid.push(
+          <text key={`lxt${v}`} className={css.mono} x={x} y={p.y1 + 14} textAnchor="middle" opacity={linA} style={{ fontSize: 9 }}>
+            {shortNum(v)}
+          </text>,
+        );
     }
     const Y = 10 ** s.lgY;
     const ys = niceStep(Y / 4);
@@ -117,7 +121,7 @@ export function ChartScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
       const x = p.x0 + (k / s.lgX2) * W;
       grid.push(<line key={`gx${k}`} className={css.gridline} x1={x} x2={x} y1={p.y0} y2={p.y1} opacity={logA} />);
       const every = maxX > 4 && !land ? 2 : 1;
-      if (k % every === 0)
+      if (k % every === 0 && !nearCursor(x))
         grid.push(
           <text key={`gxt${k}`} className={css.mono} x={x} y={p.y1 + 14} textAnchor="middle" opacity={logA} style={{ fontSize: 9 }}>
             {pow10Label(k)}
@@ -194,8 +198,6 @@ export function ChartScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
   }
 
   /* ---------- cursor at n ---------- */
-  const N = c.nNow;
-  const cx = s.xOf(N);
   const dots = curves.map((cv) => {
     const y = s.yOfLg(cv.lg(N));
     return { cv, y, off: y < p.y0 };
@@ -204,7 +206,7 @@ export function ChartScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
   /* ---------- label de-collision (right edge) ---------- */
   const right = labels.filter((l) => !l.exit).sort((a, b) => b.y - a.y);
   for (let i = 0; i < right.length; i++) {
-    const lim = i === 0 ? p.y1 - 2 : right[i - 1].y - 13;
+    const lim = i === 0 ? p.y1 - 2 : right[i - 1].y - 14;
     right[i].y = Math.min(right[i].y, lim);
   }
   const tops = labels.filter((l) => l.exit).sort((a, b) => a.x - b.x);
@@ -220,18 +222,18 @@ export function ChartScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
       {hl === 'plot' && <rect x={p.x0 - 8} y={p.y0 - 8} width={W + 16} height={H + 16} rx={8} fill="none" stroke="var(--accent)" strokeDasharray="3 3" />}
       {grid}
       <path className={css.axis} d={`M${p.x0},${p.y0 - 6} V${p.y1} H${p.x1 + 6}`} />
-      <text className={css.caps} x={p.x0 + 6} y={p.y0 + 4}>
+      <text className={css.caps} x={p.x0 - 8} y={p.y0 - 12} textAnchor={land ? 'middle' : 'start'}>
         steps{s.m > 0.5 ? ' (log)' : ''}
       </text>
-      <text className={css.caps} x={p.x1} y={p.y1 + (land ? 28 : 24)} textAnchor="end">
-        input size n{s.m > 0.5 ? ' (log)' : ''} →
+      <text className={css.caps} x={p.x1} y={p.y1 + (land ? 30 : 26)} textAnchor="end">
+        {land ? `input size n${s.m > 0.5 ? ' (log)' : ''} →` : `n${s.m > 0.5 ? ' (log)' : ''} →`}
       </text>
       <g clipPath={`url(#${clipId})`}>{paths}</g>
 
       {/* cursor */}
-      <line x1={cx} x2={cx} y1={p.y0} y2={p.y1} stroke={SIG.warn} strokeWidth={1.2} strokeDasharray="3 4" opacity={0.75} />
-      <g transform={`translate(${Math.min(p.x1 - 30, Math.max(p.x0 + 30, cx))},${p.y1 - 12})`}>
-        <rect x={-38} y={-10} width={76} height={19} rx={9.5} fill="rgba(7,11,20,0.92)" stroke={SIG.warn} strokeOpacity={0.6} />
+      <line x1={cx} x2={cx} y1={p.y0} y2={p.y1 + 2} stroke={SIG.warn} strokeWidth={1.2} strokeDasharray="3 4" opacity={0.75} />
+      <g transform={`translate(${Math.min(p.x1 + 4, Math.max(p.x0 + 30, cx))},${p.y1 + 11})`}>
+        <rect x={-34} y={-9} width={68} height={18} rx={9} fill="rgba(7,11,20,0.95)" stroke={SIG.warn} strokeOpacity={0.7} />
         <text className={css.monoStrong} x={0} y={4} textAnchor="middle" style={{ fill: SIG.warn, fontSize: 10.5 }}>
           n = {shortNum(Math.round(N))}
         </text>
@@ -260,11 +262,4 @@ export function ChartScene({ sim, hl }: { sim: BigOSim; hl: string | null }) {
       ))}
     </g>
   );
-}
-
-/** Values at the cursor for the readouts. */
-export function chartValues(sim: BigOSim) {
-  const c = sim.chart;
-  const N = Math.round(c.N);
-  return c.curves.map((cv) => ({ cv, lg: cv.lg(N), text: fmtCountLg(cv.lg(N)) }));
 }

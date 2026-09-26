@@ -290,6 +290,19 @@
   color: var(--text-1);
 }
 
+.tbl4 {
+  display: grid;
+  grid-template-columns: auto auto auto 1fr;
+  column-gap: 16px;
+  row-gap: 5px;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.tbl4 > span:nth-child(4n) {
+  text-align: right;
+}
+
 .tblHead {
   color: var(--text-3) !important;
   font-size: 9px;
@@ -349,6 +362,103 @@
 .chips span[data-last='true'] {
   border-color: var(--accent);
   color: var(--text-1);
+}
+
+/* ---------- code on the stage (classify) ---------- */
+.code {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--rule-strong);
+  background: rgba(6, 10, 19, 0.95);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  pointer-events: none !important;
+  animation: codeIn 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes codeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.codeHead {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.codeDots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.codeDots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(var(--line-rgb), 0.25);
+}
+
+.codeVerdict {
+  margin-left: auto;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.codePre {
+  margin: 0;
+  padding: 10px 0 12px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.75;
+  color: #c9d4e6;
+}
+
+.codeLine {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-right: 12px;
+  white-space: pre;
+  transition: background 200ms;
+}
+
+.codeLine[data-active='true'] {
+  background: rgba(255, 210, 63, 0.12);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.codeNum {
+  flex: none;
+  width: 30px;
+  text-align: right;
+  font-size: 0.78em;
+  color: var(--text-3);
+}
+
+.codeLine[data-active='true'] .codeNum {
+  color: var(--accent);
+}
+
+.codeText {
+  flex: 1;
+  min-width: 0;
+}
+
+.codeMark {
+  flex: none;
+  padding: 0 7px;
+  border-radius: 4px;
+  background: rgba(75, 227, 160, 0.12);
+  color: #8ff3c6;
+  font-size: 0.8em;
 }
 
 /* ---------- panel ---------- */

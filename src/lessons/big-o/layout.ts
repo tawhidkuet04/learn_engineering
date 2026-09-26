@@ -26,17 +26,17 @@ export function stripH(sim: BigOSim) {
   if (sim.orient === 'landscape') return 0;
   switch (sim.cfg.view) {
     case 'scan':
-      return sim.cfg.scan === 'cases' ? 76 : 58;
+      return sim.cfg.scan === 'cases' ? 92 : sim.cfg.scan === 'search' ? 74 : 52;
     case 'binary':
       return sim.cfg.binary === 'array' ? 58 : 0;
+    case 'race':
+      return sim.cfg.race === 'space' ? 74 : 0;
     case 'merge':
     case 'grid':
     case 'fib':
-      return 58;
+      return 52;
     case 'chart':
-      return 92;
-    case 'classify':
-      return 0;
+      return sim.cfg.chart === 'rules' ? 70 : 84;
     default:
       return 0;
   }
@@ -84,29 +84,59 @@ export interface LaneGeo {
   valX: number;
 }
 
-export function raceGeo(sim: BigOSim, count: number): LaneGeo[] {
+/** Height reserved under the lanes for a summary panel, per preset. */
+function racePanelH(sim: BigOSim, land: boolean) {
+  switch (sim.cfg.race) {
+    case 'machines':
+      return land ? 168 : 132;
+    case 'constants':
+      return land ? 236 : 184;
+    case 'space':
+      return land ? 118 : 0;
+    default:
+      return 0;
+  }
+}
+
+function raceLayout(sim: BigOSim, count: number) {
   const f = frame(sim);
   const space = sim.cfg.race === 'space';
+  const panelH = racePanelH(sim, f.land);
   if (f.land) {
     const laneH = space ? 84 : 60;
-    const gap = count <= 3 ? 30 : 18;
-    const total = count * laneH + (count - 1) * gap;
+    const gap = count <= 3 ? 28 : 18;
+    const lanesH = count * laneH + (count - 1) * gap;
+    const total = lanesH + (panelH ? panelH + 34 : 0);
     const top = f.y0 + Math.max(0, (f.y1 - f.y0 - total) / 2);
     const labelW = 184;
     const valW = 178;
-    return Array.from({ length: count }, (_, i) => {
+    const lanes = Array.from({ length: count }, (_, i) => {
       const y = top + i * (laneH + gap);
       return { y, h: laneH, labelX: f.x0, tx0: f.x0 + labelW, tx1: f.x1 - valW, ty: y + (space ? 30 : laneH / 2), valX: f.x1 };
     });
+    const py = top + lanesH + 34;
+    return { lanes, panel: { x0: f.x0, y0: py, x1: f.x1, y1: py + panelH } };
   }
   const laneH = space ? 92 : 64;
-  const gap = count <= 3 ? 22 : 10;
-  const total = count * laneH + (count - 1) * gap;
+  const gap = count <= 3 ? 16 : 10;
+  const lanesH = count * laneH + (count - 1) * gap;
+  const total = lanesH + (panelH ? panelH + 18 : 0);
   const top = f.y0 + Math.max(0, (f.y1 - f.y0 - total) / 2);
-  return Array.from({ length: count }, (_, i) => {
+  const lanes = Array.from({ length: count }, (_, i) => {
     const y = top + i * (laneH + gap);
-    return { y, h: laneH, labelX: f.x0 + 2, tx0: f.x0 + 4, tx1: f.x1 - 4, ty: y + 30, valX: f.x1 - 2 };
+    return { y, h: laneH, labelX: f.x0 + 2, tx0: f.x0 + 4, tx1: f.x1 - 18, ty: y + 30, valX: f.x1 - 2 };
   });
+  const py = top + lanesH + 18;
+  return { lanes, panel: { x0: f.x0, y0: py, x1: f.x1, y1: py + panelH } };
+}
+
+export function raceGeo(sim: BigOSim, count: number): LaneGeo[] {
+  return raceLayout(sim, count).lanes;
+}
+
+/** The summary panel under the lanes (machines, constants, space). */
+export function racePanel(sim: BigOSim) {
+  return raceLayout(sim, sim.race.lanes.length).panel;
 }
 
 /* ------------------------------------------------------------------ */
@@ -133,37 +163,43 @@ export function scanGeo(sim: BigOSim, n: number): ScanGeo {
     const gap = 6;
     const cw = Math.min(48, (f.x1 - f.x0 - 40 - (n - 1) * gap) / n);
     const ch = 44;
-    const arrY = search ? f.y0 + (f.y1 - f.y0) / 2 - 110 : f.y0 + 58;
+    const arrY = search ? f.y0 + (f.y1 - f.y0) / 2 - 120 : f.y0 + 58;
     const total = n * cw + (n - 1) * gap;
     const x0 = (f.x0 + f.x1) / 2 - total / 2;
     const cells = Array.from({ length: n }, (_, i) => ({ x: x0 + i * (cw + gap), y: arrY, w: cw, h: ch }));
     const panelTop = arrY + ch + 104;
-    const pw = cases ? 470 : 400;
+    const pw = cases ? 470 : 430;
+    const px0 = (f.x0 + f.x1) / 2 - (pw + 44 + 270) / 2;
     return {
       cells,
       cw,
       ch,
       arrY,
       reg: { x: (f.x0 + f.x1) / 2, y: arrY + ch + 46 },
-      panel: { x0: f.x0 + 60, y0: panelTop, x1: f.x0 + 60 + pw, y1: Math.min(f.y1, panelTop + 250) },
+      panel: { x0: px0, y0: panelTop, x1: px0 + pw, y1: Math.min(f.y1, panelTop + 260) },
       land: true,
     };
   }
-  const gap = n > 12 ? 3 : 5;
-  const cw = Math.min(40, (f.x1 - f.x0 - (n - 1) * gap) / n);
-  const ch = 28;
-  const arrY = search ? f.y0 + 70 : f.y0 + 34;
-  const total = n * cw + (n - 1) * gap;
+  // phones: one row up to 8 cells, two rows beyond that
+  const rows = n > 8 ? 2 : 1;
+  const per = Math.ceil(n / rows);
+  const gap = 5;
+  const cw = Math.min(40, (f.x1 - f.x0 - (per - 1) * gap) / per);
+  const ch = 32;
+  const pitch = ch + 36;
+  const arrY = search ? f.y0 + 46 : f.y0 + 26;
+  const total = per * cw + (per - 1) * gap;
   const x0 = (f.x0 + f.x1) / 2 - total / 2;
-  const cells = Array.from({ length: n }, (_, i) => ({ x: x0 + i * (cw + gap), y: arrY, w: cw, h: ch }));
-  const panelTop = arrY + ch + 92;
+  const cells = Array.from({ length: n }, (_, i) => ({ x: x0 + (i % per) * (cw + gap), y: arrY + Math.floor(i / per) * pitch, w: cw, h: ch }));
+  const bottom = arrY + (rows - 1) * pitch + ch;
+  const panelTop = bottom + 84;
   return {
     cells,
     cw,
     ch,
     arrY,
-    reg: { x: (f.x0 + f.x1) / 2, y: arrY + ch + 34 },
-    panel: { x0: f.x0 + 34, y0: panelTop, x1: f.x1 - 10, y1: Math.max(panelTop + 110, f.y1) },
+    reg: { x: (f.x0 + f.x1) / 2, y: bottom + 30 },
+    panel: { x0: f.x0 + 30, y0: panelTop, x1: f.x1 - 8, y1: Math.max(panelTop + 100, f.y1) },
     land: false,
   };
 }
@@ -177,20 +213,20 @@ export function binaryCells(sim: BigOSim, count = 32): { cells: Rect[]; cw: numb
   if (f.land) {
     const gap = 3;
     const cw = Math.min(30, (f.x1 - f.x0 - 20 - (count - 1) * gap) / count);
-    const ch = 36;
+    const ch = 42;
     const total = count * cw + (count - 1) * gap;
     const x0 = (f.x0 + f.x1) / 2 - total / 2;
-    const y = f.y0 + 96;
+    const y = f.y0 + Math.max(90, (f.y1 - f.y0) / 2 - 150);
     return { cells: Array.from({ length: count }, (_, i) => ({ x: x0 + i * (cw + gap), y, w: cw, h: ch })), cw, ch, rows: 1 };
   }
   const per = 8;
   const gap = 5;
   const cw = Math.min(40, (f.x1 - f.x0 - (per - 1) * gap) / per);
-  const ch = 30;
-  const pitch = 58;
+  const ch = 32;
+  const pitch = 62;
   const total = per * cw + (per - 1) * gap;
   const x0 = (f.x0 + f.x1) / 2 - total / 2;
-  const y0 = f.y0 + 34;
+  const y0 = f.y0 + 40;
   return {
     cells: Array.from({ length: count }, (_, i) => ({ x: x0 + (i % per) * (cw + gap), y: y0 + Math.floor(i / per) * pitch, w: cw, h: ch })),
     cw,
@@ -219,7 +255,7 @@ export function bigGeo(sim: BigOSim): BigGeo {
   const bx1 = f.x1 - 8;
   const per = 5;
   const gap = 6;
-  return { bx0, bx1, by: f.y0 + 62, bh: 30, oy: f.y0 + 150, ladder: { x0: bx0, x1: bx1, y: f.y0 + 196, per, cw: (bx1 - bx0 - (per - 1) * gap) / per, chH: 22, gap } };
+  return { bx0, bx1, by: f.y0 + 96, bh: 30, oy: f.y0 + 178, ladder: { x0: bx0, x1: bx1, y: f.y0 + 222, per, cw: (bx1 - bx0 - (per - 1) * gap) / per, chH: 22, gap } };
 }
 
 /* ------------------------------------------------------------------ */
@@ -239,8 +275,8 @@ export interface MergeGeo {
 export function mergeGeo(sim: BigOSim, n: number, L: number): MergeGeo {
   const f = frame(sim);
   const land = f.land;
-  const labelW = land ? 128 : 0;
-  const rightW = land ? 132 : 0;
+  const labelW = land ? 100 : 0;
+  const rightW = land ? 112 : 0;
   const ax0 = f.x0 + labelW;
   const ax1 = f.x1 - rightW;
   const areaW = ax1 - ax0;
@@ -286,7 +322,7 @@ export function gridGeo(sim: BigOSim, n: number): GridGeo {
   if (f.land) {
     const areaX1 = f.x1 - SIDE_W - 30;
     const hs = 30;
-    const S = Math.min(f.y1 - f.y0 - hs - 10, areaX1 - f.x0 - hs - 20, 16 * 36);
+    const S = Math.min(f.y1 - f.y0 - hs - 40, areaX1 - f.x0 - hs - 20, 520);
     const cell = S / n;
     const gx = f.x0 + hs + 16 + (areaX1 - f.x0 - hs - 16 - S) / 2;
     const gy = f.y0 + hs + 4 + (f.y1 - f.y0 - hs - 4 - S) / 2;
@@ -378,11 +414,11 @@ export interface ClassifyGeo {
 export function classifyGeo(sim: BigOSim): ClassifyGeo {
   const f = frame(sim);
   if (f.land) {
-    const w = Math.min(560, f.x1 - f.x0 - 40);
+    const w = Math.min(620, f.x1 - f.x0 - 40);
     const x = (f.x0 + f.x1) / 2 - w / 2;
-    return { code: { x, y: f.y0 + 6, w }, test: { x0: x, y0: f.y0 + 214, x1: x + w, y1: Math.min(f.y1, f.y0 + 470) } };
+    return { code: { x, y: f.y0 + 4, w }, test: { x0: x, y0: f.y0 + 262, x1: x + w, y1: Math.min(f.y1, f.y0 + 540) } };
   }
-  return { code: { x: f.x0, y: f.y0 - 2, w: f.x1 - f.x0 }, test: { x0: f.x0 + 4, y0: f.y0 + 178, x1: f.x1 - 4, y1: f.y1 - 4 } };
+  return { code: { x: f.x0, y: f.y0 - 4, w: f.x1 - f.x0 }, test: { x0: f.x0 + 4, y0: f.y0 + 214, x1: f.x1 - 4, y1: f.y1 - 4 } };
 }
 
 /* ------------------------------------------------------------------ */
