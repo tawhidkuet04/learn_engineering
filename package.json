@@ -15,6 +15,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "deploy": "next build && npx --yes wrangler@4.65.0 pages deploy out --project-name learn-engineering --branch main",
     "start": "next start",
     "lint": "eslint",
     "verify": "rm -rf verify/results && vitest run"

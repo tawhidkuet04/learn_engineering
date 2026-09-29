@@ -43,6 +43,7 @@ npm run dev          # http://localhost:3000
 | --- | --- |
 | `npm run dev` | Dev server with hot reload |
 | `npm run build` | Static export of the whole site to `out/` |
+| `npm run deploy` | Build and upload to Cloudflare Pages (needs `wrangler login`) |
 | `npm run lint` | ESLint |
 | `npx vitest run verify/<lesson>.test.ts` | Check one lesson against the real software (see below) |
 | `npm run verify` | Check every lesson (about 7 minutes) |
@@ -91,7 +92,7 @@ npm run build
 npx wrangler pages deploy out --project-name <your-project>
 ```
 
-Set your own name, URL and (optional) Buy Me a Coffee link in [`src/content/site.ts`](src/content/site.ts). The URL is used for share images.
+`npm run deploy` does both for the live site; change `--project-name` in `package.json` to use it for yours. Set your own name, URL and (optional) Buy Me a Coffee link in [`src/content/site.ts`](src/content/site.ts). The URL is used for share images.
 
 ## Contributing
 
