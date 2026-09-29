@@ -42,8 +42,7 @@ npm run dev          # http://localhost:3000
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Dev server with hot reload |
-| `npm run build` | Static export of the whole site to `out/` |
-| `npm run deploy` | Build and upload to Cloudflare Pages (needs `wrangler login`) |
+| `npm run build` | Production build: a static site in `out/` |
 | `npm run lint` | ESLint |
 | `npx vitest run verify/<lesson>.test.ts` | Check one lesson against the real software (see below) |
 | `npm run verify` | Check every lesson (about 7 minutes) |
@@ -82,17 +81,6 @@ Each test file needs a few programs installed:
 On macOS: `brew install nginx haproxy redis postgresql@14 mysql openjdk`. Everything runs on 127.0.0.1 with random ports and temp directories.
 
 Results depend on versions, and the badges say which versions were used. When you change a lesson, run only that lesson's file; its results replace only its own entries in `verify/results/` and `src/content/`. See [verify/README.md](verify/README.md) for how to write a check.
-
-## Deploy your own
-
-`npm run build` produces a plain static site in `out/` that any static host can serve. The live site runs on Cloudflare Pages:
-
-```bash
-npm run build
-npx wrangler pages deploy out --project-name <your-project>
-```
-
-`npm run deploy` does both for the live site; change `--project-name` in `package.json` to use it for yours. Set your own name, URL and (optional) Buy Me a Coffee link in [`src/content/site.ts`](src/content/site.ts). The URL is used for share images.
 
 ## Contributing
 
