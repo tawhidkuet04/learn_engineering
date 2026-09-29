@@ -5,6 +5,14 @@ on:
     branches: [main]
   pull_request:
 
+# Read-only token; a newer push cancels the run it replaces.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -1,0 +1,23 @@
+name: Something on the site is broken
+description: A page doesn't load, the animation or controls misbehave, text overlaps, or something isn't accessible.
+labels: [bug]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Page URL
+      description: The URL includes the step, e.g. https://learn-engineering.xyz/learn/tcp#three-way-handshake
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you saw. A screenshot helps.
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: e.g. Safari on iPhone, Chrome on Windows

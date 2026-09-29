@@ -2,6 +2,8 @@
 
 Thanks for helping. The goal is lessons that are clear to a beginner and have nothing wrong or hand-wavy for an expert, so corrections are as welcome as new features.
 
+Everyone taking part agrees to the [Code of Conduct](CODE_OF_CONDUCT.md). Found a security problem? Please report it privately, as described in [SECURITY.md](SECURITY.md), not in a public issue.
+
 ## Report something wrong
 
 If a lesson's animation, text or config doesn't match how the real software behaves, [open a "Something in a lesson is wrong" issue](https://github.com/tawhidkuet04/learn_engineering/issues/new/choose). Include the lesson URL (it contains the step), what you expected, and ideally how to see it on the real thing: versions, a config, a command. Evidence from the real software can usually become a check in `verify/`, so the mistake can't come back.

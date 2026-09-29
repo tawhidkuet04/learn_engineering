@@ -1,5 +1,8 @@
 # Moving Parts
 
+[![CI](https://github.com/tawhidkuet04/learn_engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/tawhidkuet04/learn_engineering/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **Systems, animated.** Step-by-step animated lessons on system design, networking and computer science. Watch requests move, predict what happens next, and break things on purpose.
 
 **Live: [learn-engineering.xyz](https://learn-engineering.xyz)**
@@ -84,7 +87,9 @@ Results depend on versions, and the badges say which versions were used. When yo
 
 ## Contributing
 
-Found something wrong in a lesson? That's the most useful thing you can report: [open an issue](https://github.com/tawhidkuet04/learn_engineering/issues/new/choose), ideally with how the real software behaves. Pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
+Found something wrong in a lesson? That's the most useful thing you can report: use the **Suggest a fix** link under any step, or [open an issue](https://github.com/tawhidkuet04/learn_engineering/issues/new/choose), ideally with how the real software behaves. Pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Everyone taking part agrees to the [Code of Conduct](CODE_OF_CONDUCT.md). Please report security problems privately, as described in [SECURITY.md](SECURITY.md).
 
 ## License
 
