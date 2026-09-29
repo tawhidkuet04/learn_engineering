@@ -8,7 +8,9 @@ npx vitest run verify/load-balancing.test.ts     # one lesson
 npx vitest run verify/load-balancing.test.ts -t "round robin"   # one test
 ```
 
-Needs `nginx`, `haproxy`, `redis-server` and `postgres` on the PATH (Homebrew: `brew install nginx haproxy redis postgresql`). Everything runs on 127.0.0.1 with random ports and temporary directories; nothing touches system config.
+Each file needs the programs it tests on the PATH: nginx, HAProxy, Redis, PostgreSQL, a MySQL server, curl, openssl, Google Chrome (or `CHROME_PATH`) and a JDK. The main [README](../README.md#checking-lessons-against-real-software) lists which file needs which. Everything runs on 127.0.0.1 with random ports and temporary directories; nothing touches system config.
+
+When you change one lesson, run only its file. Results are kept per test, so a partial run replaces only its own entries.
 
 ## What a run produces
 

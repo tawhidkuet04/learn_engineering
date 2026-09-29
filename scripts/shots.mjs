@@ -6,7 +6,7 @@
 // --steps   walk the whole lesson with the → key, one PNG per step
 // Prints console errors and page errors at the end. Needs Google Chrome
 // (or set CHROME_PATH).
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
 
 const args = process.argv.slice(2);
@@ -23,8 +23,15 @@ if (!url) {
 }
 mkdirSync(outDir, { recursive: true });
 
+const chromes = [
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  '/usr/bin/google-chrome',
+  '/usr/bin/google-chrome-stable',
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+];
 const browser = await puppeteer.launch({
-  executablePath: process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  executablePath: process.env.CHROME_PATH ?? chromes.find((p) => existsSync(p)) ?? chromes[0],
   headless: 'new',
   args: ['--no-sandbox', '--hide-scrollbars'],
 });

@@ -2,6 +2,16 @@
   "name": "learn_engineering",
   "version": "0.1.0",
   "private": true,
+  "description": "Step-by-step animated lessons on system design, networking and computer science.",
+  "license": "MIT",
+  "homepage": "https://learn-engineering.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tawhidkuet04/learn_engineering.git"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

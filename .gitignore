@@ -43,3 +43,7 @@ next-env.d.ts
 
 # agent worktrees
 /.claude/worktrees/
+
+# verify: half-written result files from an interrupted run
+/verify/results/*.tmp
+/src/content/*.tmp

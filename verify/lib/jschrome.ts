@@ -3,12 +3,21 @@
  * about the browser: rendering, input, timers, workers, WebSockets, the heap.
  * Everything runs on 127.0.0.1 with a random port.
  */
+import { existsSync } from 'node:fs';
 import http from 'node:http';
 import type { AddressInfo, Socket } from 'node:net';
 import type { Duplex } from 'node:stream';
 import puppeteer, { type Browser, type BrowserContext, type Page } from 'puppeteer-core';
 
-export const CHROME_PATH = process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+/** Where Chrome usually lives on macOS and Linux; set CHROME_PATH to override. */
+const CHROMES = [
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  '/usr/bin/google-chrome',
+  '/usr/bin/google-chrome-stable',
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+];
+export const CHROME_PATH = process.env.CHROME_PATH ?? CHROMES.find((p) => existsSync(p)) ?? CHROMES[0];
 
 export const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, Math.max(0, ms)));
 

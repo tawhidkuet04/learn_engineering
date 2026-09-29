@@ -15,21 +15,18 @@ A lesson is done when a curious developer who knows nothing about the topic can 
 - **End with a cheat sheet step and a playground step** (a sandbox with the main knobs, and ideally 2–3 challenges).
 - **Correct.** Numbers, protocol fields, names and behavior must be accurate. When simplifying, say so in an `Aside`.
 
-## Rules for parallel authors
+## Ground rules
 
-1. **Only create or edit files inside `src/lessons/<your-slug>/`.** Your folder already exists with a placeholder `Lesson.tsx` (default export) that is registered in `src/lessons/registry.ts`. Replace it.
-2. **Do not edit shared files**: `src/components/**`, `src/lib/**`, `src/app/**`, `src/content/**`, `registry.ts`, `package.json`, the load-balancing lesson or other lessons. If the kit is missing something, build it inside your folder and mention it in your final report.
-3. **No new npm dependencies.**
-4. Commit your work on your branch when done (see the end of this file).
+1. **Keep a lesson inside `src/lessons/<slug>/`.** Add a `Lesson.tsx` (default export), register it in `src/lessons/registry.ts`, and add or flip its entry in `src/content/catalog.ts`.
+2. **Kit changes go in their own pull request.** If a lesson needs something the shared kit (`src/components/**`, `src/lib/**`) lacks, build it inside the lesson folder first; move it into the kit once a second lesson needs it.
+3. **No new npm dependencies** without discussing it first.
 
-## Setup (inside your worktree)
+## Setup
 
 ```bash
-cp -cR "/path/to/learn_engineering/node_modules" ./node_modules   # instant APFS clone
-npx next dev --port <your port>        # then open http://localhost:<port>/learn/<slug>
+npm install
+npm run dev          # then open http://localhost:3000/learn/<slug>
 ```
-
-Stop your dev server when you finish.
 
 ## Architecture
 
@@ -113,13 +110,14 @@ Dark drafting-grid stage, thin pale linework, glowing signal-colored packets, ye
 1. `npx tsc --noEmit` and `npx eslint src/lessons/<slug>` are clean.
 2. Screenshot every step on desktop and phone:
    ```bash
-   node scripts/shots.mjs http://localhost:<port>/learn/<slug> shots/<slug> --steps --wait=4000
-   node scripts/shots.mjs http://localhost:<port>/learn/<slug> shots/<slug> --steps --wait=4000 --width=390 --height=844
+   node scripts/shots.mjs http://localhost:3000/learn/<slug> shots/<slug> --steps --wait=4000
+   node scripts/shots.mjs http://localhost:3000/learn/<slug> shots/<slug> --steps --wait=4000 --width=390 --height=844
    ```
    Look at **every** image. Fix overlaps, clipped text, empty-looking stages, unreadable labels, and anything that doesn't match the narration.
 3. Play each interaction (predict answers, sliders, buttons) and confirm the feedback is right.
 4. No console errors.
+5. Anything the lesson says about real software (a config, a default, an error message, how a crash plays out) gets a check in `verify/`, run against the real program. See [verify/README.md](../verify/README.md).
 
 ## Finish
 
-Commit on your branch with a clear message ending in `Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>`. Report: branch name, worktree path, number of chapters/steps, estimated minutes, what the lesson covers, and anything you needed from the kit.
+Open a pull request with a short summary: what the lesson covers, how many chapters and steps, the estimated minutes, and anything you added to the kit.

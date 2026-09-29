@@ -1,0 +1,24 @@
+name: Something in a lesson is wrong
+description: The animation, the text or a config snippet doesn't match how the real software behaves.
+labels: [lesson-error]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Lesson and step
+      description: Paste the page URL. It includes the step, e.g. https://learn-engineering.xyz/learn/load-balancing#a-server-crashes
+    validations:
+      required: true
+  - type: textarea
+    id: lesson
+    attributes:
+      label: What the lesson shows
+    validations:
+      required: true
+  - type: textarea
+    id: real
+    attributes:
+      label: What really happens
+      description: Versions, a config or commands that show it, links to docs. Evidence from the real software can become a check in verify/, so the mistake can't come back.
+    validations:
+      required: true
