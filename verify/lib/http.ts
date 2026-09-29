@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
 import http from 'node:http';
 import https from 'node:https';
+import { testCert } from './confs';
 
 export interface Hit {
   /** Seconds since the traffic run started */
@@ -17,7 +19,7 @@ export interface Hit {
 
 /**
  * One request on a fresh TCP connection unless an agent is given. HTTPS
- * accepts the self-signed test certificate.
+ * trusts the throwaway test certificate (and nothing else).
  */
 export function request(
   url: string,
@@ -27,7 +29,7 @@ export function request(
   const secure = url.startsWith('https:');
   const mod = secure ? https : http;
   return new Promise((resolve) => {
-    const options = { method: opts.method ?? 'GET', headers: opts.headers, agent: opts.agent ?? false, ...(secure ? { rejectUnauthorized: false } : {}) };
+    const options = { method: opts.method ?? 'GET', headers: opts.headers, agent: opts.agent ?? false, ...(secure ? { ca: readFileSync(testCert().crt) } : {}) };
     const req = mod.request(url, options, (res) => {
       let body = '';
       res.setEncoding('utf8');

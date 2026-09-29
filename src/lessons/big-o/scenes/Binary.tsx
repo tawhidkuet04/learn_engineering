@@ -142,7 +142,7 @@ function Verdict({ sim, y }: { sim: BigOSim; y: number }) {
     text = `${b.target} isn't there · ${b.steps} steps`;
     tone = SIG.err;
   } else if (b.phase === 'cut') text = `${b.hi - b.lo + 1} left to search`;
-  if (!land && text.length > 34) text = text.replace(' → ', ' → ').replace('drop the ', '');
+  if (!land && text.length > 34) text = text.replace(' → ', '→').replace('drop the ', '');
   const w = text.length * (land ? 7.4 : 6.5) + 28;
   return (
     <g transform={`translate(${cx},${y})`}>

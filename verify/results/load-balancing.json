@@ -176,30 +176,10 @@
       "step": "adding-a-server-reshuffles",
       "title": "Going from 3 to 4 servers",
       "software": "nginx 1.31.6",
-      "real": "ip_hash moved 78% of 200 visitors; hash … consistent moved 24%",
+      "real": "ip_hash moved 78% of 200 visitors; hash … consistent moved 27%",
       "lesson_says": "toy hash moves 79% (\"almost every user\"); consistent hashing about 1 in N",
       "pass": true,
       "test": "sticky sessions > adding a server moves most users; consistent hashing moves about 1 in N (adding-a-server-reshuffles)"
-    },
-    {
-      "lesson": "load-balancing",
-      "step": "layer-4",
-      "title": "One connection, one server",
-      "software": "HAProxy 3.4.6",
-      "real": "mode tcp: six requests on one connection all went to web-3; mode http: web-1, web-2, web-3, web-1, web-2, web-3",
-      "lesson_says": "all of Alice's requests follow her connection (web-1 ×13)",
-      "pass": true,
-      "test": "layer 4 and layer 7 > layer 4 keeps a whole connection on one server (layer-4)"
-    },
-    {
-      "lesson": "load-balancing",
-      "step": "layer-7",
-      "title": "/api/ and /media/ go to different pools",
-      "software": "nginx 1.31.6",
-      "real": "/api/cart → web-1, web-2, web-1, web-2; /media/hero.jpg → web-3, web-3",
-      "lesson_says": "/api/* → web-1, web-2; /media/* → web-3",
-      "pass": true,
-      "test": "layer 4 and layer 7 > layer 7 routes by path (layer-7)"
     },
     {
       "lesson": "load-balancing",
@@ -276,7 +256,7 @@
       "step": "a-server-crashes",
       "title": "With option redispatch, a refused request goes to another server",
       "software": "HAProxy 3.4.6",
-      "real": "200 web-1, 200 web-3, 200 web-3, 200 web-3, 200 web-1, 200 web-3; slowest 1 ms",
+      "real": "200 web-1, 200 web-3, 200 web-3, 200 web-1, 200 web-1, 200 web-1; slowest 1 ms",
       "lesson_says": "HAProxy retries on another server too if you add option redispatch",
       "pass": true,
       "test": "when servers fail > HAProxy with option redispatch retries on another server (a-server-crashes aside)"
@@ -286,7 +266,7 @@
       "step": "playground",
       "software": "nginx 1.31.6",
       "title": "One server crashes, the others are fine",
-      "real": "0 errors in 118 requests; the retry cost at most 2 ms",
+      "real": "0 errors in 118 requests; the retry cost at most 3 ms",
       "lesson_says": "0 errors in 45 requests (NGINX retries the next server)",
       "pass": true,
       "test": "when servers fail > nginx: a crash under the playground config (playground)"
@@ -310,6 +290,26 @@
       "lesson_says": "skipped for 10 s after each refusal",
       "pass": true,
       "test": "when servers fail > nginx: a dead server is skipped for 10 seconds, then tried again"
+    },
+    {
+      "lesson": "load-balancing",
+      "step": "layer-4",
+      "title": "One connection, one server",
+      "software": "HAProxy 3.4.6",
+      "real": "mode tcp: six requests on one connection all went to web-2; mode http: web-1, web-2, web-3, web-1, web-2, web-3",
+      "lesson_says": "all of Alice's requests follow her connection (web-1 ×13)",
+      "pass": true,
+      "test": "layer 4 and layer 7 > layer 4 keeps a whole connection on one server (layer-4)"
+    },
+    {
+      "lesson": "load-balancing",
+      "step": "layer-7",
+      "title": "/api/ and /media/ go to different pools",
+      "software": "nginx 1.31.6",
+      "real": "/api/cart → web-1, web-2, web-1, web-2; /media/hero.jpg → web-3, web-3",
+      "lesson_says": "/api/* → web-1, web-2; /media/* → web-3",
+      "pass": true,
+      "test": "layer 4 and layer 7 > layer 7 routes by path (layer-7)"
     }
   ],
   "stamps": [
@@ -434,11 +434,19 @@
       "test": "sticky sessions > ip_hash keeps each visitor on one server (sticky-sessions)"
     },
     {
+      "hash": "1dg6jwp",
+      "lesson": "load-balancing",
+      "by": "HAProxy 3.4.6",
+      "kind": "ran",
+      "note": "Ran it on HAProxy 3.4.6 and crashed web-2: requests sent its way got 503 after 3 s of retries, it was pulled after 3 failed checks, and came back after 2 passing ones.",
+      "test": "when servers fail > HAProxy: a crash, three failed checks, recovery (health-checks, a-server-crashes, recovery)"
+    },
+    {
       "hash": "8a37r",
       "lesson": "load-balancing",
       "by": "HAProxy 3.4.6",
       "kind": "ran",
-      "note": "Ran it on HAProxy 3.4.6: six requests over one connection all reached web-3. Switched to mode http, they were spread out.",
+      "note": "Ran it on HAProxy 3.4.6: six requests over one connection all reached the same server. Switched to mode http, they were spread out.",
       "test": "layer 4 and layer 7 > layer 4 keeps a whole connection on one server (layer-4)"
     },
     {
@@ -448,14 +456,6 @@
       "kind": "ran",
       "note": "Ran it on nginx 1.31.6 over HTTPS: /api/ requests alternated between the two API servers and /media/ went to the media server.",
       "test": "layer 4 and layer 7 > layer 7 routes by path (layer-7)"
-    },
-    {
-      "hash": "1dg6jwp",
-      "lesson": "load-balancing",
-      "by": "HAProxy 3.4.6",
-      "kind": "ran",
-      "note": "Ran it on HAProxy 3.4.6 and crashed web-2: requests sent its way got 503 after 3 s of retries, it was pulled after 3 failed checks, and came back after 2 passing ones.",
-      "test": "when servers fail > HAProxy: a crash, three failed checks, recovery (health-checks, a-server-crashes, recovery)"
     }
   ]
 }

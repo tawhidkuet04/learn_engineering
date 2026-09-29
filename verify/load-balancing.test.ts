@@ -365,7 +365,7 @@ describe('layer 4 and layer 7', () => {
       pass,
     });
     expect(pass).toBe(true);
-    R.stamp(s.code, { lesson: LESSON, by: HAPROXY, kind: 'ran', note: `Ran it on HAProxy ${haproxyVersion()}: six requests over one connection all reached ${oneConn[0]}. Switched to mode http, they were spread out.` });
+    R.stamp(s.code, { lesson: LESSON, by: HAPROXY, kind: 'ran', note: `Ran it on HAProxy ${haproxyVersion()}: six requests over one connection all reached the same server. Switched to mode http, they were spread out.` });
   });
 
   test('layer 7 routes by path (layer-7)', async () => {

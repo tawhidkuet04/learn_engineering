@@ -1364,26 +1364,8 @@
    "step": "adding-a-server-reshuffles",
    "title": "Going from 3 to 4 servers",
    "software": "nginx 1.31.6",
-   "real": "ip_hash moved 78% of 200 visitors; hash … consistent moved 24%",
+   "real": "ip_hash moved 78% of 200 visitors; hash … consistent moved 27%",
    "lesson_says": "toy hash moves 79% (\"almost every user\"); consistent hashing about 1 in N",
-   "pass": true
-  },
-  {
-   "lesson": "load-balancing",
-   "step": "layer-4",
-   "title": "One connection, one server",
-   "software": "HAProxy 3.4.6",
-   "real": "mode tcp: six requests on one connection all went to web-3; mode http: web-1, web-2, web-3, web-1, web-2, web-3",
-   "lesson_says": "all of Alice's requests follow her connection (web-1 ×13)",
-   "pass": true
-  },
-  {
-   "lesson": "load-balancing",
-   "step": "layer-7",
-   "title": "/api/ and /media/ go to different pools",
-   "software": "nginx 1.31.6",
-   "real": "/api/cart → web-1, web-2, web-1, web-2; /media/hero.jpg → web-3, web-3",
-   "lesson_says": "/api/* → web-1, web-2; /media/* → web-3",
    "pass": true
   },
   {
@@ -1454,7 +1436,7 @@
    "step": "a-server-crashes",
    "title": "With option redispatch, a refused request goes to another server",
    "software": "HAProxy 3.4.6",
-   "real": "200 web-1, 200 web-3, 200 web-3, 200 web-3, 200 web-1, 200 web-3; slowest 1 ms",
+   "real": "200 web-1, 200 web-3, 200 web-3, 200 web-1, 200 web-1, 200 web-1; slowest 1 ms",
    "lesson_says": "HAProxy retries on another server too if you add option redispatch",
    "pass": true
   },
@@ -1463,7 +1445,7 @@
    "step": "playground",
    "title": "One server crashes, the others are fine",
    "software": "nginx 1.31.6",
-   "real": "0 errors in 118 requests; the retry cost at most 2 ms",
+   "real": "0 errors in 118 requests; the retry cost at most 3 ms",
    "lesson_says": "0 errors in 45 requests (NGINX retries the next server)",
    "pass": true
   },
@@ -1483,6 +1465,24 @@
    "software": "nginx 1.31.6",
    "real": "2 attempts in 13 s at 5 req/s, 11 s apart (the first at +-0 s)",
    "lesson_says": "skipped for 10 s after each refusal",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "layer-4",
+   "title": "One connection, one server",
+   "software": "HAProxy 3.4.6",
+   "real": "mode tcp: six requests on one connection all went to web-2; mode http: web-1, web-2, web-3, web-1, web-2, web-3",
+   "lesson_says": "all of Alice's requests follow her connection (web-1 ×13)",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "layer-7",
+   "title": "/api/ and /media/ go to different pools",
+   "software": "nginx 1.31.6",
+   "real": "/api/cart → web-1, web-2, web-1, web-2; /media/hero.jpg → web-3, web-3",
+   "lesson_says": "/api/* → web-1, web-2; /media/* → web-3",
    "pass": true
   },
   {
