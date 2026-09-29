@@ -92,6 +92,25 @@ export const APPS: Record<AppKind, AppInfo> = {
   video: { label: 'Video call', proto: 'RTP', l4: 'udp', sport: 50012, dport: 5004, portName: 'rtp' },
 };
 
+/**
+ * Layers that exist only in the model for this app: no separate protocol runs
+ * there, and nothing is added to the data. Their jobs happen inside the app.
+ */
+export function isHollow(n: LayerN, app: AppKind): boolean {
+  return n === 5 || (n === 6 && app !== 'https');
+}
+
+/**
+ * Where each layer's work really happens on a Linux host, top to bottom. Spans
+ * are in layer units: 4.5 is the gap between rows 4 and 5, 2 is the middle of
+ * row 2. Layer 2 is split: the kernel writes the header, the card adds the FCS.
+ */
+export const RUNS_ON: { label: string; span: [number, number] }[] = [
+  { label: 'the program', span: [7.5, 4.5] },
+  { label: 'OS kernel', span: [4.5, 2] },
+  { label: 'network card', span: [2, 0.5] },
+];
+
 /** Label for each layer row, per machine side and settings. */
 export function protoFor(n: LayerN, app: AppKind, link: LinkKind, side: 'alice' | 'far'): string {
   const a = APPS[app];
@@ -99,9 +118,8 @@ export function protoFor(n: LayerN, app: AppKind, link: LinkKind, side: 'alice' 
     case 7:
       return a.proto;
     case 6:
-      return app === 'https' ? 'TLS' : '—';
     case 5:
-      return '—';
+      return isHollow(n, app) ? '—' : 'TLS';
     case 4:
       return a.l4.toUpperCase();
     case 3:

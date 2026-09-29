@@ -4,8 +4,8 @@ import { SIG } from '@/lib/sim/colors';
 import { clamp } from '@/lib/sim/geometry';
 import { ClientCard, Effects, Flights, NodeCard, Wires } from '@/components/stage/svg';
 import { TRACE_HOPS } from './content';
-import { LAYERS, REGION_COLOR, TCPIP, bitSample, blockColor, blockLabel, blockBytes, protoFor, receiverFor, type BlockKind, type Built, type LayerN } from './model';
-import { OsiSim, type Col, type DevId } from './sim';
+import { LAYERS, REGION_COLOR, RUNS_ON, TCPIP, bitSample, blockColor, blockLabel, blockBytes, isHollow, protoFor, receiverFor, type BlockKind, type Built, type LayerN } from './model';
+import { OsiSim, RAIL_W, type Col, type DevId } from './sim';
 import css from './osi.module.css';
 
 export interface SceneOpts {
@@ -44,6 +44,7 @@ export function Scene({ sim, opts }: { sim: OsiSim; opts: SceneOpts }) {
   return (
     <g>
       {opts.peers && view === 'stack' && <PeerLines sim={sim} />}
+      {view === 'stack' && sim.orient === 'landscape' && <RunsOn sim={sim} opts={opts} />}
       <Cables sim={sim} />
       {sim.g.cols.map((c) => (
         <Column key={c.dev} sim={sim} col={c} opts={opts} />
@@ -179,17 +180,21 @@ function Row({ sim, col, slot, opts, d }: { sim: OsiSim; col: Col; slot: Slot; o
   const here = unitAt(sim);
   const active = !!here && here.dev === col.dev && slot.layers.includes(here.layer) && !!sim.tripSpecActive;
   const side = col.dev === 'alice' ? 'alice' : 'far';
-  const proto = multi
-    ? `${protoFor(4, sim.cfg.app, sim.cfg.link, side)} · ${protoFor(7, sim.cfg.app, sim.cfg.link, side)}`
-    : col.dev === 'rt' && L === 1
-      ? 'copper · fiber'
-      : col.dev === 'sw' && L === 1
-        ? sim.cfg.link === 'wifi' ? 'radio · copper' : 'copper'
-        : col.dev === 'sw' && L === 2 && sim.cfg.link === 'wifi'
-          ? '802.11 → Eth'
-          : col.dev === 'ref'
-            ? ''
-            : protoFor(L, sim.cfg.app, sim.cfg.link, side);
+  // Layers 5 and 6 with no protocol of their own: drawn as empty boxes, because the app does their jobs.
+  const hollow = !multi && (col.dev === 'alice' || col.dev === 'srv') && isHollow(L, sim.cfg.app);
+  const proto = hollow
+    ? 'in the app'
+    : multi
+      ? `${protoFor(4, sim.cfg.app, sim.cfg.link, side)} · ${protoFor(7, sim.cfg.app, sim.cfg.link, side)}`
+      : col.dev === 'rt' && L === 1
+        ? 'copper · fiber'
+        : col.dev === 'sw' && L === 1
+          ? sim.cfg.link === 'wifi' ? 'radio · copper' : 'copper'
+          : col.dev === 'sw' && L === 2 && sim.cfg.link === 'wifi'
+            ? '802.11 → Eth'
+            : col.dev === 'ref'
+              ? ''
+              : protoFor(L, sim.cfg.app, sim.cfg.link, side);
   const dim = !!opts.focus?.length && !slot.layers.some((l) => opts.focus!.includes(l));
   const glow = slot.layers.some((l) => opts.highlight === `${col.dev}.${l}`);
   const flash = slot.layers.map((l) => sim.flashes.get(`${col.dev}.${l}`)).find(Boolean);
@@ -208,7 +213,7 @@ function Row({ sim, col, slot, opts, d }: { sim: OsiSim; col: Col; slot: Slot; o
   // Every density uses two lines: name on top, then the job (full) or the protocol.
   const line1 = d === 'full' ? h / 2 - 3 : h / 2 - 2;
   const line2 = d === 'full' ? h / 2 + 12 : d === 'mid' ? h / 2 + 13 : h / 2 + 11;
-  const protoStyle = active ? { fill: info.color } : proto === '—' ? { opacity: 0.5 } : undefined;
+  const protoStyle = active ? { fill: info.color } : hollow ? { opacity: 0.6 } : proto === '—' ? { opacity: 0.5 } : undefined;
 
   return (
     <g
@@ -223,19 +228,19 @@ function Row({ sim, col, slot, opts, d }: { sim: OsiSim; col: Col; slot: Slot; o
       {active && <rect x={-4} y={-4} width={w + 8} height={h + 8} rx={10} fill={info.color} opacity={0.09} />}
       {fk > 0 && <rect x={-3} y={-3} width={w + 6} height={h + 6} rx={9} fill="none" stroke={flash!.color} strokeWidth={2.2} opacity={fk * 0.85} />}
       {glow && <rect x={-6} y={-6} width={w + 12} height={h + 12} rx={11} fill="none" stroke="var(--accent)" strokeWidth={1.4} strokeDasharray="3 3" />}
-      <rect className={css.rowRect} width={w} height={h} rx={7} style={accent ? { stroke: accent, strokeWidth: 1.6 } : undefined} data-pick={pick || undefined} />
+      <rect className={css.rowRect} width={w} height={h} rx={7} style={accent ? { stroke: accent, strokeWidth: 1.6 } : undefined} data-pick={pick || undefined} data-hollow={hollow || undefined} />
       {colors.map((c, i) => (
-        <rect key={i} x={0.5} y={0.5 + (i * (h - 1)) / colors.length} width={4} height={(h - 1) / colors.length} fill={c} opacity={active || !dim ? 0.95 : 0.6} rx={i === 0 || i === colors.length - 1 ? 2 : 0} />
+        <rect key={i} x={0.5} y={0.5 + (i * (h - 1)) / colors.length} width={4} height={(h - 1) / colors.length} fill={c} opacity={hollow ? 0.35 : active || !dim ? 0.95 : 0.6} rx={i === 0 || i === colors.length - 1 ? 2 : 0} />
       ))}
       {dead && <rect width={w} height={h} rx={7} fill="url(#kit-hatch)" />}
       <text className={css.rowNum} x={numX} y={d === 'full' ? h / 2 + 4 : line1} fill={info.color} style={d === 'tiny' ? { fontSize: 10 } : multi ? { fontSize: 11 } : undefined}>
         {num}
       </text>
-      <text className={css.rowName} x={nameX} y={line1} style={d === 'tiny' ? { fontSize: 10.5 } : d === 'small' ? { fontSize: 11.5 } : undefined}>
+      <text className={css.rowName} x={nameX} y={line1} opacity={hollow ? 0.62 : undefined} style={d === 'tiny' ? { fontSize: 10.5 } : d === 'small' ? { fontSize: 11.5 } : undefined}>
         {name}
       </text>
       {d === 'full' && (
-        <text className={css.rowJob} x={nameX} y={line2}>
+        <text className={css.rowJob} x={nameX} y={line2} opacity={hollow ? 0.75 : undefined}>
           {multi ? 'TCP, TLS and the app' : info.job}
         </text>
       )}
@@ -275,6 +280,49 @@ function MergedRow({ sim, col, slot, d }: { sim: OsiSim; col: Col; slot: Slot & 
       <text className={css.rowJob} x={small ? 12 : 18} y={h / 2 + (small ? 10 : 12)} style={small ? { fontSize: 8.5 } : undefined}>
         {col.dev === 'ref' ? `OSI ${nums}` : `OSI ${nums}${protos && !small ? ` · ${protos}` : ''}`}
       </text>
+    </g>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Where each layer really runs: program, kernel, network card         */
+/* ------------------------------------------------------------------ */
+
+function RunsOn({ sim, opts }: { sim: OsiSim; opts: SceneOpts }) {
+  const { pitch, rowH } = sim.g;
+  const tick = 5;
+  return (
+    <g>
+      {(['alice', 'srv'] as DevId[]).map((dev) => {
+        const c = sim.col(dev);
+        if (!c) return null;
+        // Fade and dim with the stack it labels.
+        const alpha = (sim.boxes.get(dev)?.alpha ?? 1) * (opts.focusDevs?.length && !opts.focusDevs.includes(dev) ? 0.3 : 1);
+        const left = dev === 'alice';
+        // The rail sits just outside the stack; ticks point back at the rows.
+        const x = left ? c.cx - c.w / 2 - RAIL_W / 2 + 2 : c.cx + c.w / 2 + RAIL_W / 2 - 2;
+        const dx = left ? tick : -tick;
+        const y1 = sim.slotY(c, 1);
+        const yOf = (v: number) => (v >= 7.5 ? sim.slotY(c, 7) - rowH / 2 : v <= 0.5 ? y1 + rowH / 2 : y1 - (v - 1) * pitch);
+        return (
+          <g key={dev} opacity={alpha}>
+            {RUNS_ON.map((r) => {
+              const top = yOf(r.span[0]) + 3;
+              const bottom = yOf(r.span[1]) - 3;
+              const mid = (top + bottom) / 2;
+              const tw = r.label.length * 7 + 12;
+              return (
+                <g key={r.label}>
+                  <path d={`M${x + dx},${top} H${x} V${mid - tw / 2} M${x},${mid + tw / 2} V${bottom} H${x + dx}`} className={css.rail} />
+                  <text className={css.railLabel} transform={`translate(${x},${mid}) rotate(${left ? -90 : 90})`} y={3.2} textAnchor="middle">
+                    {r.label}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+        );
+      })}
     </g>
   );
 }

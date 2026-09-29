@@ -9,6 +9,7 @@ import {
   LAYERS,
   build,
   blockBytes,
+  isHollow,
   receiverFor,
   unitName,
   type AppKind,
@@ -123,6 +124,8 @@ const BASE_W: Record<BlockKind, number> = { app: 100, tls: 52, tcp: 64, udp: 56,
 const APP_W: Record<AppKind, number> = { http: 100, https: 100, smtp: 90, dns: 80, video: 120 };
 const GAP = 3;
 const SPRITE_GAP_PORTRAIT = 7;
+/** Landscape stack view: room outside each stack for the rail that shows where each layer runs. */
+export const RAIL_W = 20;
 
 export function blockWidth(k: BlockKind, app: AppKind) {
   return k === 'app' ? APP_W[app] : BASE_W[k];
@@ -463,10 +466,12 @@ export class OsiSim extends Sim {
         rowH = pitch - 11;
         y1 = top + 6 * pitch + rowH / 2;
         if (view === 'stack') {
+          // The outer edge of each stack holds the rail that shows where each layer runs.
+          const edge = 24 + RAIL_W;
           const cw = clamp(w * 0.235, 186, 236);
-          cols.push({ dev: 'alice', cx: 24 + cw / 2, w: cw, layers: OsiSim.layersOf('alice'), collapsed: false });
-          cols.push({ dev: 'srv', cx: w - 24 - cw / 2, w: cw, layers: OsiSim.layersOf('srv'), collapsed: false });
-          const lane = w - 48 - 2 * cw;
+          cols.push({ dev: 'alice', cx: edge + cw / 2, w: cw, layers: OsiSim.layersOf('alice'), collapsed: false });
+          cols.push({ dev: 'srv', cx: w - edge - cw / 2, w: cw, layers: OsiSim.layersOf('srv'), collapsed: false });
+          const lane = w - 2 * edge - 2 * cw;
           scale = Math.min(1, (lane - 30) / full);
         } else {
           const cw = clamp(w * 0.27, 220, 270);
@@ -784,8 +789,10 @@ export class OsiSim extends Sim {
     };
     const flashRow = (color?: string) => live && this.flash(`${wp.dev}.${wp.layer}`, color ?? LAYERS[wp.layer].color);
 
+    // Layers 5 and 6 are only boxes in the model unless TLS runs: the unit passes through without a flash.
+    const hollow = isHollow(wp.layer, app);
     if (wp.act === 'encap') {
-      flashRow();
+      if (!hollow) flashRow();
       switch (wp.layer) {
         case 7:
           if (live && this.broken === 'dns') {
@@ -934,7 +941,7 @@ export class OsiSim extends Sim {
     }
 
     if (wp.act === 'decap') {
-      flashRow();
+      if (!hollow) flashRow();
       switch (wp.layer) {
         case 2:
           this.bits = false;

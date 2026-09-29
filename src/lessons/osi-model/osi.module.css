@@ -10,6 +10,28 @@
   transition: stroke 200ms;
 }
 
+/* a layer that exists only in the model here: no protocol, no header */
+.rowRect[data-hollow] {
+  fill: rgba(var(--line-rgb), 0.015);
+  stroke-dasharray: 4 3;
+}
+
+/* the "runs in" rail beside each stack */
+.rail {
+  fill: none;
+  stroke: rgba(var(--line-rgb), 0.6);
+  stroke-width: 1.2;
+}
+
+.railLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  fill: var(--text-2);
+}
+
 .rowClick {
   cursor: pointer;
 }

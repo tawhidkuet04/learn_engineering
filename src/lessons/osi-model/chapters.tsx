@@ -77,6 +77,11 @@ export const CHAPTERS: Chapter[] = [
               then climbs <strong>up</strong> <Term k="srv">the server’s stack</Term>, shrinking back to the original 75 bytes. By the end of this lesson
               you’ll be able to read every block.
             </p>
+            <Aside>
+              The seven boxes are the <strong>OSI model</strong>: a map for talking about networks, not seven programs running on the laptop. On a real
+              machine the program does layers 5 to 7, the OS kernel does 3 and 4, and the network card handles the signal. Layers 5 and 6 are dashed because
+              on the internet they rarely exist as separate protocols.
+            </Aside>
           </>
         ),
         hud: ['unit', 'size'],
@@ -90,8 +95,8 @@ export const CHAPTERS: Chapter[] = [
         body: (
           <>
             <p>
-              Networks split the work into <strong>layers</strong>. Each layer solves exactly one problem, and it only talks to the layers directly above and
-              below it, through a simple interface.
+              The model splits the work into <strong>layers</strong>. Each layer solves one problem and only talks to the layers directly above and below it,
+              through a simple interface. Real protocols bend that rule now and then: TCP’s checksum, for one, also covers the IP addresses.
             </p>
             <p>
               Each layer also has a twin on the other machine, its <strong>peer</strong>. <Term k="alice.4">TCP on Alice’s laptop</Term> talks to{' '}
@@ -103,8 +108,8 @@ export const CHAPTERS: Chapter[] = [
               2), as you’ll see in chapter 4.
             </p>
             <Aside>
-              This seven-layer picture is the <strong>OSI model</strong> (Open Systems Interconnection), published by the ISO in 1984. It’s a model, not a
-              protocol: a shared map for talking about networks.
+              OSI (Open Systems Interconnection) was published by the ISO in 1984, as part of a project to build a whole new family of protocols. The
+              protocols lost to TCP/IP, which the internet runs on, but the seven-layer vocabulary stuck. Chapter 5 lines the two up.
             </Aside>
           </>
         ),
@@ -198,8 +203,8 @@ $ curl -v http://shop.example/
               compression, encryption. The <Term k="alice.5">session layer</Term> opens, keeps alive and closes a conversation.
             </p>
             <p>
-              Here’s the honest part: on the internet, layers 5 and 6 rarely exist as separate protocols. Their jobs happen inside the application and its
-              libraries. So for plain HTTP, the request passes through both layers unchanged.
+              That’s why they’re drawn dashed: on the internet, layers 5 and 6 rarely exist as separate protocols. Their jobs happen inside the application
+              and its libraries. So for plain HTTP, the request passes through both layers unchanged.
             </p>
             <p>
               Switch to <strong>HTTPS</strong> and watch layer 6. <strong>TLS</strong> encrypts the request and adds a 5-byte record header. It’s usually
@@ -314,7 +319,8 @@ $ ip route
             </p>
             <p>
               This is the only layer that adds a trailer too: the <strong>FCS</strong>, a CRC-32 checksum of the whole frame. A receiver that computes a
-              different value knows the frame was damaged and drops it.
+              different value knows the frame was damaged and drops it. The kernel writes the header, but the network card computes the FCS as the frame
+              leaves, so this one layer is split between the two.
             </p>
           </>
         ),
@@ -659,8 +665,8 @@ traceroute to shop.example (203.0.113.10), 30 hops max, 60 byte packets
         body: (
           <>
             <p>
-              Here’s a secret: the internet doesn’t run on the OSI model. It runs on <strong>TCP/IP</strong>, designed in the 1970s, which has four layers.
-              Flip the switch below to see how they line up.
+              As chapter 1 warned, the internet doesn’t run on the OSI model. It runs on <strong>TCP/IP</strong>, designed in the 1970s, which has four
+              layers. Flip the switch below to see how they line up.
             </p>
             <p>
               TCP/IP folds layers 5, 6 and 7 into one <strong>application</strong> layer, because in practice they all live inside the program. It calls
