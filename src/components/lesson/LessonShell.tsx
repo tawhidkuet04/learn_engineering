@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CoffeeButton } from '@/components/site/CoffeeButton';
 import { Logo } from '@/components/site/Logo';
+import { SITE } from '@/content/site';
 import { Icon } from './Icon';
 import css from './lesson.module.css';
 
@@ -29,6 +31,16 @@ interface Props {
 
 const pad = (n: number) => n.toString().padStart(2, '0');
 
+/** A new GitHub issue from the suggestion form, with the step's URL and title filled in. */
+function suggestHref(pathname: string, lesson: string, step: { id: string; title: string }) {
+  const q = new URLSearchParams({
+    template: 'suggestion.yml',
+    title: `${lesson} · ${step.title}: `,
+    where: `${SITE.url}${pathname}#${step.id}`,
+  });
+  return `${SITE.repo}/issues/new?${q}`;
+}
+
 /** Keep mouse clicks from parking focus on a button, so Space still means play/pause. */
 const noFocus = { onMouseDown: (e: { preventDefault: () => void }) => e.preventDefault() };
 
@@ -46,6 +58,7 @@ export function LessonShell({ code, track, title, chapters, index, visited, onIn
   const next = flat[index + 1];
   const [menuOpen, setMenuOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   // Keyboard: ← → to move between steps, space to pause, R to replay.
   useEffect(() => {
@@ -141,6 +154,12 @@ export function LessonShell({ code, track, title, chapters, index, visited, onIn
               </div>
               <h1 className={css.h1}>{cur.title}</h1>
               {panel}
+              <a className={css.suggest} href={suggestHref(pathname, title, cur)} target="_blank" rel="noopener noreferrer">
+                <Icon name="flag" size={13} />
+                <span>
+                  Wrong, misleading or unclear? <strong>Suggest a fix</strong>
+                </span>
+              </a>
             </div>
           </div>
           <div className={css.nav}>

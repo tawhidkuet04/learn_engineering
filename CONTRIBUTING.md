@@ -6,6 +6,8 @@ Thanks for helping. The goal is lessons that are clear to a beginner and have no
 
 If a lesson's animation, text or config doesn't match how the real software behaves, [open a "Something in a lesson is wrong" issue](https://github.com/tawhidkuet04/learn_engineering/issues/new/choose). Include the lesson URL (it contains the step), what you expected, and ideally how to see it on the real thing: versions, a config, a command. Evidence from the real software can usually become a check in `verify/`, so the mistake can't come back.
 
+If a step is misleading, oversimplified or unclear, or you have an idea, use the **Suggest a fix** link under every step. It opens a suggestion issue with the lesson and step already filled in.
+
 ## Make a change
 
 ```bash

@@ -199,6 +199,9 @@ export default function Home() {
         <Link href="/tested" className={css.footLink}>
           How the lessons are tested
         </Link>
+        <a href={`${SITE.repo}/issues/new/choose`} className={css.footLink} target="_blank" rel="noopener noreferrer">
+          Suggest a fix or a topic
+        </a>
         <span className={css.footNote}>Addresses shown are from documentation ranges (RFC 5737). No servers were harmed.</span>
       </footer>
     </div>

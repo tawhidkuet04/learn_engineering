@@ -4,6 +4,8 @@ export const SITE = {
   /** Public origin, used to build absolute URLs for share images. */
   url: 'https://learn-engineering.xyz',
   tagline: 'Systems, animated.',
+  /** Source repository. Each lesson step links to a new issue here, prefilled with its URL. */
+  repo: 'https://github.com/tawhidkuet04/learn_engineering',
   /** Buy Me a Coffee page, e.g. https://buymeacoffee.com/yourname. Every coffee button hides while this is empty. */
   coffeeUrl: 'https://buymeacoffee.com/tawhidj',
   description:

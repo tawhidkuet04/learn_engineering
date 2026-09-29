@@ -228,6 +228,29 @@
   }
 }
 
+/* "Suggest a fix" link under each step */
+.suggest {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 13px;
+  color: var(--text-3);
+  text-decoration: none;
+}
+
+.suggest strong {
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.suggest:hover,
+.suggest:hover strong {
+  color: var(--accent);
+}
+
 .kicker {
   display: flex;
   justify-content: space-between;

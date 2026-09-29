@@ -1,0 +1,34 @@
+name: Suggest a fix or an improvement
+description: A step is wrong, misleading or unclear, or you have an idea to make it better.
+labels: [suggestion]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Lesson and step
+      description: The "Suggest a fix" link on each step fills this in. Otherwise paste the page URL, e.g. https://learn-engineering.xyz/learn/osi-model#one-job-each
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of suggestion?
+      options:
+        - Something is wrong
+        - Something is misleading or oversimplified
+        - Something is unclear
+        - An idea
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you change?
+      description: What the step shows or says, and what you'd show or say instead.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence (optional)
+      description: Links to docs or RFCs, versions, a config or commands that show it on the real software. Evidence can become a check in verify/, so the mistake can't come back.
