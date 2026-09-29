@@ -358,7 +358,13 @@ export class Machine {
     this.host.ring(l.vid, SIG.warn);
     this.clicks++;
     const label = `click #${this.clicks}`;
-    this.enqueue({ vid, label, q: 'task', icon: 'click', line: l.line, says: firstSay(fn.body), make: () => this.frame(label, 'task', fn.body, 'click', vid) });
+    const job: Job = { vid, label, q: 'task', icon: 'click', line: l.line, says: firstSay(fn.body), make: () => this.frame(label, 'task', fn.body, 'click', vid) };
+    // Browsers favor input: Chrome runs a waiting click before a timer that came
+    // due earlier. So a click joins the line behind other clicks, ahead of timers.
+    const q = this.queues.task;
+    const at = q.findIndex((j) => j.icon === 'timer');
+    if (at < 0) q.push(job);
+    else q.splice(at, 0, job);
     return true;
   }
 

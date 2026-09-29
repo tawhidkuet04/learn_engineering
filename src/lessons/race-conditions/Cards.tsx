@@ -279,14 +279,14 @@ export function DeadlockCard({ sim }: { sim: RaceSim }) {
 /* Check-then-act and database modes                                   */
 /* ------------------------------------------------------------------ */
 
-interface ModeSpec<M extends string> {
+export interface ModeSpec<M extends string> {
   id: M;
   label: string;
   note: ReactNode;
   code: CodeSpec;
 }
 
-const SEAT_MODES: ModeSpec<SeatMode>[] = [
+export const SEAT_MODES: ModeSpec<SeatMode>[] = [
   {
     id: 'racy',
     label: 'check, then book',
@@ -323,7 +323,7 @@ const SEAT_MODES: ModeSpec<SeatMode>[] = [
   },
 ];
 
-const BANK_MODES: ModeSpec<BankMode>[] = [
+export const BANK_MODES: ModeSpec<BankMode>[] = [
   {
     id: 'racy',
     label: 'no lock',

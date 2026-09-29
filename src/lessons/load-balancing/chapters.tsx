@@ -199,6 +199,8 @@ export const CHAPTERS: Chapter[] = [
 server {
     listen 443 ssl;
     server_name shop.example;
+    ssl_certificate     /etc/ssl/shop.example.crt;
+    ssl_certificate_key /etc/ssl/shop.example.key;
 
     location / {
 !        proxy_pass http://backend;
@@ -426,7 +428,10 @@ upstream backend {
               <strong>IP hash</strong> fixes it: turn the user&apos;s IP address into a number, divide by the number of servers, and use the remainder to
               pick one. Same IP, same server, every time. Switch the algorithm below.
             </p>
-            <Aside>Real load balancers use a proper hash function. Adding up the numbers is just easier to follow.</Aside>
+            <Aside>
+              Real load balancers use a proper hash function; adding up the numbers is just easier to follow. NGINX&apos;s <code>ip_hash</code> also
+              reads only the first three numbers of an address, so Alice and Carol (both <code>198.51.100.x</code>) would always share a server.
+            </Aside>
           </>
         ),
         interaction: {
@@ -541,7 +546,7 @@ app.use(session({
   {
     id: 'health',
     title: 'When servers fail',
-    config: { lb: 'single', servers: THREE, algorithm: 'least', healthChecks: true, rps: 2.2, showBrain: false, showZones: true },
+    config: { lb: 'single', servers: THREE, algorithm: 'least', healthChecks: true, proxy: 'haproxy', rps: 2.2, showBrain: false, showZones: true },
     steps: [
       {
         id: 'health-checks',
@@ -554,7 +559,9 @@ app.use(session({
               Every couple of seconds it sends each server a tiny <code>GET /health</code> request (the small purple pulses). A quick{' '}
               <code>200 OK</code> means &ldquo;I&apos;m alive and ready.&rdquo; The dots above each server show its last three results.
             </p>
-            <Aside>Time is compressed here. Real health checks usually run every 2 to 10 seconds.</Aside>
+            <Aside>
+              The checks run in real time, one every 2 seconds, just like the config below. Real deployments usually check every 2 to 10 seconds.
+            </Aside>
           </>
         ),
         callouts: [{ target: 'server:s1', text: <>last 3 checks: <b>all passed</b></>, dir: 'up' }],
@@ -563,6 +570,7 @@ app.use(session({
           lang: 'haproxy',
           code: `
 backend web
+    balance leastconn
 !    option httpchk GET /health
 !    server web-1 10.0.1.11:8080 check inter 2s fall 3 rise 2
     server web-2 10.0.1.12:8080 check inter 2s fall 3 rise 2
@@ -583,11 +591,16 @@ backend web
               Watch: <Term k="server:s2">web-2</Term> is about to crash.
             </p>
             <p>
-              At first the load balancer doesn&apos;t know, so it keeps sending web-2 traffic, and those users get <code>502 Bad Gateway</code> errors.
-              Then the health checks start failing. After <strong>3 failures in a row</strong>, the load balancer marks web-2 as down and stops sending it
-              anything. The errors stop, and web-1 and web-3 absorb the load.
+              At first the load balancer doesn&apos;t know, so it keeps sending web-2 traffic. HAProxy retries each of those connections three times, a
+              second apart, then gives up and answers <code>503 Service Unavailable</code>. Meanwhile the health checks start failing. After{' '}
+              <strong>3 failures in a row</strong>, the load balancer marks web-2 as down and stops sending it anything. The errors stop, and web-1 and
+              web-3 absorb the load.
             </p>
-            <Aside>Many load balancers also retry a failed request on another server. That&apos;s a safety net, not a replacement for health checks.</Aside>
+            <Aside>
+              NGINX behaves differently out of the box: when a server refuses a connection, it quietly retries the request on the next server and skips
+              the dead one for 10 seconds, so users rarely see an error. HAProxy retries on another server too if you add{' '}
+              <code>option redispatch</code>. Retries are a safety net, not a replacement for health checks.
+            </Aside>
           </>
         ),
         quiz: {
@@ -670,7 +683,9 @@ frontend www
 backend web
 !    mode tcp
     balance leastconn
-    server web-1 10.0.1.11:443 check`,
+    server web-1 10.0.1.11:443 check
+    server web-2 10.0.1.12:443 check
+    server web-3 10.0.1.13:443 check`,
         },
         legend: ['sealed'],
       },
@@ -715,6 +730,8 @@ upstream media { server 10.0.1.13:8080; }
 
 server {
     listen 443 ssl;             # TLS terminates here
+    ssl_certificate     /etc/ssl/shop.example.crt;
+    ssl_certificate_key /etc/ssl/shop.example.key;
 !    location /api/   { proxy_pass http://api; }
 !    location /media/ { proxy_pass http://media; }
 }`,
@@ -865,10 +882,16 @@ vrrp_instance VI_1 {
         },
         clickServers: true,
         body: (
-          <p>
-            Everything you&apos;ve learned, in one sandbox. Change the algorithm, dial up the traffic, resize servers, and click any server to crash it.
-            The config at the bottom is generated live from your settings.
-          </p>
+          <>
+            <p>
+              Everything you&apos;ve learned, in one sandbox. Change the algorithm, dial up the traffic, resize servers, and click any server to crash
+              it. The config at the bottom is generated live from your settings.
+            </p>
+            <p>
+              The balancer here acts like NGINX: a refused request is retried on the next server, and the dead one is skipped for 10 seconds. Crash
+              every server to see it give up with <code>502</code>.
+            </p>
+          </>
         ),
         interaction: { kind: 'playground' },
         hud: ['throughput', 'latency', 'errors', 'share'],

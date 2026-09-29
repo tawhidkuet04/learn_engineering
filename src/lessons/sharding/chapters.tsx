@@ -746,7 +746,12 @@ SELECT create_distributed_table('order_items', 'customer_id',
               label: 'Crash the coordinator mid-commit',
               icon: 'power',
               run: (s) => s.runTransfer(true),
-              after: <>Both shards voted YES and now wait. Anything that touches Alice&apos;s or Bob&apos;s rows is stuck behind those locks.</>,
+              after: (
+                <>
+                  Both shards voted YES and now wait. Any write to Alice&apos;s or Bob&apos;s row is stuck behind those locks. Plain reads still get the old
+                  balances.
+                </>
+              ),
             },
             {
               label: 'Restart the coordinator',

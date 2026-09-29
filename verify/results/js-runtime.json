@@ -1,0 +1,1233 @@
+{
+  "file": "js-runtime",
+  "checks": [
+    {
+      "lesson": "event-loop",
+      "step": "call-stack",
+      "title": "greet.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: Hi, Ada; Node: Hi, Ada ×8",
+      "lesson_says": "Hi, Ada",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "hand-it-off",
+      "title": "checkout.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×2: Order placed | Show receipt | Email sent; Node: Order placed | Show receipt | Email sent ×8",
+      "lesson_says": "Order placed | Show receipt | Email sent",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "zero-is-not-now",
+      "title": "zero.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: A | C | B; Node: A | C | B ×8",
+      "lesson_says": "A | C | B (quiz answer \"A C B\")",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "zero-is-not-now",
+      "title": "timers.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: 3 | 2 | 1; Node: 3 | 2 | 1 ×8",
+      "lesson_says": "3 | 2 | 1 (quiz answer \"3 2 1\")",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "zero-is-not-now",
+      "title": "busy.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: Y | X; Node: Y | X ×8",
+      "lesson_says": "Y | X (quiz answer \"Y X\")",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "the-microtask-queue",
+      "title": "queues.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: A | D | C | B; Node: A | D | C | B ×8",
+      "lesson_says": "A | D | C | B",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "task-or-microtask",
+      "title": "classic.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: script start | script end | promise1 | promise2 | setTimeout; Node: script start | script end | promise1 | promise2 | setTimeout ×8",
+      "lesson_says": "script start | script end | promise1 | promise2 | setTimeout",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "task-or-microtask",
+      "title": "nested.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: sync | m1 | m2 | t1 | t2; Node: sync | m1 | m2 | t1 | t2 ×8",
+      "lesson_says": "sync | m1 | m2 | t1 | t2",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "drained-until-empty",
+      "title": "drain.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: micro 1 | micro 2 | micro 3 | timeout; Node: micro 1 | micro 2 | micro 3 | timeout ×8",
+      "lesson_says": "micro 1 | micro 2 | micro 3 | timeout",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "where-rendering-fits",
+      "title": "animate.js: console output",
+      "software": "Chrome 154",
+      "real": "Chrome ×3: task",
+      "lesson_says": "task",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "await-splits-a-function",
+      "title": "checkout.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: 1 · checkout starts | 2 · back in the script | 3 · after await; Node: 1 · checkout starts | 2 · back in the script | 3 · after await ×8",
+      "lesson_says": "1 · checkout starts | 2 · back in the script | 3 · after await",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "awaiting-the-network",
+      "title": "cart.js: console output",
+      "software": "Chrome 154",
+      "real": "Chrome ×3: loading… | page is interactive | status 200",
+      "lesson_says": "loading… | page is interactive | status 200",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "predict-the-async-order",
+      "title": "order.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: 1 | 5 | 2 | 4 | 3; Node: 1 | 5 | 2 | 4 | 3 ×8",
+      "lesson_says": "1 | 5 | 2 | 4 | 3 (quiz answer \"1 5 2 4 3\")",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "predict-the-async-order",
+      "title": "nested-await.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: a1 | b | end | a2; Node: a1 | b | end | a2 ×8",
+      "lesson_says": "a1 | b | end | a2 (quiz answer \"a1 b end a2\")",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "predict-the-async-order",
+      "title": "sleep.js: console output",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome ×3: f1 | s | m | f2; Node: f1 | s | m | f2 ×8",
+      "lesson_says": "f1 | s | m | f2 (quiz answer \"f1 s m f2\")",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > every program prints, in Chrome and Node, what the animation prints"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "timers-are-a-minimum",
+      "title": "What late.js prints after the 300 ms busy loop",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome: 304; Node: 301, 302 (always after \"loop done\")",
+      "lesson_says": "the animation prints \"loop done\", \"timer 300\"; the text says timer 300 or a few ms more, never timer 100",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > a 300 ms busy loop delays a 100 ms timer (timers-are-a-minimum)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "timers-are-a-minimum",
+      "title": "Quiz: a click 50 ms into the busy loop",
+      "software": "Chrome 154",
+      "real": "loop done at 300 ms, click at 300 ms, timer at 301 ms",
+      "lesson_says": "the handler runs after the loop ends",
+      "pass": true,
+      "test": "The Event Loop: the programs on the stage > a 300 ms busy loop delays a 100 ms timer (timers-are-a-minimum)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "where-rendering-fits",
+      "title": "animate.js (stage): three rAF frames move the box 50 px each; the timer vs the first frame",
+      "software": "Chrome 154",
+      "real": "at page load: task, frame:50px, frame:100px, frame:150px ×10; from a click handler: frame:50px, task, frame:100px, frame:150px ×6; rAF every 16.65 ms",
+      "lesson_says": "animation: task, frame, frame, frame, 3 frames painted; aside: the timer usually runs first, but from a click handler Chrome paints the frame first",
+      "pass": true,
+      "test": "The Event Loop: rendering and input > requestAnimationFrame runs once per frame; the timer usually beats the first frame (where-rendering-fits)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "every-click-is-a-task",
+      "title": "A click that arrives while the tick waits runs first",
+      "software": "Chrome 154",
+      "real": "quick clicks: click 1, click 2, click 3; tick came due during a busy 500 ms, a click arrived after it: click 4, tick",
+      "lesson_says": "click 1, click 2, click 3, click 4, tick",
+      "pass": true,
+      "test": "The Event Loop: rendering and input > clicks are tasks, and Chrome runs a waiting click before an expired timer (every-click-is-a-task)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "a-long-task",
+      "title": "The \"long\" strategy: frames, longest task, click delay",
+      "software": "Chrome 154",
+      "real": "work 1500 ms, 0/90 frames painted, longest task 1502 ms, clicks waited 1052/650/253 ms",
+      "lesson_says": "work 1503 ms, 1/90 frames painted, longest task 1500 ms, clicks waited 1038/643/265 ms",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > the stage page code, run for real, matches the timeline for every strategy"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "break-it-up",
+      "title": "The \"chunk\" strategy: frames, longest task, click delay",
+      "software": "Chrome 154",
+      "real": "work 2040 ms, 122/122 frames painted, no task over 50 ms, clicks waited 12/11/6 ms",
+      "lesson_says": "work 2065 ms, 123/123 frames painted, longest task 12 ms, clicks waited 3/3/3 ms",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > the stage page code, run for real, matches the timeline for every strategy"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "microtasks-cant-yield",
+      "title": "The \"micro\" strategy: frames, longest task, click delay",
+      "software": "Chrome 154",
+      "real": "work 1500 ms, 0/90 frames painted, longest task 1500 ms, clicks waited 1050/649/249 ms",
+      "lesson_says": "work 1518 ms, 1/91 frames painted, longest task 1515 ms, clicks waited 1054/659/280 ms",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > the stage page code, run for real, matches the timeline for every strategy"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "web-workers",
+      "title": "The \"worker\" strategy: frames, longest task, click delay",
+      "software": "Chrome 154",
+      "real": "work 1505 ms, 91/90 frames painted, no task over 50 ms, clicks waited 0/0/0 ms",
+      "lesson_says": "work 1506 ms, 90/90 frames painted, longest task 5 ms, clicks waited 3/3/3 ms",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > the stage page code, run for real, matches the timeline for every strategy"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "break-it-up",
+      "title": "Chunks with setTimeout take longer than one long task",
+      "software": "Chrome 154",
+      "real": "2040 ms vs 1500 ms (×1.36)",
+      "lesson_says": "about a third longer; the timeline shows ×1.37",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > the stage page code, run for real, matches the timeline for every strategy"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "microtasks-cant-yield",
+      "title": "yield.js: a microtask yield vs a task yield between 12 ms chunks",
+      "software": "Chrome 154",
+      "real": "await Promise.resolve(); → 0 frames, clicks waited up to 1050 ms; await new Promise((r) => setTimeout(r)); → 122/122 frames, clicks within 12 ms",
+      "lesson_says": "a microtask: no frame, no click in between; a task: the loop gets a turn",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > the stage page code, run for real, matches the timeline for every strategy"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "microtasks-cant-yield",
+      "title": "Yielding with a message instead of a timer",
+      "software": "Chrome 154",
+      "real": "MessageChannel: work 1510 ms, 90/91 frames painted, no task over 50 ms, clicks waited 7/4/3 ms; setTimeout: work 2040 ms, 122/122 frames painted, no task over 50 ms, clicks waited 12/11/6 ms",
+      "lesson_says": "a real task boundary (a timer, a message, or scheduler.yield()) gives rendering and input a turn",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > a timer, a message and scheduler.yield() are all task boundaries (microtasks-cant-yield)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "a-long-task",
+      "title": "orders.js runs as one long task",
+      "software": "Chrome 154",
+      "real": "work 1500 ms, 0/90 frames painted, longest task 1500 ms, clicks waited 1051/651/250 ms",
+      "lesson_says": "3,000 × 0.5 ms = 1.5 s in one task: no frames, clicks wait",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > orders.js: 3,000 orders in one click handler (a-long-task)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "break-it-up",
+      "title": "scheduler.yield(): front of the queue, clicks fast, fewer frames",
+      "software": "Chrome 154",
+      "real": "work 1503 ms, 36/90 frames painted, no task over 50 ms, clicks waited 1/1/3 ms; setTimeout chunks: 122/122 frames in 2040 ms; order: scheduler.yield continuation → setTimeout queued first → setTimeout queued first → setTimeout continuation",
+      "lesson_says": "continuation goes to the front; clicks still get in and the work finishes sooner, but frames are painted less often",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > orders.js: processAll with yieldToLoop (break-it-up)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "web-workers",
+      "title": "A worker crunches 3,000 orders; the main thread stays free",
+      "software": "Chrome 154",
+      "real": "work 1509 ms, 91/91 frames painted, no task over 50 ms, clicks waited 1/0/0 ms; result had 3000 items, first 0 although main set orders[0].id = -1 after posting; typeof document in a worker: undefined",
+      "lesson_says": "frames keep painting, clicks handled instantly, data is copied, workers have no DOM",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > main.js + orders-worker.js: the work moves off the main thread (web-workers)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "a-long-task",
+      "title": "Compositor animations during a 1.5 s long task",
+      "software": "Chrome 154",
+      "real": "78 frames reached the screen during the task; in 13 of them the CSS transform box was at 10 different places and the CSS opacity box had 8 shades, the rAF-driven box at 1",
+      "lesson_says": "CSS animations of transform and opacity can keep running on the compositor thread; anything your code renders needs the main thread",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > during a long task, CSS transform and opacity animations keep moving, a JS-driven one freezes (a-long-task aside)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "a-long-task",
+      "title": "Which tasks Chrome reports as long tasks",
+      "software": "Chrome 154",
+      "real": "tasks of 40, 47, 55, 70 ms → long tasks reported: 55, 70 ms",
+      "lesson_says": "any task over 50 ms",
+      "pass": true,
+      "test": "The Event Loop: blocking the loop > Chrome counts tasks over 50 ms as long tasks (a-long-task aside)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "call-stack",
+      "title": "The stack trace DevTools shows",
+      "software": "Chrome 154",
+      "real": "Uncaught Error: out of greetings\n    at greet (greet.js:2:9)\n    at main (greet.js:5:15)\n    at greet.js:8:1",
+      "lesson_says": "Uncaught Error: out of greetings\n    at greet (greet.js:2:9)\n    at main (greet.js:5:15)\n    at greet.js:8:1",
+      "pass": true,
+      "test": "The Event Loop: code snippets > DevTools console: the stack trace of greet.js (call-stack)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "hand-it-off",
+      "title": "setTimeout returns at once with an id; clearTimeout cancels",
+      "software": "Chrome 154",
+      "real": "id 1, both lines took 0.00 ms; after 1.3 s sendEmail ran: false",
+      "lesson_says": "returns at once, with an id; cancelled before it fires",
+      "pass": true,
+      "test": "The Event Loop: code snippets > timers.js: setTimeout returns an id at once, clearTimeout cancels it (hand-it-off)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "zero-is-not-now",
+      "title": "Focus waits for the script; the 4 ms clamp after 5 levels of nesting",
+      "software": "Chrome 154",
+      "real": "focused during the script: false, after: true; chained setTimeout(…, 0) delays: 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.5, 4.6, 4.5, 4.5, 4.6, 4.4 ms",
+      "lesson_says": "after the current code is done; after 5 levels of nesting the minimum becomes 4 ms",
+      "pass": true,
+      "test": "The Event Loop: code snippets > focus.js: a 0 ms timer runs after the current code; nested timers clamp to 4 ms (zero-is-not-now)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "every-click-is-a-task",
+      "title": "What is on the stack when the click handler runs",
+      "software": "Chrome 154",
+      "real": "addToCart('A-42') with stack: addToCart ← HTMLButtonElement.<anonymous>",
+      "lesson_says": "runs later, as a task, on an empty stack",
+      "pass": true,
+      "test": "The Event Loop: code snippets > cart.js: a real click runs the handler as a task, on an empty stack (every-click-is-a-task)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "timers-are-a-minimum",
+      "title": "How late a 100 ms timer fires on an idle thread",
+      "software": "Chrome 154, Node 22.22.0",
+      "real": "Chrome: 2.00, 1.70, 1.00, 1.80 ms; Node: 1.16, 1.11, 0.40, 0.98 ms",
+      "lesson_says": "a minimum, never early",
+      "pass": true,
+      "test": "The Event Loop: code snippets > late.js: the delay is a minimum (timers-are-a-minimum)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "the-microtask-queue",
+      "title": "queueMicrotask, .then, await and MutationObserver all run before a task queued first",
+      "software": "Chrome 154",
+      "real": "script → queueMicrotask → then → after await → MutationObserver → task queued first",
+      "lesson_says": "all four run their callbacks as microtasks",
+      "pass": true,
+      "test": "The Event Loop: code snippets > microtasks.js: all four run their callbacks as microtasks (the-microtask-queue)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "where-rendering-fits",
+      "title": "rAF runs tick once per frame",
+      "software": "Chrome 154",
+      "real": "37 calls in 600 ms, 16.67 ms apart; transform set from the frame time each call: true",
+      "lesson_says": "once per frame",
+      "pass": true,
+      "test": "The Event Loop: code snippets > animate.js: requestAnimationFrame calls tick once per frame (where-rendering-fits)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "await-splits-a-function",
+      "title": "checkout.js (promises) vs the async checkout() on the stage, in 3 interleavings",
+      "software": "Node 22.22.0",
+      "real": "same: 1 · checkout starts, 2 · back in the script, 3 · after await; same: 1 · checkout starts, sync, m1, 3 · after await, m2, p1, done, p2, p3, task; same: 1 · checkout starts, 3 · after await, p1, awaited, p2, p3, p4",
+      "lesson_says": "the ordering is exactly this",
+      "pass": true,
+      "test": "The Event Loop: code snippets > checkout.js: the promise version orders exactly like await (await-splits-a-function)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "awaiting-the-network",
+      "title": "Two awaits: headers first, then the body",
+      "software": "Chrome 154",
+      "real": "headers at 1 ms, a timer ran at 121 ms (stack depth 1), renderCart at 301 ms",
+      "lesson_says": "the body streams in later, so await again; while waiting the stack is empty and the loop is free",
+      "pass": true,
+      "test": "The Event Loop: code snippets > cart.js: await fetch resumes at the headers, await res.json() at the body (awaiting-the-network)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "hand-it-off",
+      "title": "Node reads files on libuv’s thread pool",
+      "software": "Node 22.22.0",
+      "real": "a readFile queued behind a blocked FIFO read finished after 309 ms with a pool of 1 thread, 2 ms with 4",
+      "lesson_says": "libuv has a thread pool for file I/O",
+      "pass": true,
+      "test": "The Event Loop: Node.js > libuv does file I/O on a thread pool (hand-it-off aside)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "task-or-microtask",
+      "title": "When the second .then joins the queue",
+      "software": "Node 22.22.0",
+      "real": "promise1 → queued inside promise1 → promise2",
+      "lesson_says": "promise2 isn’t queued until promise1’s callback returns",
+      "pass": true,
+      "test": "The Event Loop: Node.js > promise2 is queued only when promise1’s callback returns (task-or-microtask aside)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "node-js",
+      "title": "app.js on the stage: readFile callback schedules both",
+      "software": "Node 22.22.0",
+      "real": "immediate | timeout ×60",
+      "lesson_says": "immediate | timeout",
+      "pass": true,
+      "test": "The Event Loop: Node.js > inside an I/O callback, setImmediate always beats setTimeout 0 (node-js)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "node-js",
+      "title": "setTimeout(…, 0) is a 1 ms timer in Node",
+      "software": "Node 22.22.0",
+      "real": "_idleTimeout = 1",
+      "lesson_says": "the timer card reads \"setTimeout · 0 → 1 ms\"",
+      "pass": true,
+      "test": "The Event Loop: Node.js > inside an I/O callback, setImmediate always beats setTimeout 0 (node-js)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "node-js",
+      "title": "setTimeout 0 vs setImmediate from the main module",
+      "software": "Node 22.22.0",
+      "real": "immediate | timeout ×58; timeout | immediate ×2; after a 2 ms busy wait in the module: timeout | immediate ×30",
+      "lesson_says": "the order can flip: it depends on whether 1 ms has passed when the loop first checks its timers",
+      "pass": true,
+      "test": "The Event Loop: Node.js > main.js: from the main module the order can flip (node-js)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "node-js",
+      "title": "process.nextTick vs a promise",
+      "software": "Node 22.22.0",
+      "real": "ticks.cjs: nextTick | promise ×6; same code as .mjs: promise | nextTick ×6",
+      "lesson_says": "CommonJS prints nextTick, promise; in an ES module the promise prints first",
+      "pass": true,
+      "test": "The Event Loop: Node.js > ticks.cjs: nextTick first in CommonJS, promise first in an ES module (node-js)"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "cheat-sheet",
+      "title": "Who goes first: process.nextTick or a promise?",
+      "software": "Node 22.22.0",
+      "real": "CommonJS main module: nextTick; ES module body: promise; setTimeout callback: nextTick; setImmediate callback: nextTick; fs.readFile callback: nextTick; inside a .then callback: promise",
+      "lesson_says": "as soon as control returns to Node, ahead of promises",
+      "pass": true,
+      "test": "The Event Loop: Node.js > cheat sheet: nextTick runs ahead of promises once control returns to Node"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "node-js",
+      "title": "Microtasks drain between callbacks of the same phase",
+      "software": "Node 22.22.0",
+      "real": "t1 p1 t2 p2 i1 q1 i2 q2",
+      "lesson_says": "between callbacks, Node drains microtasks",
+      "pass": true,
+      "test": "The Event Loop: Node.js > cheat sheet: nextTick runs ahead of promises once control returns to Node"
+    },
+    {
+      "lesson": "event-loop",
+      "step": "playground",
+      "title": "Block programs: console order, animation vs Chrome",
+      "software": "Chrome 154",
+      "real": "195 programs (every 1–3 block mix of log, timeout, then, microtask and async, every pair with setTimeout 100 or fetch, 16 longer ones) printed the same order",
+      "lesson_says": "same order in every program",
+      "pass": true,
+      "test": "The Event Loop: playground > every block program prints in Chrome what the animation prints"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "hash-function",
+      "title": "hash() vs Java's String.hashCode()",
+      "software": "Node 22.22.0, OpenJDK 18.0.2.1",
+      "real": "hash('bob') = 97717, 97717; 17 short keys: identical to Java; long strings: plain hash differs (no wrap); the note's (Math.imul(h, 31) + ch.charCodeAt(0)) | 0: matches Java on all; Math.imul without | 0 on \"xfjfxtz\": 2147483668 vs Java -2147483628",
+      "lesson_says": "97717 every time; exactly Java's String.hashCode() for short keys; the note's expression reproduces Java's wrap-around",
+      "pass": true,
+      "test": "Hash tables > hash.js: bob is 97717 every time, exactly Java’s String.hashCode() for short keys"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "hash-to-bucket",
+      "title": "table.js: the values in the comments",
+      "software": "Node 22.22.0",
+      "real": "hash('alice') = 92903040, bucket 0",
+      "lesson_says": "92903040 % 10 = 0",
+      "pass": true,
+      "test": "Hash tables > table.js, phone.js, lazy.js, order.js: the numbers in the comments"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "lookups",
+      "title": "phone.js: the values in the comments",
+      "software": "Node 22.22.0",
+      "real": "get('dave') = 555-0108, get('zoe') undefined: true, has('alice') = true",
+      "lesson_says": "'555-0108', undefined, true",
+      "pass": true,
+      "test": "Hash tables > table.js, phone.js, lazy.js, order.js: the numbers in the comments"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "lazy-hash",
+      "title": "lazy.js: the values in the comments",
+      "software": "Node 22.22.0",
+      "real": "jack → 6, jill → 6",
+      "lesson_says": "6, 6",
+      "pass": true,
+      "test": "Hash tables > table.js, phone.js, lazy.js, order.js: the numbers in the comments"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "python-dict",
+      "title": "order.js: the values in the comments",
+      "software": "Node 22.22.0",
+      "real": "[\"carol\",\"alice\",\"bob\"]",
+      "lesson_says": "['carol', 'alice', 'bob']",
+      "pass": true,
+      "test": "Hash tables > table.js, phone.js, lazy.js, order.js: the numbers in the comments"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "python-dict",
+      "title": "V8 objects: fixed shapes, then dictionary mode",
+      "software": "Node 22.22.0",
+      "real": "new object fast: true; dictionary mode after 20 computed-key adds; after one delete fast: false",
+      "lesson_says": "objects start with fixed \"shapes\" and turn into hash tables after many adds and deletes",
+      "pass": true,
+      "test": "Hash tables > table.js, phone.js, lazy.js, order.js: the numbers in the comments"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "scan-a-list",
+      "title": "contacts.find() over the lesson’s 10 contacts",
+      "software": "Node 22.22.0",
+      "real": "dave: 9 comparisons, zoe: 10",
+      "lesson_says": "dave is 9th: 9 comparisons; zoe: all 10",
+      "pass": true,
+      "test": "Hash tables > contacts.js and chained-table.js: the comparisons the lesson counts"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "separate-chaining",
+      "title": "ChainedTable: bucket 0 and the lookup for frank",
+      "software": "Node 22.22.0",
+      "real": "bucket 0: alice, erin, frank; get('frank') = 3 after 3 comparisons; set('erin') again updated it to 20",
+      "lesson_says": "erin and frank join alice’s chain; looking up frank: 3 comparisons",
+      "pass": true,
+      "test": "Hash tables > contacts.js and chained-table.js: the comparisons the lesson counts"
+    },
+    {
+      "lesson": "big-o",
+      "step": "why-not-seconds",
+      "title": "One timed findMax over 10 million numbers",
+      "software": "Node 22.22.0",
+      "real": "console.timeEnd printed 47.4 ms (Apple M5 Pro)",
+      "lesson_says": "~50 ms on one laptop; yours will differ",
+      "pass": true,
+      "test": "Big-O > findMax.js: timing 10 million numbers (why-not-seconds)"
+    },
+    {
+      "lesson": "big-o",
+      "step": "constant-time",
+      "title": "constant.js",
+      "software": "Node 22.22.0",
+      "real": "8 bytes per number, 10,000,000 numbers; names.has('carol') = true",
+      "lesson_says": "8 bytes per number",
+      "pass": true,
+      "test": "Big-O > constant.js, search.js, binarySearch.js: the values in the comments"
+    },
+    {
+      "lesson": "big-o",
+      "step": "linear-search",
+      "title": "search.js",
+      "software": "Node 22.22.0",
+      "real": "includes true, indexOf 14, has true",
+      "lesson_says": "indexOf(46) returns 14",
+      "pass": true,
+      "test": "Big-O > constant.js, search.js, binarySearch.js: the values in the comments"
+    },
+    {
+      "lesson": "big-o",
+      "step": "binary-search",
+      "title": "binarySearch.js",
+      "software": "Node 22.22.0",
+      "real": "correct on 1200 searches; a miss in 1,048,576 items read 40 elements",
+      "lesson_says": "halves the range each step: about log₂ n looks",
+      "pass": true,
+      "test": "Big-O > constant.js, search.js, binarySearch.js: the values in the comments"
+    },
+    {
+      "lesson": "big-o",
+      "step": "merge-back-up",
+      "title": "mergeSort, merge and V8’s Array.prototype.sort",
+      "software": "Node 22.22.0",
+      "real": "[5, 3, 9, 1] → [1, 3, 5, 9]; mergeSort matched sort on 200 random arrays: true; sorting 10,000 sorted numbers took 9999 comparisons (n − 1), random ones 119,911",
+      "lesson_says": "V8 uses TimSort: O(n log n)",
+      "pass": true,
+      "test": "Big-O > mergeSort.js + merge.js: sorts, and V8’s sort behaves like TimSort (split-in-halves, merge-back-up)"
+    },
+    {
+      "lesson": "big-o",
+      "step": "exploding-calls",
+      "title": "fib(30) and fib(50): calls and time",
+      "software": "Node 22.22.0",
+      "real": "fib(30) made 2,692,537 calls; counted calls for n = 30…35 all equal 2·fib(n+1) − 1; fib(40) ran at 1.70 ns a call, so fib(50)'s 40,730,022,147 calls take about 69 s; memoized fib(50) made 99 calls",
+      "lesson_says": "2,692,537 calls; 40,730,022,147 calls: over a minute, even on a fast machine; memoized: 99 calls",
+      "pass": true,
+      "test": "Big-O > fib.js and fibMemo.js: the call counts (exploding-calls, memoization)"
+    },
+    {
+      "lesson": "big-o",
+      "step": "a-million-items",
+      "title": "a-million.js: the step counts",
+      "software": "Node 22.22.0",
+      "real": "n = 1000000, n·log₂n = 19,931,569, n² = 1e+12, 2ⁿ has 301,030 digits (BigInt)",
+      "lesson_says": "1,000,000; ≈ 20,000,000; 1,000,000,000,000; a 301,030-digit number",
+      "pass": true,
+      "test": "Big-O > a-million.js and the duplicate checks (a-million-items, all-pairs, space-complexity)"
+    },
+    {
+      "lesson": "big-o",
+      "step": "space-complexity",
+      "title": "hasDuplicate: all pairs, with a Set, and the one-liner agree",
+      "software": "Node 22.22.0",
+      "real": "500 random arrays: same answer from all three",
+      "lesson_says": "same idea, O(n) with a Set",
+      "pass": true,
+      "test": "Big-O > a-million.js and the duplicate checks (a-million-items, all-pairs, space-complexity)"
+    },
+    {
+      "lesson": "garbage-collection",
+      "step": "find-the-leak",
+      "title": "Heap after GC, per open and close of a ~5 MB report",
+      "software": "Chrome 154",
+      "real": "leaky: 0.6 → 5.7 → 10.6 → 15.6 MB; with the fix: 0.6 → 0.7 → 0.7 → 0.7 MB",
+      "lesson_says": "after every open and close, the heap after GC is 5 MB bigger; removing the listener fixes it",
+      "pass": true,
+      "test": "Garbage collection > report.js: the listener leaks a report per open; the AbortController fix does not (find-the-leak)"
+    },
+    {
+      "lesson": "garbage-collection",
+      "step": "mark",
+      "title": "mark() on a graph with two cycles, then sweep()",
+      "software": "Node 22.22.0",
+      "real": "marked user, profile, cart; freed draft, note in address order; marks cleared: true",
+      "lesson_says": "cycles can’t trap the marker; the unreachable draft ↔ note cycle is freed",
+      "pass": true,
+      "test": "Garbage collection > mark.js and sweep.js: cycles stop the marker; the sweep frees the rest (mark, sweep)"
+    },
+    {
+      "lesson": "garbage-collection",
+      "step": "young-and-old",
+      "title": "node --trace-gc prints Scavenge and Mark-Compact lines in this format",
+      "software": "Node 22.22.0",
+      "real": "printed Scavenge and Mark-Compact lines with pid:isolate, time, heap before (reserved) -> after (reserved) MB, pause, plus a \"pooled: N MB,\" field the lesson’s lines don’t have",
+      "lesson_says": "these fields; the format varies a little between Node versions",
+      "pass": true,
+      "test": "Garbage collection > node --trace-gc and --max-semi-space-size (mark-compact, copying, young-and-old)"
+    },
+    {
+      "lesson": "garbage-collection",
+      "step": "copying",
+      "title": "--max-semi-space-size=32",
+      "software": "Node 22.22.0",
+      "real": "new space grew to 64 MB (default 32 MB, starting at 1 MB); scavenges: 16 vs 20",
+      "lesson_says": "sets the maximum size of each half, in MB; they start small and grow",
+      "pass": true,
+      "test": "Garbage collection > node --trace-gc and --max-semi-space-size (mark-compact, copying, young-and-old)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "the-lost-update",
+      "title": "4 worker threads × 1,000,000 increments on one SharedArrayBuffer",
+      "software": "Node 22.22.0",
+      "real": "count[0] = count[0] + 1 ended at 1,071,043 and 1,858,163; Atomics.add at 4,000,000 and 4,000,000; Atomics.add on 5 returned 5",
+      "lesson_says": "plain: lost updates; atomic: exactly 4,000,000; Atomics.add returns the old value",
+      "pass": true,
+      "test": "Race conditions > worker.js: a plain increment loses updates; Atomics.add does not (the-lost-update, fetch-and-add)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "fetch-and-add",
+      "title": "SharedArrayBuffer with and without COOP + COEP",
+      "software": "Chrome 154",
+      "real": "without the headers: typeof SharedArrayBuffer = undefined; with them: function (crossOriginIsolated true)",
+      "lesson_says": "needs a cross-origin isolated page (COOP and COEP headers)",
+      "pass": true,
+      "test": "Race conditions > SharedArrayBuffer needs a cross-origin isolated page in Chrome (fetch-and-add note)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "ask-to-upgrade",
+      "title": "What the browser sends, and when onopen runs",
+      "software": "Chrome 154",
+      "real": "GET with Upgrade: websocket, Connection: Upgrade, a 16-byte key, version 13, Origin, and the page's cookie; \"connected\" logged after the 101, readyState 1",
+      "lesson_says": "Upgrade + Connection, 16 random bytes base64, version 13, cookies sent; onopen runs after the handshake",
+      "pass": true,
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "switching-protocols",
+      "title": "Sec-WebSocket-Accept for the RFC’s sample key",
+      "software": "Node 22.22.0",
+      "real": "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+      "lesson_says": "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+      "pass": true,
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "switching-protocols",
+      "title": "A wrong Sec-WebSocket-Accept",
+      "software": "Chrome 154",
+      "real": "open: false, error: true, close code 1006",
+      "lesson_says": "the browser refuses the connection",
+      "pass": true,
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "one-connection",
+      "title": "readyState during the handshake",
+      "software": "Chrome 154",
+      "real": "before: 0, in onopen: 1",
+      "lesson_says": "CONNECTING (0), then OPEN (1) when the 101 checks out",
+      "pass": true,
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "heartbeats",
+      "title": "The connection is cut without a close frame",
+      "software": "Chrome 154",
+      "real": "close code 1006",
+      "lesson_says": "the browser sees it close (code 1006)",
+      "pass": true,
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "heartbeats",
+      "title": "A ping from the server",
+      "software": "Chrome 154",
+      "real": "browser answered with opcode 10 carrying \"hb-1\"; messages seen by the page: 0",
+      "lesson_says": "the browser answers with a pong (opcode 10), automatically, hidden from JavaScript",
+      "pass": true,
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "switching-protocols",
+      "title": "A WebSocket to another origin",
+      "software": "Chrome 154",
+      "real": "page on 127.0.0.1 opened ws://localhost: true, Origin sent: http://127.0.0.1:61367",
+      "lesson_says": "the same-origin policy doesn’t stop other sites from opening WebSockets; check Origin",
+      "pass": true,
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "one-connection",
+      "title": "chat.js end to end",
+      "software": "Chrome 154",
+      "real": "server got {\"type\":\"join\",\"room\":42} then {\"type\":\"say\",\"text\":\"Sounds good\"}; render() got \"Lunch at noon?\"; console: closed with code 1000",
+      "lesson_says": "join on open, render each message, send on click, log the close code",
+      "pass": true,
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "silent-death",
+      "title": "Reconnect backoff against a server that is down",
+      "software": "Chrome 154",
+      "real": "waits: 0.96 s, 1.51 s, 3.80 s",
+      "lesson_says": "about 1 s, then 2, 4… with random jitter (the code waits 50–100% of 1, 2, 4 s)",
+      "pass": true,
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "server-sent-events",
+      "title": "EventSource: a GET, events, and a reconnect after a drop",
+      "software": "Chrome 154",
+      "real": "GET with Accept: text/event-stream; render got \"Lunch at noon?\"; after the server dropped the stream, the browser came back with Last-Event-ID: 18 and got \"Sounds good\"; POST body {\"room\":42,\"text\":\"Sounds good\"}",
+      "lesson_says": "an ordinary GET; if the stream drops, the browser reconnects by itself and sends Last-Event-ID",
+      "pass": true,
+      "test": "WebSockets: the browser side > Server-Sent Events and long polling (server-sent-events, long-polling)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "server-sent-events",
+      "title": "Seven EventSources to one HTTP/1.1 server, across two tabs",
+      "software": "Chrome 154",
+      "real": "the server saw 6 streams at once; readyStates 1, 1, 1, 1, 1, 1, 0",
+      "lesson_says": "about six connections per server, across all tabs",
+      "pass": true,
+      "test": "WebSockets: the browser side > Server-Sent Events and long polling (server-sent-events, long-polling)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "long-polling",
+      "title": "long-poll.js against a server that answers 204, then news",
+      "software": "Chrome 154",
+      "real": "requests with after = 17, 17, 18; after the 204 it asked again 1 ms later; render got id 18",
+      "lesson_says": "204: ask again immediately; then render and move the cursor",
+      "pass": true,
+      "test": "WebSockets: the browser side > Server-Sent Events and long polling (server-sent-events, long-polling)"
+    },
+    {
+      "lesson": "processes-threads",
+      "step": "python-and-node",
+      "title": "worker_threads: the sum, and four at once",
+      "software": "Node 22.22.0",
+      "real": "printed 333333283333717100000; one worker 202 ms, four at once 201 ms",
+      "lesson_says": "real threads, each with its own heap; the result comes back as a message",
+      "pass": true,
+      "test": "Processes & threads, message queues > main.js: a worker thread sums in parallel (python-and-node)"
+    },
+    {
+      "lesson": "message-queues",
+      "step": "the-message-that-always-fails",
+      "title": "parseCharge on a good and a poison message",
+      "software": "Node 22.22.0",
+      "real": "good → {\"orderId\":7,\"amount\":12.5}; \"amount\": \"12\", three tries → TypeError: bad amount: 12",
+      "lesson_says": "a message with a bad amount throws, every time",
+      "pass": true,
+      "test": "Processes & threads, message queues > parseCharge: the message that always fails (the-message-that-always-fails)"
+    }
+  ],
+  "stamps": [
+    {
+      "hash": "cbsrm1",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: between 12 ms chunks of work, await Promise.resolve() let no frame paint and no click in until the end; the setTimeout version painted every frame and handled clicks within milliseconds.",
+      "test": "The Event Loop: blocking the loop > the stage page code, run for real, matches the timeline for every strategy"
+    },
+    {
+      "hash": "5e1jcj",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: with 3,000 orders at 0.5 ms each it ran as one long task. No frame was painted and no click was handled until it ended.",
+      "test": "The Event Loop: blocking the loop > orders.js: 3,000 orders in one click handler (a-long-task)"
+    },
+    {
+      "hash": "1ssioxr",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: it took the scheduler.yield() path. No task passed 50 ms and clicks were handled within milliseconds, but fewer frames were painted than with setTimeout chunks.",
+      "test": "The Event Loop: blocking the loop > orders.js: processAll with yieldToLoop (break-it-up)"
+    },
+    {
+      "hash": "f8wdmv",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: with 3,000 orders at 0.5 ms each, frames kept painting and clicks stayed instant while the worker worked, and the worker got its own copy of the orders.",
+      "test": "The Event Loop: blocking the loop > main.js + orders-worker.js: the work moves off the main thread (web-workers)"
+    },
+    {
+      "hash": "gj6oam",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: made the stage's greet() throw on line 2, and DevTools reported exactly this stack, top frame first.",
+      "test": "The Event Loop: code snippets > DevTools console: the stack trace of greet.js (call-stack)"
+    },
+    {
+      "hash": "1toaqt2",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: setTimeout returned a numeric id straight away, and after clearTimeout, sendEmail never ran.",
+      "test": "The Event Loop: code snippets > timers.js: setTimeout returns an id at once, clearTimeout cancels it (hand-it-off)"
+    },
+    {
+      "hash": "pyk3ui",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: the input got focus only after the script had finished. Chained setTimeout(…, 0) calls ran at once 6 times (the first, then 5 levels of nesting), then waited at least 4 ms each.",
+      "test": "The Event Loop: code snippets > focus.js: a 0 ms timer runs after the current code; nested timers clamp to 4 ms (zero-is-not-now)"
+    },
+    {
+      "hash": "93eqoi",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: a real click ran the handler with nothing below it on the stack, and addToCart got the button’s data-sku.",
+      "test": "The Event Loop: code snippets > cart.js: a real click runs the handler as a task, on an empty stack (every-click-is-a-task)"
+    },
+    {
+      "hash": "1xq6l3s",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: on an idle page the callback came a little late, never early.",
+      "test": "The Event Loop: code snippets > late.js: the delay is a minimum (timers-are-a-minimum)"
+    },
+    {
+      "hash": "1xq6l3s",
+      "lesson": "event-loop",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: the callback came a little late, never early.",
+      "test": "The Event Loop: code snippets > late.js: the delay is a minimum (timers-are-a-minimum)"
+    },
+    {
+      "hash": "1smwowo",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: in a module, all four callbacks ran before a setTimeout(…, 0) task queued ahead of them: queueMicrotask, then, the code after await, then the MutationObserver.",
+      "test": "The Event Loop: code snippets > microtasks.js: all four run their callbacks as microtasks (the-microtask-queue)"
+    },
+    {
+      "hash": "47kxy1",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: tick ran once per frame, 16.7 ms apart on a 60 Hz display, and moved the box by the frame’s timestamp each time.",
+      "test": "The Event Loop: code snippets > animate.js: requestAnimationFrame calls tick once per frame (where-rendering-fits)"
+    },
+    {
+      "hash": "1ighv6l",
+      "lesson": "event-loop",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: this promise version and the async checkout() printed the same order in three interleavings with other microtasks and a timer.",
+      "test": "The Event Loop: code snippets > checkout.js: the promise version orders exactly like await (await-splits-a-function)"
+    },
+    {
+      "hash": "1mv61u9",
+      "lesson": "event-loop",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: against a server that sent the headers at once and the body 300 ms later, the first await resumed with the headers and the second once the body arrived. A timer ran in between, on an otherwise empty stack.",
+      "test": "The Event Loop: code snippets > cart.js: await fetch resumes at the headers, await res.json() at the body (awaiting-the-network)"
+    },
+    {
+      "hash": "1ktzgo8",
+      "lesson": "event-loop",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: over many runs both orders showed up. Busy-waiting 2 ms at the end of the module made timeout win every time.",
+      "test": "The Event Loop: Node.js > main.js: from the main module the order can flip (node-js)"
+    },
+    {
+      "hash": "nfii0g",
+      "lesson": "event-loop",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: as a .cjs file it printed nextTick, then promise. The same lines as an ES module printed promise first.",
+      "test": "The Event Loop: Node.js > ticks.cjs: nextTick first in CommonJS, promise first in an ES module (node-js)"
+    },
+    {
+      "hash": "19xz32t",
+      "lesson": "hash-tables",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: hash('bob') gave 97717 both times, the same number Java 18.0.2.1's \"bob\".hashCode() returns.",
+      "test": "Hash tables > hash.js: bob is 97717 every time, exactly Java’s String.hashCode() for short keys"
+    },
+    {
+      "hash": "2metpr",
+      "lesson": "hash-tables",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: hash('alice') is 92903040, so alice lands in bucket 0.",
+      "test": "Hash tables > table.js, phone.js, lazy.js, order.js: the numbers in the comments"
+    },
+    {
+      "hash": "r5gq7s",
+      "lesson": "hash-tables",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: get('dave') returned '555-0108', get('zoe') undefined and has('alice') true.",
+      "test": "Hash tables > table.js, phone.js, lazy.js, order.js: the numbers in the comments"
+    },
+    {
+      "hash": "1ffp9ac",
+      "lesson": "hash-tables",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: both jack and jill land in bucket 6.",
+      "test": "Hash tables > table.js, phone.js, lazy.js, order.js: the numbers in the comments"
+    },
+    {
+      "hash": "21feh5",
+      "lesson": "hash-tables",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: the Map listed carol, alice, bob. A plain object stayed in fast mode until a delete, or a couple dozen added keys, turned it into a dictionary.",
+      "test": "Hash tables > table.js, phone.js, lazy.js, order.js: the numbers in the comments"
+    },
+    {
+      "hash": "d6ec3o",
+      "lesson": "hash-tables",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: over the lesson’s 10 contacts, finding dave took 9 comparisons and missing zoe took all 10.",
+      "test": "Hash tables > contacts.js and chained-table.js: the comparisons the lesson counts"
+    },
+    {
+      "hash": "ia5u9j",
+      "lesson": "hash-tables",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: alice, erin and frank all chained in bucket 0, and get('frank') compared 3 keys.",
+      "test": "Hash tables > contacts.js and chained-table.js: the comparisons the lesson counts"
+    },
+    {
+      "hash": "f5h9mo",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: one timed call over 10 million numbers took tens of milliseconds on an Apple M5 Pro laptop.",
+      "test": "Big-O > findMax.js: timing 10 million numbers (why-not-seconds)"
+    },
+    {
+      "hash": "cr4jvp",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: each Float64Array element is 8 bytes, and the Set found carol.",
+      "test": "Big-O > constant.js, search.js, binarySearch.js: the values in the comments"
+    },
+    {
+      "hash": "oam7d",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: includes found 46, indexOf returned 14, and the Set agreed.",
+      "test": "Big-O > constant.js, search.js, binarySearch.js: the values in the comments"
+    },
+    {
+      "hash": "gexjym",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: it found every target on sorted arrays up to a million items and missed nothing, touching about log₂ n elements per search.",
+      "test": "Big-O > constant.js, search.js, binarySearch.js: the values in the comments"
+    },
+    {
+      "hash": "1w29cff",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: with merge.js, it sorted 200 random arrays exactly like Array.prototype.sort.",
+      "test": "Big-O > mergeSort.js + merge.js: sorts, and V8’s sort behaves like TimSort (split-in-halves, merge-back-up)"
+    },
+    {
+      "hash": "1xmhven",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: [5, 3, 9, 1] sorted to [1, 3, 5, 9]. V8’s sort needed only n − 1 comparisons on already sorted input, the TimSort signature.",
+      "test": "Big-O > mergeSort.js + merge.js: sorts, and V8’s sort behaves like TimSort (split-in-halves, merge-back-up)"
+    },
+    {
+      "hash": "ms3bai",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: fib(30) made exactly 2,692,537 calls. At the per-call speed of fib(40), fib(50)’s 40.7 billion calls take more than a minute.",
+      "test": "Big-O > fib.js and fibMemo.js: the call counts (exploding-calls, memoization)"
+    },
+    {
+      "hash": "x7n5ye",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: fib(50) returned 12,586,269,025 after exactly 99 calls.",
+      "test": "Big-O > fib.js and fibMemo.js: the call counts (exploding-calls, memoization)"
+    },
+    {
+      "hash": "77rupl",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: with n = 1,000,000 the first three lines evaluate to 1,000,000, about 19.9 million and 10¹², and 2n ** 1000000n has 301,030 digits.",
+      "test": "Big-O > a-million.js and the duplicate checks (a-million-items, all-pairs, space-complexity)"
+    },
+    {
+      "hash": "us1t3z",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: it agreed with the Set version on 500 random arrays.",
+      "test": "Big-O > a-million.js and the duplicate checks (a-million-items, all-pairs, space-complexity)"
+    },
+    {
+      "hash": "flgph5",
+      "lesson": "big-o",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: both versions agreed with the all-pairs check on 500 random arrays.",
+      "test": "Big-O > a-million.js and the duplicate checks (a-million-items, all-pairs, space-complexity)"
+    },
+    {
+      "hash": "mon1kh",
+      "lesson": "garbage-collection",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: with a 5 MB report, each open and close left about 5 MB more on the heap after GC. With the AbortController fix, the heap stayed flat.",
+      "test": "Garbage collection > report.js: the listener leaks a report per open; the AbortController fix does not (find-the-leak)"
+    },
+    {
+      "hash": "1upa7qk",
+      "lesson": "garbage-collection",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: on a graph with a reachable cycle it finished and marked exactly the three reachable objects; the unreachable draft ↔ note cycle stayed unmarked.",
+      "test": "Garbage collection > mark.js and sweep.js: cycles stop the marker; the sweep frees the rest (mark, sweep)"
+    },
+    {
+      "hash": "k87fk9",
+      "lesson": "garbage-collection",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: after mark.js, it put the unmarked draft and note on the free list in heap order and cleared every mark.",
+      "test": "Garbage collection > mark.js and sweep.js: cycles stop the marker; the sweep frees the rest (mark, sweep)"
+    },
+    {
+      "hash": "1ec1y81",
+      "lesson": "race-conditions",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: with 4 worker threads doing a million increments each on one SharedArrayBuffer, the count came up short: updates were lost.",
+      "test": "Race conditions > worker.js: a plain increment loses updates; Atomics.add does not (the-lost-update, fetch-and-add)"
+    },
+    {
+      "hash": "fz5kx0",
+      "lesson": "race-conditions",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: the same 4 threads with Atomics.add always reached exactly 4,000,000, and Atomics.add returned the old value.",
+      "test": "Race conditions > worker.js: a plain increment loses updates; Atomics.add does not (the-lost-update, fetch-and-add)"
+    },
+    {
+      "hash": "c6td2l",
+      "lesson": "websockets",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: onopen ran only after the server’s 101, and the upgrade request carried a 16-byte key, version 13, the Origin and the page’s cookies.",
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "hash": "olrv1r",
+      "lesson": "websockets",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: the RFC’s sample key gives s3pPLMBiTxaQ9kYGzzhZRbK+xOo=, and Chrome 154 accepted the handshakes it answered (and refused a wrong one).",
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "hash": "1rxt5qb",
+      "lesson": "websockets",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: it joined on open, rendered the server’s message, sent on click and logged \"closed with code 1000\" when the server closed.",
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "hash": "126ua3a",
+      "lesson": "websockets",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: against a server that was down, the waits between attempts fell within 0.5–1 s, 1–2 s and 2–4 s: doubling, with jitter.",
+      "test": "WebSockets: the browser side > handshake, frames, pings, closes, reconnects: what Chrome does (ask-to-upgrade … silent-death)"
+    },
+    {
+      "hash": "14kk4k8",
+      "lesson": "websockets",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: EventSource sent a GET asking for text/event-stream and rendered each event; when the stream dropped, it reconnected with Last-Event-ID on its own.",
+      "test": "WebSockets: the browser side > Server-Sent Events and long polling (server-sent-events, long-polling)"
+    },
+    {
+      "hash": "1n6v7bx",
+      "lesson": "websockets",
+      "by": "Chrome 154",
+      "kind": "ran",
+      "note": "Ran it in Chrome 154: after a 204 it asked again at once, and after the news it asked with the new cursor.",
+      "test": "WebSockets: the browser side > Server-Sent Events and long polling (server-sent-events, long-polling)"
+    },
+    {
+      "hash": "zlhrpv",
+      "lesson": "processes-threads",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: the worker posted back the sum of 10 million squares. Four such workers at once took about as long as one: real threads, on separate cores.",
+      "test": "Processes & threads, message queues > main.js: a worker thread sums in parallel (python-and-node)"
+    },
+    {
+      "hash": "17wrq55",
+      "lesson": "message-queues",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: a body with \"amount\": \"12\" threw TypeError: bad amount: 12 on every attempt, while a good one parsed.",
+      "test": "Processes & threads, message queues > parseCharge: the message that always fails (the-message-that-always-fails)"
+    }
+  ]
+}

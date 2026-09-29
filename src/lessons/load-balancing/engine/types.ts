@@ -39,6 +39,13 @@ export interface WorldConfig {
   /** Deterministic heavy/light pattern, overrides heavyRatio */
   pattern: ('H' | 'L')[] | null;
   healthChecks: boolean;
+  /**
+   * Whose failure handling to imitate when a server refuses a connection.
+   * nginx: retry the next server at once and skip the dead one for 10 s.
+   * haproxy: retry the same server 3 times, a second apart, then answer 503.
+   * Both were measured on the real software (verify/load-balancing.test.ts).
+   */
+  proxy: 'nginx' | 'haproxy';
   /** Servers keep shopping carts in their own memory */
   sessions: boolean;
   /** Carts live in a shared Redis instead */

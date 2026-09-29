@@ -684,7 +684,7 @@ server {
     ssl_certificate_key /etc/ssl/shop.example.key;
 !    add_header Alt-Svc 'h3=":443"; ma=86400';
 }`,
-          note: 'nginx 1.25 or newer. Only one listen line per address and port may say reuseport.',
+          note: 'nginx 1.25.1 or newer. Only one listen line per address and port may say reuseport.',
         },
       },
     ],

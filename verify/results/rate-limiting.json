@@ -1,0 +1,309 @@
+{
+  "file": "rate-limiting",
+  "checks": [
+    {
+      "lesson": "rate-limiting",
+      "step": "burst-then-trickle",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted (limit_req_zone moved to the http level; wrapped in server {}; stub upstream backend)",
+      "pass": true,
+      "test": "every nginx snippet loads > nginx -t: burst-then-trickle / nginx.conf"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "leaky-bucket",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted (added the \"api\" zone the lesson defined earlier; wrapped in server {}; stub upstream backend)",
+      "pass": true,
+      "test": "every nginx snippet loads > nginx -t: leaky-bucket / nginx.conf"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "burst-then-trickle",
+      "software": "nginx 1.31.6",
+      "title": "An idle client sends 20 requests at once",
+      "real": "11 passed, 9 rejected (each burst reached nginx within 1 ms)",
+      "lesson_says": "11 (burst + 1); the lesson's token bucket on the same arrivals: 11",
+      "pass": true,
+      "test": "nginx limit_req > with nodelay it acts like a token bucket of burst + 1 (burst-then-trickle)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "burst-then-trickle",
+      "software": "nginx 1.31.6",
+      "title": "Then a steady 10 requests a second",
+      "real": "15 of 31 passed, one every 200 ms on average: 5.0 per second",
+      "lesson_says": "5 per second; the lesson's token bucket: 15 of 31",
+      "pass": true,
+      "test": "nginx limit_req > with nodelay it acts like a token bucket of burst + 1 (burst-then-trickle)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "burst-then-trickle",
+      "software": "nginx 1.31.6",
+      "title": "Every decision, request by request",
+      "real": "42 passed, 34 rejected of 76; after a 1 s pause 5 of 10, after 2.5 s 11 of 15",
+      "lesson_says": "token bucket of 11 refilling at 5/s: 0 disagreements (0 decided on the 1 ms clock difference)",
+      "pass": true,
+      "test": "nginx limit_req > with nodelay it acts like a token bucket of burst + 1 (burst-then-trickle)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "burst-then-trickle",
+      "software": "nginx 1.31.6",
+      "title": "Status of the rejected requests",
+      "real": "429",
+      "lesson_says": "limit_req_status 429",
+      "pass": true,
+      "test": "nginx limit_req > with nodelay it acts like a token bucket of burst + 1 (burst-then-trickle)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "burst-then-trickle",
+      "title": "The default status for a rejected request",
+      "software": "nginx 1.31.6",
+      "real": "11 × 200, 4 × 503",
+      "lesson_says": "default: 503",
+      "pass": true,
+      "test": "nginx limit_req > without limit_req_status, rejections are 503 (burst-then-trickle comment)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "leaky-bucket",
+      "software": "nginx 1.31.6",
+      "title": "15 requests at once",
+      "real": "1 passed, 10 delayed, 4 rejected (each burst reached nginx in the same millisecond)",
+      "lesson_says": "leaky bucket with 10 slots: 1 passed, 10 delayed, 4 rejected",
+      "pass": true,
+      "test": "nginx limit_req > without nodelay it is a leaky bucket that releases at exactly the rate (leaky-bucket)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "leaky-bucket",
+      "software": "nginx 1.31.6",
+      "title": "Held requests go to the server at a fixed pace",
+      "real": "23 releases, 199–201 ms apart (average 200.0 ms)",
+      "lesson_says": "one every 200 ms (\"exactly the configured rate\")",
+      "pass": true,
+      "test": "nginx limit_req > without nodelay it is a leaky bucket that releases at exactly the rate (leaky-bucket)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "leaky-bucket",
+      "software": "nginx 1.31.6",
+      "title": "Every decision and release time, request by request",
+      "real": "2 passed, 22 delayed, 13 rejected; every release within 1 ms of the lesson's",
+      "lesson_says": "0 disagreements (0 decided on the 1 ms clock difference)",
+      "pass": true,
+      "test": "nginx limit_req > without nodelay it is a leaky bucket that releases at exactly the rate (leaky-bucket)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "leaky-bucket",
+      "software": "nginx 1.31.6",
+      "title": "Status when the bucket is full",
+      "real": "429",
+      "lesson_says": "429 (limit_req_status 429)",
+      "pass": true,
+      "test": "nginx limit_req > without nodelay it is a leaky bucket that releases at exactly the rate (leaky-bucket)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "burst-then-trickle",
+      "title": "How many client IPs a 10m zone remembers",
+      "software": "nginx 1.31.6",
+      "real": "remembered the last 81,017 of 200,000 IPv4 addresses, forgetting the oldest first (a 1m zone: 7,863)",
+      "lesson_says": "about 80,000",
+      "pass": true,
+      "test": "nginx limit_req > how many client IPs a 10m zone remembers (burst-then-trickle note)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "atomic-counters",
+      "software": "Redis 7.2.5",
+      "title": "The Lua script on the animation's own request times",
+      "real": "EVALSHA allowed 430 and denied 589 of 1019 requests from 5 steps (times in whole ms)",
+      "lesson_says": "the animation allowed 430: 0 disagreements; limiter.ts on the same times: 0",
+      "pass": true,
+      "test": "Redis > token_bucket.lua decides like the lesson's token bucket, in one atomic step (atomic-counters)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "atomic-counters",
+      "software": "Redis 7.2.5",
+      "title": "The Lua script on random arrivals",
+      "real": "1200 requests into buckets of 5 @ 1/s, 11 @ 5/s and 5 @ 0.5/s",
+      "lesson_says": "limiter.ts: 0 disagreements",
+      "pass": true,
+      "test": "Redis > token_bucket.lua decides like the lesson's token bucket, in one atomic step (atomic-counters)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "atomic-counters",
+      "software": "Redis 7.2.5",
+      "title": "20 requests at the same moment from 4 gateways, bucket of 5",
+      "real": "as one Lua script (EVALSHA): 5 allowed; as separate HMGET and HSET calls: 20 allowed",
+      "lesson_says": "Redis executes the script without interleaving any other command",
+      "pass": true,
+      "test": "Redis > token_bucket.lua decides like the lesson's token bucket, in one atomic step (atomic-counters)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "atomic-counters",
+      "software": "Redis 7.2.5",
+      "title": "GET, then SET, from two gateways at once",
+      "real": "both read 4 and 4, 2 allowed, the counter says 5",
+      "lesson_says": "both read 4 and 4, \"both\" get through, the counter says 5",
+      "pass": true,
+      "test": "Redis > GET then SET races; INCR does not (atomic-counters)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "atomic-counters",
+      "software": "Redis 7.2.5",
+      "title": "INCR from two gateways at once",
+      "real": "replies 5 and 6: 1 allowed, 1 refused; counter 6",
+      "lesson_says": "replies 5 and 6: gw-1 allows, gw-2 sends a 429",
+      "pass": true,
+      "test": "Redis > GET then SET races; INCR does not (atomic-counters)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "distributed-counters",
+      "software": "Redis 7.2.5",
+      "title": "Local counters: the most the scraper got through in one 10 s window",
+      "real": "15 (gateway.js against a separate Redis per gateway)",
+      "lesson_says": "15 (\"15 per window, three times the limit\"); 0 of 131 decisions differ",
+      "pass": true,
+      "test": "Redis > gateway.js: local counters let the scraper through 3 times, one shared count holds (distributed-counters)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "distributed-counters",
+      "software": "Redis 7.2.5",
+      "title": "Shared counter in Redis: the most the scraper got through in one 10 s window",
+      "real": "5 (gateway.js, three gateways, one Redis); the counter's TTL was 10 s",
+      "lesson_says": "5 (\"the limit holds at 5\"); 0 of 129 decisions differ",
+      "pass": true,
+      "test": "Redis > gateway.js: local counters let the scraper through 3 times, one shared count holds (distributed-counters)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "sliding-window-log",
+      "software": "Redis 7.2.5",
+      "title": "The boundary attack against the sliding log",
+      "real": "6 bursts; the second of each pair got 0/5, 0/5, 0/5 through",
+      "lesson_says": "the second burst is rejected in full; 0 of 30 decisions differ from the animation",
+      "pass": true,
+      "test": "Redis > the sliding log in a sorted set rejects the second burst in full (sliding-window-log)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "sliding-window-log",
+      "software": "Redis 7.2.5",
+      "title": "The two timestamps and the expiry in the snippet",
+      "real": "ZREMRANGEBYSCORE cuts at 1790424590000, ZADD scores 1790424600000: 10000 ms apart; PEXPIRE 10000; ZCARD of 4 then allowed 3 times",
+      "lesson_says": "10 s window; \"4 in the window: room for 1\"",
+      "pass": true,
+      "test": "Redis > the sliding log in a sorted set rejects the second burst in full (sliding-window-log)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "sliding-window-log",
+      "software": "Redis 7.2.5",
+      "title": "Two servers run the commands at once, 4 in the window",
+      "real": "both counted 4 and 4, the set now holds 6",
+      "lesson_says": "\"two servers can both count 4 and both add\" without a Lua script",
+      "pass": true,
+      "test": "Redis > the sliding log in a sorted set rejects the second burst in full (sliding-window-log)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "http-429",
+      "title": "Headers on a 429 from limit_req",
+      "software": "nginx 1.31.6",
+      "real": "9 × 429 with headers: connection, content-length, content-type, date, server",
+      "lesson_says": "a bare 429, no Retry-After or RateLimit headers",
+      "pass": true,
+      "test": "retrying after a 429 > nginx's limit_req sends a bare 429 (response aside)"
+    },
+    {
+      "lesson": "rate-limiting",
+      "step": "backoff-and-jitter",
+      "title": "client.js waits for Retry-After in either form, else jitters",
+      "software": "Node 22.22.0 & nginx 1.31.6",
+      "real": "Retry-After: 4 → waited 4000 ms; an HTTP date 3 s ahead → 2064 ms; no header → 445 ms (random); against limit_req: 200 after 1 retries",
+      "lesson_says": "honor Retry-After (seconds or HTTP date); otherwise full jitter",
+      "pass": true,
+      "test": "retrying after a 429 > client.js honors Retry-After as seconds or a date, and jitters without it (backoff-and-jitter)"
+    }
+  ],
+  "stamps": [
+    {
+      "hash": "sd7kz3",
+      "lesson": "rate-limiting",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads > nginx -t: burst-then-trickle / nginx.conf"
+    },
+    {
+      "hash": "1aah0kz",
+      "lesson": "rate-limiting",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads > nginx -t: leaky-bucket / nginx.conf"
+    },
+    {
+      "hash": "sd7kz3",
+      "lesson": "rate-limiting",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: an idle client got 11 of 20 simultaneous requests through and 9 got 429, then 5 per second got through. Every decision matched a token bucket of 11 tokens refilling at 5 per second.",
+      "test": "nginx limit_req > with nodelay it acts like a token bucket of burst + 1 (burst-then-trickle)"
+    },
+    {
+      "hash": "1aah0kz",
+      "lesson": "rate-limiting",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: of 15 simultaneous requests, 1 went straight through, 10 waited and left one every 200 ms, and 4 got 429. Every decision and release matched the lesson's leaky bucket.",
+      "test": "nginx limit_req > without nodelay it is a leaky bucket that releases at exactly the rate (leaky-bucket)"
+    },
+    {
+      "hash": "wrc6iw",
+      "lesson": "rate-limiting",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: called with EVALSHA on the animation's own request times, it allowed and denied exactly what the lesson's token bucket did. 20 simultaneous calls on a 5-token bucket let exactly 5 through.",
+      "test": "Redis > token_bucket.lua decides like the lesson's token bucket, in one atomic step (atomic-counters)"
+    },
+    {
+      "hash": "7mg9cw",
+      "lesson": "rate-limiting",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: with three gateways sharing one Redis, the scraper got 5 requests through per 10-second window, same as the animation. With a separate Redis per gateway, 15.",
+      "test": "Redis > gateway.js: local counters let the scraper through 3 times, one shared count holds (distributed-counters)"
+    },
+    {
+      "hash": "ftcxvw",
+      "lesson": "rate-limiting",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: against the animation's boundary attack, every second burst was rejected in full, request for request what the animation shows.",
+      "test": "Redis > the sliding log in a sorted set rejects the second burst in full (sliding-window-log)"
+    },
+    {
+      "hash": "ggnlij",
+      "lesson": "rate-limiting",
+      "by": "Node 22.22.0",
+      "kind": "ran",
+      "note": "Ran it on Node 22.22.0: it waited out Retry-After given as seconds or as a date, and without one (nginx's limit_req sends none) it waited a random, jittered time, then got through.",
+      "test": "retrying after a 429 > client.js honors Retry-After as seconds or a date, and jitters without it (backoff-and-jitter)"
+    }
+  ]
+}

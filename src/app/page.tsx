@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Icon } from '@/components/lesson/Icon';
+import { CoffeeBand, CoffeeButton } from '@/components/site/CoffeeButton';
 import { HeroStage } from '@/components/site/HeroStage';
 import { Logo } from '@/components/site/Logo';
 import { TopicGlyph } from '@/components/site/TopicGlyph';
@@ -80,7 +81,12 @@ const HOW = [
   },
   {
     title: 'Break it on purpose',
-    text: 'Crash servers, flood the traffic, flip algorithms. Then read the real NGINX or HAProxy config that does the same thing.',
+    text: (
+      <>
+        Crash servers, flood the traffic, flip algorithms. Then read the real NGINX or HAProxy config that does the same thing,{' '}
+        <Link href="/tested">tested against the real software</Link>.
+      </>
+    ),
     art: (
       <svg viewBox="0 0 160 70" aria-hidden>
         <defs>
@@ -107,6 +113,7 @@ export default function Home() {
           <a href="#how">How it works</a>
           <a href="#topics">Topics</a>
         </nav>
+        <CoffeeButton compact className={css.headerCoffee} />
         <Link href={FIRST} className={css.headerCta}>
           Start learning <Icon name="arrowRight" size={14} />
         </Link>
@@ -184,9 +191,14 @@ export default function Home() {
         })}
       </section>
 
+      <CoffeeBand />
+
       <footer className={css.footer}>
         <Logo />
         <span>{SITE.tagline}</span>
+        <Link href="/tested" className={css.footLink}>
+          How the lessons are tested
+        </Link>
         <span className={css.footNote}>Addresses shown are from documentation ranges (RFC 5737). No servers were harmed.</span>
       </footer>
     </div>

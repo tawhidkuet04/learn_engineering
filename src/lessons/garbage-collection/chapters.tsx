@@ -762,7 +762,7 @@ $ node --trace-gc server.js
           lang: 'shell',
           code: `
 !$ node --max-semi-space-size=32 server.js`,
-          note: 'V8’s young generation is a copying collector over two semi-spaces. This flag sets the size of each half in MB.',
+          note: 'V8’s young generation is a copying collector over two semi-spaces. This flag sets the maximum size of each half, in MB; they start small and grow.',
         },
       },
     ],

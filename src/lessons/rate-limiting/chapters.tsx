@@ -523,7 +523,7 @@ location /api/ {
 !    limit_req_status 429;   # default: 503
     proxy_pass http://backend;
 }`,
-          note: 'NGINX calls its algorithm a leaky bucket, but with nodelay it acts like a token bucket: an idle client can send 11 requests at once (burst + 1), then 5 per second. 10m of shared memory holds about 160,000 client IPs.',
+          note: 'NGINX calls its algorithm a leaky bucket, but with nodelay it acts like a token bucket: an idle client can send 11 requests at once (burst + 1), then 5 per second. 10m of shared memory holds about 80,000 client IPs.',
         },
       },
       {
@@ -669,6 +669,7 @@ token_bucket:
             <Aside>
               Header names vary. Many APIs send X-RateLimit-Limit, -Remaining and -Reset (GitHub does, with Reset as a Unix timestamp). The RateLimit-*
               names here come from an IETF draft, whose latest version folds them into RateLimit and RateLimit-Policy. 429 itself is from RFC 6585.
+              NGINX&apos;s <code>limit_req</code> sends a bare 429 with none of these headers, so your app or gateway has to add them.
             </Aside>
           </>
         ),
@@ -729,14 +730,17 @@ async function fetchWithRetry(url, tries = 6) {
     const res = await fetch(url);
     if (res.status !== 429 || i === tries - 1)
       return res;
+    // Retry-After is seconds ("4") or an HTTP date
     const after = res.headers.get('Retry-After');
+    const ms = !after ? NaN
+      : isNaN(after) ? Date.parse(after) - Date.now() : after * 1000;
 !    const cap = Math.min(30_000, 1000 * 2 ** i);
-!    const wait = after ? after * 1000
-!      : Math.random() * cap;   // full jitter
+!    const wait = Number.isNaN(ms) ? Math.random() * cap   // full jitter
+!      : Math.max(0, ms);
     await sleep(wait);
   }
 }`,
-          note: '“Full jitter”: wait a random time between 0 and the exponential cap. Retry-After is usually seconds; it can also be an HTTP date.',
+          note: '“Full jitter”: wait a random time between 0 and the exponential cap, unless the server said how long to wait.',
         },
       },
     ],

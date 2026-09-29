@@ -8,6 +8,7 @@ import cards from '@/components/lesson/cards.module.css';
 import { POLICY_NAMES, type Policy } from '../cache';
 import { HOT, keyName } from '../products';
 import type { CacheConfig, CacheSim } from '../sim';
+import { redisConf } from './redisConf';
 
 interface Mission {
   id: string;
@@ -50,22 +51,6 @@ const POLICIES: Policy[] = ['lru', 'lfu', 'fifo'];
 
 /** Products the playground's traffic touches (its config sets keys to match). */
 export const KEYS = 12;
-
-function redisConf(cfg: CacheConfig): string {
-  const policy = cfg.policy === 'lru' ? 'allkeys-lru' : cfg.policy === 'lfu' ? 'allkeys-lfu' : 'allkeys-random';
-  const lines = [
-    '# redis.conf',
-    `!maxmemory 64mb      # here: room for ${cfg.slots} keys`,
-    ...(cfg.policy === 'fifo' ? ['# Redis has no FIFO; closest is random'] : []),
-    `!maxmemory-policy ${policy}`,
-    '',
-    '# the app',
-    cfg.ttl > 0 ? `!SET product:42 "{…}" EX ${cfg.ttl}` : '!SET product:42 "{…}"   # no TTL',
-    `# on write: ${cfg.writeMode === 'around' ? 'UPDATE, then DEL the key' : 'UPDATE only (stale copies)'}`,
-    `# misses: ${cfg.coalesce ? 'coalesced, 1 query per key' : 'each runs its own query'}`,
-  ];
-  return lines.join('\n');
-}
 
 function Range({ label, value, min, max, step, format, onChange }: { label: string; value: number; min: number; max: number; step: number; format: (v: number) => ReactNode; onChange: (v: number) => void }) {
   return (

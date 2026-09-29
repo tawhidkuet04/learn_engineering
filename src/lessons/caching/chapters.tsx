@@ -391,11 +391,13 @@ await redis.set(key, json, { EX: TTL.price });`,
               used. The rows stay in order of last use: every read moves a key to the top, and when room is needed, the bottom key goes.
             </p>
             <p>
-              Watch <Term k={`row:${HOT}`}>product:42</Term>: it’s read so often that it never gets near the bottom.
+              Watch <Term k={`row:${HOT}`}>product:42</Term>: it’s read so often that it seldom sinks to the bottom. When it does get evicted, its next
+              read brings it right back.
             </p>
             <Aside>
-              Real Redis approximates LRU. Instead of keeping a sorted list, it samples 5 random keys (<code>maxmemory-samples</code>) and evicts the least
-              recently used of those. It’s nearly as good and costs almost nothing.
+              Real Redis approximates LRU. Instead of keeping a sorted list, it samples 5 keys at a time (<code>maxmemory-samples</code>) and evicts the
+              one idle longest among the keys it has sampled. It needs no extra memory per key, and it’s nearly as good: on this lesson’s traffic, over
+              12,000 reads, its hit ratio stayed within about two points of exact LRU’s 66%.
             </Aside>
           </>
         ),
@@ -410,7 +412,7 @@ await redis.set(key, json, { EX: TTL.price });`,
 !maxmemory 2gb
 !maxmemory-policy allkeys-lru
 maxmemory-samples 5`,
-            note: 'The default policy is noeviction: when memory is full, writes fail. Other choices include allkeys-lfu, allkeys-random and volatile-lru (only keys that have a TTL).',
+            note: 'The default policy is noeviction: when memory is full, writes fail with an OOM error. Other choices include allkeys-lfu, allkeys-random and volatile-lru (only keys that have a TTL).',
           },
         ],
       },
@@ -427,6 +429,10 @@ maxmemory-samples 5`,
               Your turn. When a miss needs room in the full cache, the animation pauses. <strong>Click the key LRU will evict.</strong>
             </p>
             <p>Watch the hits in between: each one moves its key to the top and changes who’s at the bottom.</p>
+            <Aside>
+              Real Redis doesn’t always agree. We ran these ten reads on Redis 7.2.5 again and again: its picks changed from run to run, and sometimes
+              it evicted <code>product:5</code> the moment it was written, because it still remembered the old <code>product:5</code> as long idle.
+            </Aside>
           </>
         ),
         hud: ['hit'],
@@ -457,10 +463,11 @@ maxmemory-samples 5`,
             </p>
             <p>
               <strong>LFU</strong> (least frequently used) counts reads and evicts the least popular key. It wins when popularity is stable, but a key
-              that was hot yesterday can hog space long after, so Redis’s LFU slowly decays its counters.
+              that was hot yesterday can hog space long after, so Redis’s LFU slowly decays its counters. Its counts are approximate, so on this
+              traffic Redis’s LFU scores below the exact LFU in the readout, though it usually still beats LRU.
             </p>
             <p>
-              <strong>LRU</strong> is the usual default: cheap, and quick to adapt when popularity shifts. The readout compares all three on this exact
+              <strong>LRU</strong> is the usual choice: cheap, and quick to adapt when popularity shifts. The readout compares all three on this exact
               traffic over 12,000 reads.
             </p>
           </>
@@ -484,11 +491,12 @@ maxmemory-samples 5`,
             lang: 'conf',
             code: `
 !maxmemory-policy allkeys-lfu
-# counters grow logarithmically (max 255)
+# counts grow ever more slowly: about 10
+# after 100 reads, 255 (the max) by a million
 lfu-log-factor 10
-# an idle key's count decays every minute
+# an idle key's count drops by 1 each minute
 !lfu-decay-time 1`,
-            note: 'Redis has no FIFO policy. It’s here to show why recency matters.',
+            note: 'Redis has no FIFO policy, though volatile-ttl acts much like one when every key has the same TTL. FIFO is here to show why recency matters.',
           },
         ],
       },
@@ -553,10 +561,12 @@ lfu-log-factor 10
             lang: 'shell',
             code: `
 $ redis-cli INFO memory
+…
 used_memory_human:1.83G
+…
 maxmemory_human:2.00G
 …
-$ redis-cli INFO stats | grep evicted
+$ redis-cli INFO stats | grep evicted_keys
 !evicted_keys:48213`,
             note: 'A steadily climbing evicted_keys with a falling hit ratio means your working set no longer fits.',
           },
@@ -661,8 +671,9 @@ async function updatePrice(id, price) {
               far more often than it’s read.
             </p>
             <Aside>
-              Redis can save to disk (snapshots or an append-only file), which narrows the window but doesn’t close it. With the common once-a-second
-              fsync, a crash can still lose about a second of writes.
+              Redis can save to disk, which narrows the window. Out of the box it snapshots at most once a minute, and a crash loses every write since
+              the last snapshot. With the append-only file on, a killed Redis came back with every write it had acknowledged, though by default it
+              syncs that file to disk only once a second.
             </Aside>
           </>
         ),
@@ -691,8 +702,8 @@ async function updatePrice(id, price) {
                   after: (
                     <>
                       With write-back, any <strong>dirty</strong> rows never reached Postgres: Dave was told “saved”, and the change is simply gone. With
-                      the other two, only copies are lost. Either way Redis comes back <strong>cold</strong>, so every read misses and Postgres takes the
-                      full load until the cache warms up again.
+                      the other two, only copies are lost. Either way Redis comes back <strong>cold</strong>, because this one has no snapshot to
+                      reload, so every read misses and Postgres takes the full load until the cache warms up again.
                     </>
                   ),
                 },

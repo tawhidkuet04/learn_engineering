@@ -31,6 +31,17 @@ export function nginxConfig(algo: Algo, servers: ServerLine[], healthChecks: boo
   if (healthChecks) {
     lines.push('', '!    # active checks (NGINX Plus) or HAProxy "check"', '!    # health_check interval=2s fails=3 passes=2;');
   }
-  lines.push('}', '', 'server {', '    listen 443 ssl;', '    location / {', '        proxy_pass http://backend;', '    }', '}');
+  lines.push(
+    '}',
+    '',
+    'server {',
+    '    listen 443 ssl;',
+    '    ssl_certificate     /etc/ssl/shop.example.crt;',
+    '    ssl_certificate_key /etc/ssl/shop.example.key;',
+    '    location / {',
+    '        proxy_pass http://backend;',
+    '    }',
+    '}',
+  );
   return lines.join('\n');
 }

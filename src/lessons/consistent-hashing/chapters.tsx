@@ -344,7 +344,7 @@ location /profile/ {
     set $memcached_key $uri;
     memcached_pass memcached_pool;
 }`,
-          note: 'Without "consistent", NGINX hashes mod N and a server change remaps nearly every URI.',
+          note: 'Without "consistent", NGINX hashes mod N: add or remove a server line and about 4 URIs in 5 move. A server that crashes but stays in the list only loses its own keys: NGINX re-hashes just those.',
         },
       },
     ],

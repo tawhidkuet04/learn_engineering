@@ -181,6 +181,19 @@ function core(s: KeyState, now: number, p: Params, algo: Algo): { ok: boolean; q
   }
 }
 
+/**
+ * Leaky bucket: let out every queued request whose turn has come by `now`,
+ * one per 1/rate seconds. Returns them with the moment each one dripped out.
+ */
+export function leak(s: KeyState, now: number, p: Params): { req: Queued; at: number }[] {
+  const out: { req: Queued; at: number }[] = [];
+  while (s.queue.length && now >= s.nextLeak - 1e-9) {
+    out.push({ req: s.queue.shift()!, at: s.nextLeak });
+    s.nextLeak += 1 / p.rate;
+  }
+  return out;
+}
+
 /** Would a request at `now` be allowed? (No side effects.) */
 export function wouldAllow(s: KeyState, now: number, p: Params, algo: Algo) {
   return core(cloneState(s), now, p, algo).ok;

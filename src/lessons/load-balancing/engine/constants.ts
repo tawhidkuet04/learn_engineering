@@ -30,6 +30,13 @@ export const MS_PER_S = 40;
 export const HC = { interval: 2, timeout: 1.3, fall: 3, rise: 2 };
 export const HB = { interval: 1, dead: 3.4 };
 export const GATEWAY_TIMEOUT = 1.2;
+/**
+ * What real balancers do when a server refuses a connection, with their
+ * default settings (see verify/load-balancing.test.ts).
+ * HAProxy: `retries 3`, each one second after the last, on the same server.
+ * NGINX: `max_fails=1 fail_timeout=10s`, so one refusal benches the server.
+ */
+export const RETRY = { haproxyTries: 3, haproxyGap: 1, nginxBench: 10 };
 
 export const SIZE_WORKERS: Record<Size, number> = { s: 2, m: 4, l: 8 };
 export const SIZE_WEIGHT: Record<Size, number> = { s: 1, m: 2, l: 4 };
@@ -57,6 +64,7 @@ export const DEFAULT_CONFIG: WorldConfig = {
   heavyRatio: 0,
   pattern: null,
   healthChecks: false,
+  proxy: 'nginx',
   sessions: false,
   sessionStore: false,
   colorBy: 'type',

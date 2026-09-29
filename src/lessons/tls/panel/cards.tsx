@@ -10,6 +10,7 @@ import { COMMON, PAINTS, mix, paintById } from '../sim/paintMix';
 import type { Resume, ShakeProto } from '../sim/shake';
 import type { TlsSim } from '../sim/TlsSim';
 import css from '../tls.module.css';
+import { liveNginxConf } from './nginxConf';
 
 function Kicker({ icon, children }: { icon: IconName; children: ReactNode }) {
   return (
@@ -151,22 +152,7 @@ export function Playground({ sim, initialRtt }: { sim: TlsSim; initialRtt: numbe
     { id: '0rtt', label: '0-RTT', ok: cfg.proto === 'tls13' },
   ];
   const fill = ((rtt - 10) / 290) * 100;
-  const conf = [
-    'server {',
-    cfg.proto === 'http' ? '    listen 80;' : '    listen 443 ssl;',
-    '    server_name shop.example;',
-    ...(cfg.proto === 'http'
-      ? []
-      : [
-          '    ssl_certificate     fullchain.pem;',
-          '    ssl_certificate_key privkey.pem;',
-          `!    ssl_protocols       ${cfg.proto === 'tls13' ? 'TLSv1.3' : 'TLSv1.2'};`,
-          `!    ssl_session_tickets ${cfg.resume === 'full' ? 'off' : 'on'};`,
-          ...(cfg.resume === '0rtt' ? ['!    ssl_early_data      on;'] : []),
-        ]),
-    '}',
-    ...(cfg.ech ? ['# ECH: set up at the CDN in front of the site,', '# with its key published in a DNS HTTPS record'] : []),
-  ].join('\n');
+  const conf = liveNginxConf(cfg);
   return (
     <div className={css.pg}>
       <div className={css.pgGroup}>

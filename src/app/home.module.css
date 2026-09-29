@@ -55,6 +55,10 @@
   color: var(--text-1);
 }
 
+.headerCoffee {
+  margin-right: -14px;
+}
+
 .headerCta {
   display: inline-flex;
   align-items: center;
@@ -569,6 +573,23 @@
   color: var(--text-3);
 }
 
+.footLink {
+  color: var(--text-2);
+  text-decoration: none;
+}
+
+.footLink:hover {
+  color: var(--text-1);
+  text-decoration: underline;
+}
+
+.howText a {
+  color: var(--text-1);
+  text-decoration: underline;
+  text-decoration-color: rgba(75, 227, 160, 0.6);
+  text-underline-offset: 3px;
+}
+
 .footNote {
   margin-left: auto;
   font-size: 12.5px;
@@ -590,8 +611,12 @@
     display: none;
   }
 
-  .headerCta {
+  .headerCoffee {
     margin-left: auto;
+  }
+
+  .headerCta {
+    margin-left: 0;
   }
 
   .trackCount {

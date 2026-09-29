@@ -6,6 +6,7 @@ import { Icon } from '@/components/lesson/Icon';
 import { usePoll } from '@/components/lesson/usePoll';
 import cards from '@/components/lesson/cards.module.css';
 import { PROTO_NAME, type Proto } from './engine';
+import { nginxFor } from './nginxConf';
 import { RACE, type HttpSim, type StageCfg } from './sim';
 
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
@@ -161,21 +162,6 @@ function Range({
       />
     </>
   );
-}
-
-function nginxFor(proto: Proto, zeroRtt: boolean) {
-  const lines = ['server {'];
-  if (proto === 'h3') lines.push('!    listen 443 quic reuseport;');
-  lines.push(`${proto === 'h1.0' || proto === 'h1.1' ? '!' : ''}    listen 443 ssl;`);
-  if (proto === 'h2' || proto === 'h3') lines.push('!    http2 on;');
-  lines.push('    server_name shop.example;');
-  if (proto === 'h3') {
-    lines.push(`!    add_header Alt-Svc 'h3=":443"; ma=86400';`);
-    if (zeroRtt) lines.push('!    ssl_early_data on;    # allow 0-RTT');
-  }
-  if (proto === 'h1.0') lines.push('    keepalive_timeout 0;  # close after each response');
-  lines.push('}');
-  return lines.join('\n');
 }
 
 export function Playground({ sim, initial }: { sim: HttpSim; initial: StageCfg }) {

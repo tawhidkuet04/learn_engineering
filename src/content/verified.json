@@ -1,0 +1,891 @@
+{
+ "snippets": {
+  "126ua3a": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: against a server that was down, the waits between attempts fell within 0.5–1 s, 1–2 s and 2–4 s: doubling, with jitter.",
+    "kind": "ran"
+   }
+  ],
+  "12hjmds": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: the pg_rewind line threw away the writes nobody else had, and the old leader came back as a read-only follower of db-2. (The pcs line needs Pacemaker and wasn't run.)",
+    "kind": "ran"
+   }
+  ],
+  "13cre76": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: each visitor stayed on one server, and Alice and Carol, who share 198.51.100.x, landed together.",
+    "kind": "ran"
+   }
+  ],
+  "14kk4k8": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: EventSource sent a GET asking for text/event-stream and rendered each event; when the stream dropped, it reconnected with Last-Event-ID on its own.",
+    "kind": "ran"
+   }
+  ],
+  "14x7pkm": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: the server received X-Forwarded-For with the visitor's address and the original Host header.",
+    "kind": "ran"
+   }
+  ],
+  "15jbb0e": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: nine requests went web-1, web-2, web-3, web-1… in turn, same as the animation.",
+    "kind": "ran"
+   }
+  ],
+  "17cr45e": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: INFO memory printed these fields in this order (with maxmemory 2gb, 2.00G), and grep evicted_keys printed one line counting every eviction.",
+    "kind": "ran"
+   }
+  ],
+  "17wrq55": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: a body with \"amount\": \"12\" threw TypeError: bad amount: 12 on every attempt, while a good one parsed.",
+    "kind": "ran"
+   }
+  ],
+  "18fjmz7": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: one master process plus one worker per core, each worker with a single thread.",
+    "kind": "ran"
+   }
+  ],
+  "18uaq5b": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: while web-1 held a slow request, new requests went only to the other two.",
+    "kind": "ran"
+   }
+  ],
+  "19of4ho": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: with the only sync standby crashed, commits waited in SyncRep with no error and all finished when it came back. Cancelling one printed that warning word for word.",
+    "kind": "ran"
+   }
+  ],
+  "19xz32t": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: hash('bob') gave 97717 both times, the same number Java 18.0.2.1's \"bob\".hashCode() returns.",
+    "kind": "ran"
+   }
+  ],
+  "1aah0kz": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: of 15 simultaneous requests, 1 went straight through, 10 waited and left one every 200 ms, and 4 got 429. Every decision and release matched the lesson's leaky bucket.",
+    "kind": "ran"
+   }
+  ],
+  "1apf79w": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: a key just read showed 0, and a key left alone counted up one per second.",
+    "kind": "ran"
+   }
+  ],
+  "1bdcok3": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, the second SELECT … FOR UPDATE waited for the first COMMIT, then read 20. A plain SELECT didn’t wait.",
+    "kind": "ran"
+   }
+  ],
+  "1cmvi0": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: with these lines and an empty standby.signal, the replica served reads, refused writes, and after replaying the primary's inserts its orders table was exactly as big as the primary's.",
+    "kind": "ran"
+   }
+  ],
+  "1d5zby": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: http:// got a 301 to https://, every HTTPS answer (even a 404) carried the header, and curl, having seen it once, went straight to https:// the next time.",
+    "kind": "ran"
+   }
+  ],
+  "1dg6jwp": [
+   {
+    "by": "HAProxy 3.4.6",
+    "note": "HAProxy 3.4.6 loads this config (haproxy -c).",
+    "kind": "loads"
+   },
+   {
+    "by": "HAProxy 3.4.6",
+    "note": "Ran it on HAProxy 3.4.6 and crashed web-2: requests sent its way got 503 after 3 s of retries, it was pulled after 3 failed checks, and came back after 2 passing ones.",
+    "kind": "ran"
+   }
+  ],
+  "1ec1y81": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: with 4 worker threads doing a million increments each on one SharedArrayBuffer, the count came up short: updates were lost.",
+    "kind": "ran"
+   }
+  ],
+  "1ffp9ac": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: both jack and jill land in bucket 6.",
+    "kind": "ran"
+   }
+  ],
+  "1gf4n9p": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: with db2's replay paused, a commit still returned once db2 had the entry on disk (a read there still showed the old balance). remote_apply waited for the replay; local didn't wait at all.",
+    "kind": "ran"
+   }
+  ],
+  "1hmptw": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: the first request was a MISS and the next ones were HITs from disk. A stale copy was checked with If-None-Match (304), and with stale-while-revalidate the old copy went out at once.",
+    "kind": "ran"
+   }
+  ],
+  "1ighv6l": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: this promise version and the async checkout() printed the same order in three interleavings with other microtasks and a timer.",
+    "kind": "ran"
+   }
+  ],
+  "1jif8q8": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6 over HTTPS: /api/ requests alternated between the two API servers and /media/ went to the media server.",
+    "kind": "ran"
+   }
+  ],
+  "1ktzgo8": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: over many runs both orders showed up. Busy-waiting 2 ms at the end of the module made timeout win every time.",
+    "kind": "ran"
+   }
+  ],
+  "1livcip": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: SCAN returned the three cached keys in one batch with cursor 0 (their order varies). On a million keys, KEYS held up every other client; SCAN never did.",
+    "kind": "ran"
+   }
+  ],
+  "1mv61u9": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: against a server that sent the headers at once and the body 300 ms later, the first await resumed with the headers and the second once the body arrived. A timer ran in between, on an otherwise empty stack.",
+    "kind": "ran"
+   }
+  ],
+  "1n6v7bx": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: after a 204 it asked again at once, and after the news it asked with the new cursor.",
+    "kind": "ran"
+   }
+  ],
+  "1om1vzj": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, the first UPDATE matched 1 row and the second 0.",
+    "kind": "ran"
+   }
+  ],
+  "1on9hq5": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: over four shards of very different sizes, the merged sums and counts gave exactly avg(total) of all rows; averaging the averages was far off.",
+    "kind": "ran"
+   }
+  ],
+  "1p23k9c": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: TTL started at 60 and dropped one a second (42 after 18 s); a minute after the SET, GET returned (nil).",
+    "kind": "ran"
+   }
+  ],
+  "1q6o8gy": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: on a follower that was behind, the check returned false and a read there showed the old balance; once it passed her LSN, the read included the deposit.",
+    "kind": "ran"
+   }
+  ],
+  "1q7qao0": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: with the lesson's tenants loaded, acme's lookup returned 0, the UPDATE changed exactly one row, and no other tenant moved.",
+    "kind": "ran"
+   }
+  ],
+  "1rxt5qb": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: it joined on open, rendered the server’s message, sent on click and logged \"closed with code 1000\" when the server closed.",
+    "kind": "ran"
+   }
+  ],
+  "1smwowo": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: in a module, all four callbacks ran before a setTimeout(…, 0) task queued ahead of them: queueMicrotask, then, the code after await, then the MutationObserver.",
+    "kind": "ran"
+   }
+  ],
+  "1ssioxr": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: it took the scheduler.yield() path. No task passed 50 ms and clicks were handled within milliseconds, but fewer frames were painted than with setTimeout chunks.",
+    "kind": "ran"
+   }
+  ],
+  "1t02qv4": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Redis 7.2.5 starts with this config, and CONFIG GET reads back every value.",
+    "kind": "loads"
+   },
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: with maxmemory scaled down so six values fit, it evicted by idle time; over this lesson’s 12,000 reads its hit ratio stayed within about two points of exact LRU.",
+    "kind": "ran"
+   }
+  ],
+  "1toaqt2": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: setTimeout returned a numeric id straight away, and after clearTimeout, sendEmail never ran.",
+    "kind": "ran"
+   }
+  ],
+  "1upa7qk": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: on a graph with a reachable cycle it finished and marked exactly the three reachable objects; the unreachable draft ↔ note cycle stayed unmarked.",
+    "kind": "ran"
+   }
+  ],
+  "1vzfke4": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: a request from 198.51.100.7 reached the app; anyone else got 403 Forbidden.",
+    "kind": "ran"
+   }
+  ],
+  "1w29cff": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: with merge.js, it sorted 200 random arrays exactly like Array.prototype.sort.",
+    "kind": "ran"
+   }
+  ],
+  "1wfreha": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: with these lines and an empty standby.signal, the follower streamed from the leader as db2, replayed each write a moment later, and refused writes of its own.",
+    "kind": "ran"
+   }
+  ],
+  "1xmhven": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: [5, 3, 9, 1] sorted to [1, 3, 5, 9]. V8’s sort needed only n − 1 comparisons on already sorted input, the TimSort signature.",
+    "kind": "ran"
+   }
+  ],
+  "1xq6l3s": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: on an idle page the callback came a little late, never early.",
+    "kind": "ran"
+   },
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: the callback came a little late, never early.",
+    "kind": "ran"
+   }
+  ],
+  "1yvpb7u": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: removing any one of the five servers moved about a fifth of the URIs. With plain hash $uri, about four in five moved.",
+    "kind": "ran"
+   }
+  ],
+  "21feh5": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: the Map listed carol, alice, bob. A plain object stayed in fast mode until a delete, or a couple dozen added keys, turned it into a dictionary.",
+    "kind": "ran"
+   }
+  ],
+  "26dvpk": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: a returning client resumed with its ticket, its 0-RTT GET reached the app with Early-Data: 1 before the handshake finished, and a replayed copy of that first flight ran the GET again.",
+    "kind": "ran"
+   }
+  ],
+  "26p29h": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Redis 7.2.5 starts with this config, and CONFIG GET reads back every value.",
+    "kind": "loads"
+   },
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: a key’s count grew ever more slowly and stopped at 255 by a million reads; left idle, it dropped by one when the minute turned.",
+    "kind": "ran"
+   }
+  ],
+  "28q86r": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, both read 100, both passed the check, both wrote 20.",
+    "kind": "ran"
+   }
+  ],
+  "2metpr": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: hash('alice') is 92903040, so alice lands in bucket 0.",
+    "kind": "ran"
+   }
+  ],
+  "47kxy1": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: tick ran once per frame, 16.7 ms apart on a 60 Hz display, and moved the box by the frame’s timestamp each time.",
+    "kind": "ran"
+   }
+  ],
+  "5e1jcj": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: with 3,000 orders at 0.5 ms each it ran as one long task. No frame was painted and no click was handled until it ended.",
+    "kind": "ran"
+   }
+  ],
+  "77rupl": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: with n = 1,000,000 the first three lines evaluate to 1,000,000, about 19.9 million and 10¹², and 2n ** 1000000n has 301,030 digits.",
+    "kind": "ran"
+   }
+  ],
+  "7mg9cw": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: with three gateways sharing one Redis, the scraper got 5 requests through per 10-second window, same as the animation. With a separate Redis per gateway, 15.",
+    "kind": "ran"
+   }
+  ],
+  "8a37r": [
+   {
+    "by": "HAProxy 3.4.6",
+    "note": "HAProxy 3.4.6 loads this config (haproxy -c).",
+    "kind": "loads"
+   },
+   {
+    "by": "HAProxy 3.4.6",
+    "note": "Ran it on HAProxy 3.4.6: six requests over one connection all reached web-3. Switched to mode http, they were spread out.",
+    "kind": "ran"
+   }
+  ],
+  "8nhksq": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: with a leaf + intermediate chain like this one, OpenSSL 4.0.2 printed every line shown here.",
+    "kind": "ran"
+   }
+  ],
+  "8qu9f0": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: against localhost instead of 10.0.2.6, --latency printed the same min/max/avg line, and GET returned the JSON exactly as shown.",
+    "kind": "ran"
+   }
+  ],
+  "93eqoi": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: a real click ran the handler with nothing below it on the stack, and addToCart got the button’s data-sku.",
+    "kind": "ran"
+   }
+  ],
+  "ai7fmx": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: curl got HTTP/2 through ALPN with the Alt-Svc header, and nginx opened the UDP port for QUIC. HTTP/3 itself wasn't tested: there's no HTTP/3 client here.",
+    "kind": "ran"
+   }
+  ],
+  "bc04pn": [
+   {
+    "by": "MySQL 9.2.0",
+    "note": "Ran it on MySQL 9.2.0: with two leaders replicating to each other, us-east handed out 1, 3, 5 and eu-west (offset 2) 2, 4, 6. Both ended up with all six rows and no collisions.",
+    "kind": "ran"
+   }
+  ],
+  "c6td2l": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: onopen ran only after the server’s 101, and the upgrade request carried a 16-byte key, version 13, the Origin and the page’s cookies.",
+    "kind": "ran"
+   }
+  ],
+  "cbsrm1": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: between 12 ms chunks of work, await Promise.resolve() let no frame paint and no click in until the end; the setTimeout version painted every frame and handled clicks within milliseconds.",
+    "kind": "ran"
+   }
+  ],
+  "cr4jvp": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: each Float64Array element is 8 bytes, and the Set found carol.",
+    "kind": "ran"
+   }
+  ],
+  "d6ec3o": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: over the lesson’s 10 contacts, finding dave took 9 comparisons and missing zoe took all 10.",
+    "kind": "ran"
+   }
+  ],
+  "dib700": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: /cart came back with no-store and the hashed CSS with the one-year immutable header, over a connection that was still open after a minute of silence.",
+    "kind": "ran"
+   }
+  ],
+  "diib0i": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: on two shards, after PREPARE the coordinator disconnected; both transactions stayed prepared (even across a shard restart) and writes to the two rows waited until COMMIT PREPARED.",
+    "kind": "ran"
+   }
+  ],
+  "eo0mf": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: app.3f9a.js came back with the one-year immutable header, and the HTML with no-cache.",
+    "kind": "ran"
+   }
+  ],
+  "f5h9mo": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: one timed call over 10 million numbers took tens of milliseconds on an Apple M5 Pro laptop.",
+    "kind": "ran"
+   }
+  ],
+  "f8wdmv": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: with 3,000 orders at 0.5 ms each, frames kept painting and clicks stayed instant while the worker worked, and the worker got its own copy of the orders.",
+    "kind": "ran"
+   }
+  ],
+  "flgph5": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: both versions agreed with the all-pairs check on 500 random arrays.",
+    "kind": "ran"
+   }
+  ],
+  "ftcxvw": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: against the animation's boundary attack, every second burst was rejected in full, request for request what the animation shows.",
+    "kind": "ran"
+   }
+  ],
+  "fz5kx0": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: the same 4 threads with Atomics.add always reached exactly 4,000,000, and Atomics.add returned the old value.",
+    "kind": "ran"
+   }
+  ],
+  "g2gg41": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: the LSN has the same shape as 0/3000148, and the UPDATE moved it forward by the bytes of its log record.",
+    "kind": "ran"
+   }
+  ],
+  "gexjym": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: it found every target on sorted arrays up to a million items and missed nothing, touching about log₂ n elements per search.",
+    "kind": "ran"
+   }
+  ],
+  "ggnlij": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: it waited out Retry-After given as seconds or as a date, and without one (nginx's limit_req sends none) it waited a random, jittered time, then got through.",
+    "kind": "ran"
+   }
+  ],
+  "gj6oam": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: made the stage's greet() throw on line 2, and DevTools reported exactly this stack, top frame first.",
+    "kind": "ran"
+   }
+  ],
+  "grtcqj": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: clients got TLS 1.3 by default and TLS 1.2 on request. TLS 1.3 was ready after one round trip, TLS 1.2 after two, and only TLS 1.2 showed the certificate on the wire.",
+    "kind": "ran"
+   }
+  ],
+  "i2qd7m": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: the order was web-1, web-1, web-2, web-1, web-3, web-1, the same smooth pattern the animation uses (67% to web-1).",
+    "kind": "ran"
+   }
+  ],
+  "ia5u9j": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: alice, erin and frank all chained in bucket 0, and get('frank') compared 3 keys.",
+    "kind": "ran"
+   }
+  ],
+  "jxv7km": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Redis 7.2.5 starts with this config, and CONFIG GET reads back every value.",
+    "kind": "loads"
+   },
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: these are its defaults. A hash of 512 small fields stayed a flat list and the 513th made it a hash table; the flat list took about a third of the memory.",
+    "kind": "ran"
+   }
+  ],
+  "jz9gd7": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, the second UPDATE matched 0 rows; the retry read 20, 8 and stopped.",
+    "kind": "ran"
+   }
+  ],
+  "k87fk9": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: after mark.js, it put the unmarked draft and note on the free list in heap order and cleared every mark.",
+    "kind": "ran"
+   }
+  ],
+  "mon1kh": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: with a 5 MB report, each open and close left about 5 MB more on the heap after GC. With the AbortController fix, the heap stayed flat.",
+    "kind": "ran"
+   }
+  ],
+  "ms3bai": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: fib(30) made exactly 2,692,537 calls. At the per-call speed of fib(40), fib(50)’s 40.7 billion calls take more than a minute.",
+    "kind": "ran"
+   }
+  ],
+  "n5g9o3": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: with libc malloc, deleting every other key of a million halved used memory but not RSS, so the ratio (RSS ÷ used) doubled; new keys then filled the holes without growing RSS.",
+    "kind": "ran"
+   }
+  ],
+  "nfii0g": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: as a .cjs file it printed nextTick, then promise. The same lines as an ES module printed promise first.",
+    "kind": "ran"
+   }
+  ],
+  "oam7d": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: includes found 46, indexOf returned 14, and the Set agreed.",
+    "kind": "ran"
+   }
+  ],
+  "olrv1r": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: the RFC’s sample key gives s3pPLMBiTxaQ9kYGzzhZRbK+xOo=, and Chrome 154 accepted the handshakes it answered (and refused a wrong one).",
+    "kind": "ran"
+   }
+  ],
+  "ph1x5m": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6 over HTTPS: requests were shared web-1, web-2, web-3, then around again.",
+    "kind": "ran"
+   }
+  ],
+  "py0ccp": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: db2 was sync and db3 potential; when db2 crashed, db3 took over and commits kept flowing; with both down, commits waited. With ANY 1, one follower was enough.",
+    "kind": "ran"
+   },
+   {
+    "by": "MySQL 9.2.0",
+    "note": "Ran it on MySQL 9.2.0: commits waited for the replica's ack; with the replica stopped, one commit waited out the 10 s timeout, then the source fell back to async until the replica returned.",
+    "kind": "ran"
+   }
+  ],
+  "pyk3ui": [
+   {
+    "by": "Chrome 154",
+    "note": "Ran it in Chrome 154: the input got focus only after the script had finished. Chained setTimeout(…, 0) calls ran at once 6 times (the first, then 5 levels of nesting), then waited at least 4 ms each.",
+    "kind": "ran"
+   }
+  ],
+  "r5gq7s": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: get('dave') returned '555-0108', get('zoe') undefined and has('alice') true.",
+    "kind": "ran"
+   }
+  ],
+  "r92c5k": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: with orders hash-partitioned four ways on customer_id (partitions standing in for shards), the first query touched 1 partition and the report all 4.",
+    "kind": "ran"
+   }
+  ],
+  "rst4fk": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: after the leader crashed, the follower that had received the most log was promoted, and it replayed what it had received but not yet applied.",
+    "kind": "ran"
+   }
+  ],
+  "s5fodo": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: serving each of Mallory's certificates in turn, OpenSSL 4.0.2 stopped with exactly these errors.",
+    "kind": "ran"
+   }
+  ],
+  "sd7kz3": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: an idle client got 11 of 20 simultaneous requests through and 9 got 429, then 5 per second got through. Every decision matched a token bucket of 11 tokens refilling at 5 per second.",
+    "kind": "ran"
+   }
+  ],
+  "us1t3z": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: it agreed with the Set version on 500 random arrays.",
+    "kind": "ran"
+   }
+  ],
+  "uxopmf": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: while a long transaction on one follower held up replay, its replay_lag climbed to seconds; the other stayed in milliseconds.",
+    "kind": "ran"
+   },
+   {
+    "by": "MySQL 9.2.0",
+    "note": "Ran it on MySQL 9.2.0: while a long transaction on the replica held up the applier, Seconds_Behind_Source climbed past 2, then fell back to 0.",
+    "kind": "ran"
+   }
+  ],
+  "w7yr1g": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: with the default key each ?utm_ variant was a separate MISS; with $uri as the key they all shared one copy.",
+    "kind": "ran"
+   }
+  ],
+  "w97x3b": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: with four shard databases and the lesson's users split by first letter, shard-0 answered alice | frank.",
+    "kind": "ran"
+   }
+  ],
+  "wrc6iw": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: called with EVALSHA on the animation's own request times, it allowed and denied exactly what the lesson's token bucket did. 20 simultaneous calls on a 5-token bucket let exactly 5 through.",
+    "kind": "ran"
+   }
+  ],
+  "wub1cz": [
+   {
+    "by": "PostgreSQL 14.15",
+    "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, both read NULL, both UPDATEs went through, and the row ended up saying bob.",
+    "kind": "ran"
+   }
+  ],
+  "x7n5ye": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: fib(50) returned 12,586,269,025 after exactly 99 calls.",
+    "kind": "ran"
+   }
+  ],
+  "yu6xfd": [
+   {
+    "by": "Redis 7.2.5",
+    "note": "Ran it on Redis 7.2.5: after the ten reads from the hit-or-miss step, grep printed just these two counters, with the same hits and misses as the animation.",
+    "kind": "ran"
+   }
+  ],
+  "yxbkks": [
+   {
+    "by": "nginx 1.31.6",
+    "note": "nginx 1.31.6 loads this config (nginx -t).",
+    "kind": "loads"
+   },
+   {
+    "by": "nginx 1.31.6",
+    "note": "Ran it on nginx 1.31.6: the upgrade got 101 and messages flowed both ways. With the Upgrade and Connection lines removed, the chat server got a plain GET and the handshake failed.",
+    "kind": "ran"
+   }
+  ],
+  "zlhrpv": [
+   {
+    "by": "Node 22.22.0",
+    "note": "Ran it on Node 22.22.0: the worker posted back the sum of 10 million squares. Four such workers at once took about as long as one: real threads, on separate cores.",
+    "kind": "ran"
+   }
+  ]
+ }
+}

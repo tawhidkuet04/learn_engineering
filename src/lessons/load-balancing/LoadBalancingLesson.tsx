@@ -9,8 +9,7 @@ import { HighlightContext } from '@/components/lesson/Term';
 import { useLessonPlayer, type PlayerEntry } from '@/components/lesson/useLessonPlayer';
 import { PlaybackControls, TitleBlock } from '@/components/stage/chrome';
 import { CHAPTERS, LESSON } from './chapters';
-import { DEFAULT_CONFIG } from './engine/constants';
-import type { WorldConfig } from './engine/types';
+import { configOf, enterStep } from './enterStep';
 import { World } from './engine/world';
 import { ActionsCard, ClickServersCard, PredictCard, SliderCard, ToggleCard } from './panel/Cards';
 import { Playground } from './panel/Playground';
@@ -19,18 +18,6 @@ import { Stage } from './stage/Stage';
 import type { Chapter, Step } from './types';
 
 type Entry = PlayerEntry<Step, Chapter>;
-
-function configOf({ step, chapter }: Entry): WorldConfig {
-  return { ...DEFAULT_CONFIG, ...chapter.config, ...step.config };
-}
-
-function enterStep(world: World, entry: Entry) {
-  const { step } = entry;
-  const cfg = configOf(entry);
-  world.enter(cfg, { reset: step.reset, script: step.script, seed: step.seed });
-  step.onEnter?.(world);
-  if (step.interaction?.kind === 'predict') world.startPredict(step.interaction.rounds);
-}
 
 export default function LoadBalancingLesson() {
   const [world] = useState(() => new World());

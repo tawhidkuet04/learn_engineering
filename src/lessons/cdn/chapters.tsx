@@ -329,11 +329,15 @@ cache-control: public, max-age=31536000, immutable
 server {
     listen 443 ssl;
     server_name cdn.shop.example;
+    ssl_certificate     /etc/ssl/cdn.shop.example.crt;
+    ssl_certificate_key /etc/ssl/cdn.shop.example.key;
 
     location / {
         proxy_pass https://origin.shop.example;
 !        proxy_cache edge;
 !        proxy_cache_valid 200 10m;   # when the origin doesn't say
+        proxy_cache_revalidate on;          # revalidate stale copies
+        proxy_cache_background_update on;   # for stale-while-revalidate
 !        add_header X-Cache $upstream_cache_status;   # HIT, MISS, EXPIRED…
     }
 }`,
@@ -456,7 +460,8 @@ shop.example.cdn.example.net.
             </p>
             <Aside>
               Also common: <code>s-maxage</code>, a max-age just for shared caches like CDNs (browsers ignore it), and <code>no-store</code>: nobody keeps
-              a copy, anywhere.
+              a copy, anywhere. Caches differ in the details, too: nginx won&apos;t store a <code>no-cache</code> response at all, so each request goes to
+              the origin in full.
             </Aside>
           </>
         ),

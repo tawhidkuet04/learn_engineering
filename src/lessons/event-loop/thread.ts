@@ -175,9 +175,10 @@ export class MainThread {
           this.micro.push(this.chunk());
         } else {
           // setTimeout(next, 0): the next chunk is a task, at the back of the line.
-          // Browsers clamp nested timers to 4 ms after 5 levels.
+          // Browsers clamp nested timers to 4 ms after 5 levels: the first call
+          // (from the click) and the next 5 run at 0 ms, the 7th waits 4 ms.
           this.job.nest += 1;
-          const delay = this.job.nest > 5 ? 4 : 0;
+          const delay = this.job.nest > 6 ? 4 : 0;
           this.timers.push({ at: this.ms + delay, item: this.chunk() });
         }
       },

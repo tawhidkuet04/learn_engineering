@@ -303,6 +303,7 @@ UPDATE accounts SET balance = balance + 50 WHERE id = 'alice';`,
 # on each follower (pg_basebackup -R writes this for you)
 !primary_conninfo = 'host=10.0.2.11 user=replicator application_name=db2'
 # ...plus an empty standby.signal file: "you are a follower"`,
+          note: 'pg_basebackup -R adds application_name only if you pass one (-d "application_name=db2"). Without it the follower is named walreceiver, so a sync setting like FIRST 1 (db2) never matches it and commits just wait.',
         },
         hud: ['lsn', 'lag'],
         legend: ['write', 'entry', 'commit'],
@@ -543,7 +544,8 @@ res.redirect('/account');
         id: 'dont-go-back-in-time',
         title: 'Don’t travel back in time',
         reset: true,
-        cfg: { writeRate: 1.1, bgKeys: ['alice'], bgDelta: [5], readRate: 0, delays: { db3: 2.4 }, scenario: 'monotonic', sticky: false, walLabels: false },
+        // db-3 lags by more than the time between two refreshes, so a refresh there can show an older balance than the one before.
+        cfg: { writeRate: 1.1, bgKeys: ['alice'], bgDelta: [5], readRate: 0, delays: { db3: 3.6 }, scenario: 'monotonic', sticky: false, walLabels: false },
         body: (
           <>
             <p>
@@ -749,9 +751,13 @@ const { rows } = await replica.query('SELECT balance FROM accounts WHERE id = $1
 # or wait for any one of them (quorum commit):
 # synchronous_standby_names = 'ANY 1 (db2, db3, db4)'
 
-# MySQL semi-sync (8.0.26 and later)
+# MySQL semi-sync (8.0.26 and later), on the source
+plugin-load-add = semisync_source.so
 !rpl_semi_sync_source_enabled = 1
-rpl_semi_sync_source_timeout = 10000   # ms, then fall back to async`,
+rpl_semi_sync_source_timeout = 10000   # ms, then fall back to async
+# and on each replica
+plugin-load-add = semisync_replica.so
+rpl_semi_sync_replica_enabled = 1`,
         },
         callouts: [{ target: 'L|db3', text: <><b>potential</b>: steps in if db-2 dies</>, dir: 'right' }],
         hud: ['commitLat', 'commits'],
@@ -859,7 +865,8 @@ bootstrap:
         id: 'writes-that-vanish',
         title: 'Writes that vanish',
         reset: true,
-        cfg: { writeRate: 1.4, delays: { db2: 0.5, db3: 1.6 }, scenario: 'lost', sync: false, syncNames: ['db2'], walLabels: false },
+        // db-2 trails by more than the gap between writes, so the crash always catches a confirmed write it doesn't have yet.
+        cfg: { writeRate: 1.4, delays: { db2: 0.9, db3: 1.6 }, scenario: 'lost', sync: false, syncNames: ['db2'], walLabels: false },
         script: [{ at: 5.6, run: (s) => s.crashLeader() }],
         body: (
           <>
@@ -994,7 +1001,9 @@ maximum_lag_on_failover: 1048576  # bytes: never promote a follower further behi
 
 # turn the old leader into a follower of the new one
 !pg_rewind --target-pgdata=/var/lib/postgresql/data \\
-    --source-server='host=10.0.2.12 user=postgres'`,
+    --source-server='host=10.0.2.12 user=postgres' \\
+!    --write-recovery-conf`,
+          note: 'Without --write-recovery-conf, the rewound node starts up as a leader again. pg_rewind also needs wal_log_hints = on (or data checksums) on the old leader, set before the failover.',
         },
         hud: ['leaders', 'writeErrors'],
         legend: ['write', 'entry', 'term', 'hb'],
@@ -1040,6 +1049,7 @@ maximum_lag_on_failover: 1048576  # bytes: never promote a follower further behi
 # keep auto-increment IDs from colliding across the two leaders
 !auto_increment_increment = 2   # both leaders count in steps of 2
 !auto_increment_offset    = 1   # us-east: 1, 3, 5…   (eu-west uses 2: 2, 4, 6…)`,
+          note: 'That keeps the IDs apart, nothing more. MySQL doesn’t resolve conflicts: each leader applies the other’s row change over its own, so after two concurrent deposits the leaders can end up with different balances, and nothing reports an error.',
         },
         legend: ['write', 'entry', 'commit'],
       },

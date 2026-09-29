@@ -248,7 +248,7 @@ const ROWS: { api: string[]; q: string; color: string; when: string }[] = [
   { api: ['.then', '.catch', '.finally', 'await', 'queueMicrotask'], q: 'microtask', color: SIG.hc, when: 'right after the current task, every one of them' },
   { api: ['requestAnimationFrame'], q: 'render step', color: SIG.res, when: 'when a frame is due, just before paint' },
   { api: ['setImmediate'], q: 'Node: check', color: SIG.pink, when: 'right after the poll phase' },
-  { api: ['process.nextTick'], q: 'Node: nextTick', color: SIG.hc, when: 'before promise microtasks' },
+  { api: ['process.nextTick'], q: 'Node: nextTick', color: SIG.hc, when: 'as soon as control returns to Node, ahead of promises' },
 ];
 
 export function CheatSheet() {

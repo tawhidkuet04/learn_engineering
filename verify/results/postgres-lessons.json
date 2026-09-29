@@ -1,0 +1,790 @@
+{
+  "file": "postgres-lessons",
+  "checks": [
+    {
+      "lesson": "replication",
+      "step": "the-leader-streams-its-log",
+      "title": "PostgreSQL accepts every setting in the postgresql.conf snippet",
+      "software": "PostgreSQL 14.15",
+      "real": "wal_level = replica; max_wal_senders = 10; primary_conninfo = host=10.0.2.11 user=replicator application_name=db2",
+      "lesson_says": "wal_level = replica; max_wal_senders = 10; primary_conninfo = 'host=10.0.2.11 user=replicator application_name=db2'",
+      "pass": true,
+      "test": "every postgresql.conf line the lessons show loads > postgres -C: the-leader-streams-its-log / postgresql.conf"
+    },
+    {
+      "lesson": "replication",
+      "step": "who-waits-for-whom",
+      "title": "PostgreSQL accepts every setting in the postgresql.conf · on the leader snippet",
+      "software": "PostgreSQL 14.15",
+      "real": "synchronous_standby_names = FIRST 1 (db2); synchronous_commit = on; synchronous_commit = remote_apply; synchronous_commit = local",
+      "lesson_says": "synchronous_standby_names = 'FIRST 1 (db2)'; synchronous_commit = on; synchronous_commit = remote_apply; synchronous_commit = local",
+      "pass": true,
+      "test": "every postgresql.conf line the lessons show loads > postgres -C: who-waits-for-whom / postgresql.conf · on the leader"
+    },
+    {
+      "lesson": "replication",
+      "step": "one-sync-rest-async",
+      "title": "PostgreSQL accepts every setting in the replication settings snippet",
+      "software": "PostgreSQL 14.15",
+      "real": "synchronous_standby_names = FIRST 1 (db2, db3); synchronous_standby_names = ANY 1 (db2, db3, db4)",
+      "lesson_says": "synchronous_standby_names = 'FIRST 1 (db2, db3)'; synchronous_standby_names = 'ANY 1 (db2, db3, db4)'",
+      "pass": true,
+      "test": "every postgresql.conf line the lessons show loads > postgres -C: one-sync-rest-async / replication settings"
+    },
+    {
+      "lesson": "sharding",
+      "step": "copies-dont-add-room",
+      "title": "PostgreSQL accepts every setting in the postgresql.conf · on each replica snippet",
+      "software": "PostgreSQL 14.15",
+      "real": "primary_conninfo = host=10.0.2.10 user=replicator; hot_standby = on",
+      "lesson_says": "primary_conninfo = 'host=10.0.2.10 user=replicator'; hot_standby = on",
+      "pass": true,
+      "test": "every postgresql.conf line the lessons show loads > postgres -C: copies-dont-add-room / postgresql.conf · on each replica"
+    },
+    {
+      "lesson": "replication",
+      "step": "playground",
+      "title": "PostgreSQL accepts every config the playground shows",
+      "software": "PostgreSQL 14.15",
+      "real": "19 configs, 11 distinct settings, all accepted (e.g. synchronous_standby_names = 'FIRST 1 (db2)'; synchronous_standby_names = 'FIRST 1 (db3)'; synchronous_standby_names = 'FIRST 1 (db1)')",
+      "pass": true,
+      "test": "every postgresql.conf line the lessons show loads > postgres -C: every commit mode the playground can show (playground)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "the-leader-streams-its-log",
+      "title": "A follower set up with the lesson’s lines streams and replays",
+      "real": "db2 streams as application_name db2 (user replicator, streaming); the $50 deposit showed up on db2 (alice = 150); 2 WAL sender processes for 2 followers",
+      "lesson_says": "the leader streams its log; each follower replays it in order; one sender process per follower",
+      "pass": true,
+      "test": "replication on real PostgreSQL > a follower set up with the lesson’s lines streams and replays (the-leader-streams-its-log, spread-the-reads)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "spread-the-reads",
+      "title": "Followers answer reads but refuse writes",
+      "real": "read alice = 150; UPDATE → ERROR 25006: cannot execute UPDATE in a read-only transaction",
+      "lesson_says": "Followers can’t take writes, but they can answer reads.",
+      "pass": true,
+      "test": "replication on real PostgreSQL > a follower set up with the lesson’s lines streams and replays (the-leader-streams-its-log, spread-the-reads)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "the-leader-streams-its-log",
+      "title": "standby.signal: \"you are a follower\"",
+      "real": "db2 (with the file) is in recovery: t; the same kind of clone without it started as a leader (pg_is_in_recovery() = f)",
+      "lesson_says": "...plus an empty standby.signal file: \"you are a follower\"",
+      "pass": true,
+      "test": "replication on real PostgreSQL > a follower set up with the lesson’s lines streams and replays (the-leader-streams-its-log, spread-the-reads)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "the-leader-streams-its-log",
+      "title": "What pg_basebackup -R writes for you",
+      "real": "an empty standby.signal and primary_conninfo (host, port, user…); application_name only when passed with -d; without it the follower streamed as \"walreceiver\", and FIRST 1 (db3) left a commit waiting",
+      "lesson_says": "pg_basebackup -R writes the follower settings; the note: application_name only if you pass one, otherwise commits just wait",
+      "pass": true,
+      "test": "replication on real PostgreSQL > a follower set up with the lesson’s lines streams and replays (the-leader-streams-its-log, spread-the-reads)"
+    },
+    {
+      "lesson": "replication",
+      "step": "one-leader-orders-the-writes",
+      "title": "Every write moves the log position forward",
+      "software": "PostgreSQL 14.15",
+      "real": "pg_current_wal_lsn() 0/175E098 → 0/175E108 after the UPDATE: 112 bytes of log",
+      "lesson_says": "LSNs are byte positions in the log, like 0/3000148",
+      "pass": true,
+      "test": "replication on real PostgreSQL > pg_current_wal_lsn is a byte position that moves with each write (one-leader-orders-the-writes)"
+    },
+    {
+      "lesson": "replication",
+      "step": "followers-run-behind",
+      "title": "A follower held up by a long query falls behind",
+      "software": "PostgreSQL 14.15",
+      "real": "db3's replay waited for the report; worst replay_lag: db2 0.000 s, db3 2.31 s; the lesson's query returned 127.0.0.1 | streaming | ; 127.0.0.1 | streaming | 00:00:02.309829",
+      "lesson_says": "db3 lags (80 ms vs 15 ms for db2); lag grows to seconds while a long-running query holds up replay",
+      "pass": true,
+      "test": "replication on real PostgreSQL > replay_lag: a long transaction on a follower holds up replay (followers-run-behind)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "where-did-my-deposit-go",
+      "title": "Alice reads her balance from a lagging follower right after depositing",
+      "real": "deposit UPDATE 1 on the leader; db-3 (behind) returned 100, db-2 returned 150",
+      "lesson_says": "\"What does db-3 return?\" → old: db-3 has only replayed up to #100. The deposit is #102, still on its way, so Alice sees $100.",
+      "pass": true,
+      "test": "replication on real PostgreSQL > a lagging follower returns the balance from before the deposit (where-did-my-deposit-go, read-your-own-writes)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "read-your-own-writes",
+      "title": "Waiting for her LSN",
+      "real": "pg_last_wal_replay_lsn() >= '0/4000128': f on db-3, true on db-2; once db-3 passed it (1 ms after replay resumed) the read returned 150",
+      "lesson_says": "stale reads: any follower 2/4, leader after a write 0/4, wait for her LSN 0/4",
+      "pass": true,
+      "test": "replication on real PostgreSQL > a lagging follower returns the balance from before the deposit (where-did-my-deposit-go, read-your-own-writes)"
+    },
+    {
+      "lesson": "replication",
+      "step": "dont-go-back-in-time",
+      "title": "Monotonic reads: random followers vs. one follower",
+      "software": "PostgreSQL 14.15",
+      "real": "db-2, db-3, db-2: 125 → 105 → 125 (back 1×); always db-3: 105 → 105 → 130 → 135 (back 0×)",
+      "lesson_says": "random follower: back in time 3× in 40 s; the same follower: 0×",
+      "pass": true,
+      "test": "replication on real PostgreSQL > reads from two followers can go back in time; one follower can’t (dont-go-back-in-time)"
+    },
+    {
+      "lesson": "replication",
+      "step": "who-waits-for-whom",
+      "software": "PostgreSQL 14.15",
+      "title": "Asynchronous is the default",
+      "real": "PostgreSQL: synchronous_standby_names = '', the follower's sync_state is async; MySQL 9.2.0: rpl_semi_sync_source_enabled defaults to FALSE",
+      "lesson_says": "Asynchronous, the default in Postgres and MySQL",
+      "pass": true,
+      "test": "replication on real PostgreSQL > synchronous_commit: on waits for the flush, remote_apply for the replay, local for nobody (who-waits-for-whom)"
+    },
+    {
+      "lesson": "replication",
+      "step": "who-waits-for-whom",
+      "software": "PostgreSQL 14.15",
+      "title": "synchronous_commit = on",
+      "real": "with db2's replay paused the commit returned in 5 ms: db2 had flushed it (true) but a read there still showed 100",
+      "lesson_says": "on: wait until db2 has flushed the entry to disk",
+      "pass": true,
+      "test": "replication on real PostgreSQL > synchronous_commit: on waits for the flush, remote_apply for the replay, local for nobody (who-waits-for-whom)"
+    },
+    {
+      "lesson": "replication",
+      "step": "who-waits-for-whom",
+      "software": "PostgreSQL 14.15",
+      "title": "synchronous_commit = remote_apply",
+      "real": "waited while replay was paused (true), returned after it resumed; right after, db2 showed bob = 81",
+      "lesson_says": "remote_apply: wait until db2 has replayed it (so reads there see it)",
+      "pass": true,
+      "test": "replication on real PostgreSQL > synchronous_commit: on waits for the flush, remote_apply for the replay, local for nobody (who-waits-for-whom)"
+    },
+    {
+      "lesson": "replication",
+      "step": "who-waits-for-whom",
+      "software": "PostgreSQL 14.15",
+      "title": "synchronous_commit = local",
+      "real": "with db2 down, the commit returned in 0 ms",
+      "lesson_says": "local: don’t wait for any standby at all",
+      "pass": true,
+      "test": "replication on real PostgreSQL > synchronous_commit: on waits for the flush, remote_apply for the replay, local for nobody (who-waits-for-whom)"
+    },
+    {
+      "lesson": "replication",
+      "step": "who-waits-for-whom",
+      "software": "PostgreSQL 14.15",
+      "title": "Copies that exist when COMMIT comes back",
+      "real": "sync: only after db2 had the entry (2 copies); async: in 1 ms with db2 down (1 copy)",
+      "lesson_says": "sequence diagram: 2 copies at COMMIT when sync, 1 when async",
+      "pass": true,
+      "test": "replication on real PostgreSQL > synchronous_commit: on waits for the flush, remote_apply for the replay, local for nobody (who-waits-for-whom)"
+    },
+    {
+      "lesson": "replication",
+      "step": "when-the-sync-follower-dies",
+      "software": "PostgreSQL 14.15",
+      "title": "The next writes after db-2 crashes",
+      "real": "both still waiting after 1.5 s, no error; the lesson's query: 76551 | SyncRep | active; 76552 | SyncRep | active",
+      "lesson_says": "prediction: \"What happens to this write?\" → wait (The leader promised never to confirm a write until db-2 has it. So it wrote the change locally and now it waits. Every write after it waits too.); commits stalled (1 → 1), 7 waiting, 0 errors",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the only sync follower crashes: commits wait with no error, then finish (when-the-sync-follower-dies)"
+    },
+    {
+      "lesson": "replication",
+      "step": "when-the-sync-follower-dies",
+      "software": "PostgreSQL 14.15",
+      "title": "db-2 comes back",
+      "real": "both commits returned (UPDATE 1, UPDATE 1) 117 ms after db-2 was started",
+      "lesson_says": "the stuck writes commit in a burst (8 commits right after db-2 revives)",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the only sync follower crashes: commits wait with no error, then finish (when-the-sync-follower-dies)"
+    },
+    {
+      "lesson": "replication",
+      "step": "when-the-sync-follower-dies",
+      "software": "PostgreSQL 14.15",
+      "title": "Clearing synchronous_standby_names",
+      "real": "a stuck commit returned right after the reload (UPDATE 1)",
+      "lesson_says": "releases every stuck commit at once (5 waiting → 0)",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the only sync follower crashes: commits wait with no error, then finish (when-the-sync-follower-dies)"
+    },
+    {
+      "lesson": "replication",
+      "step": "when-the-sync-follower-dies",
+      "software": "PostgreSQL 14.15",
+      "title": "Cancelling a stuck commit",
+      "real": "WARNING: canceling wait for synchronous replication due to user request DETAIL: The transaction has already committed locally, but might not have been replicated to the standby. (the client still got UPDATE 1)",
+      "lesson_says": "The transaction has already committed locally, but might not have been replicated to the standby.",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the only sync follower crashes: commits wait with no error, then finish (when-the-sync-follower-dies)"
+    },
+    {
+      "lesson": "replication",
+      "step": "one-sync-rest-async",
+      "software": "PostgreSQL 14.15",
+      "title": "FIRST 1 (db2, db3) with every follower up",
+      "real": "db2 sync, db3 potential, db4 async",
+      "lesson_says": "db2 sync, db3 potential, db4 async",
+      "pass": true,
+      "test": "replication on real PostgreSQL > FIRST 1 (db2, db3) and ANY 1: who the leader waits for (one-sync-rest-async)"
+    },
+    {
+      "lesson": "replication",
+      "step": "one-sync-rest-async",
+      "software": "PostgreSQL 14.15",
+      "title": "db-2 crashes",
+      "real": "db3 sync, db4 async; the next commit took 10 ms",
+      "lesson_says": "db3 sync, db4 async; 4 commits in the next 5 s",
+      "pass": true,
+      "test": "replication on real PostgreSQL > FIRST 1 (db2, db3) and ANY 1: who the leader waits for (one-sync-rest-async)"
+    },
+    {
+      "lesson": "replication",
+      "step": "one-sync-rest-async",
+      "software": "PostgreSQL 14.15",
+      "title": "db-2 and db-3 both down",
+      "real": "a commit waited (true) until db-3 came back, then returned",
+      "lesson_says": "0 commits in 5 s: writes stall again",
+      "pass": true,
+      "test": "replication on real PostgreSQL > FIRST 1 (db2, db3) and ANY 1: who the leader waits for (one-sync-rest-async)"
+    },
+    {
+      "lesson": "replication",
+      "step": "one-sync-rest-async",
+      "software": "PostgreSQL 14.15",
+      "title": "ANY 1 (db2, db3, db4)",
+      "real": "db2 quorum, db3 quorum, db4 quorum; with db2 and db3 down a commit took 3 ms: db4 was enough",
+      "lesson_says": "db2 quorum, db3 quorum, db4 quorum; 4 commits in 5 s with db2 and db3 down",
+      "pass": true,
+      "test": "replication on real PostgreSQL > FIRST 1 (db2, db3) and ANY 1: who the leader waits for (one-sync-rest-async)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "who-takes-over",
+      "title": "Which follower to promote",
+      "real": "received/replayed: db2 0/40056B0 / 0/4005640, db3 0/40055D0 / 0/40055D0; promoted db2 (pg_promote → t); it replayed the entry it had received but not applied (alice 140, bob 100)",
+      "lesson_says": "promote the follower with the most complete log (the animation: \"db-3 has #105, the newest log position. Promoting it throws away the fewest writes.\"); promotion applies everything it received (applied #109 of #109)",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the leader crashes: promote the most complete follower, lose the unshipped writes, fence the old leader (who-takes-over, writes-that-vanish, split-brain, fencing)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "writes-that-vanish",
+      "title": "Async: confirmed writes that never left the leader",
+      "real": "db-1 confirmed 2 more writes (UPDATE 1, UPDATE 1; alice 200, bob 70) that no follower had; after the failover db-2 has alice 140, bob 100: 2 confirmed writes gone",
+      "lesson_says": "async replay: 1 confirmed write(s) lost in the failover",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the leader crashes: promote the most complete follower, lose the unshipped writes, fence the old leader (who-takes-over, writes-that-vanish, split-brain, fencing)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "fencing",
+      "title": "The failover starts a new term",
+      "real": "db-2 now runs on timeline 2 (was 1); db-3, re-pointed at it, caught up (alice 140, bob 100)",
+      "lesson_says": "every failover bumps the term (term 2 after the promotion)",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the leader crashes: promote the most complete follower, lose the unshipped writes, fence the old leader (who-takes-over, writes-that-vanish, split-brain, fencing)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "split-brain",
+      "title": "The old leader reboots as a leader",
+      "real": "pg_is_in_recovery() = f; app-2's write → UPDATE 1; the promoted db-2 took a write too (UPDATE 1); db-1 has alice 200, bob 77; db-2 has alice 100, bob 100",
+      "lesson_says": "2 leaders, each with its own balances",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the leader crashes: promote the most complete follower, lose the unshipped writes, fence the old leader (who-takes-over, writes-that-vanish, split-brain, fencing)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "fencing",
+      "title": "pg_rewind without --write-recovery-conf",
+      "real": "rewound (exit 0) and started with pg_is_in_recovery() = f: a leader again",
+      "lesson_says": "note: without --write-recovery-conf, the rewound node starts up as a leader again",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the leader crashes: promote the most complete follower, lose the unshipped writes, fence the old leader (who-takes-over, writes-that-vanish, split-brain, fencing)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "fencing",
+      "title": "pg_rewind needs wal_log_hints",
+      "real": "on a copy last run with wal_log_hints = off: pg_rewind: fatal: target server needs to use either data checksums or \"wal_log_hints = on\"",
+      "lesson_says": "note: pg_rewind needs wal_log_hints = on (or data checksums), set before the failover",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the leader crashes: promote the most complete follower, lose the unshipped writes, fence the old leader (who-takes-over, writes-that-vanish, split-brain, fencing)"
+    },
+    {
+      "lesson": "replication",
+      "software": "PostgreSQL 14.15",
+      "step": "fencing",
+      "title": "The lesson’s pg_rewind command",
+      "real": "exit 0; db-1 came back with pg_is_in_recovery() = t, following db-2: alice 100, bob 100 (db-2: 100, 100); its own writes are gone; app-2's write → ERROR 25006 cannot execute UPDATE in a read-only transaction",
+      "lesson_says": "db-1 steps down (follower), throws away what nobody else has, follows db-2 and refuses writes; 1 leader, 1 read-only error(s)",
+      "pass": true,
+      "test": "replication on real PostgreSQL > the leader crashes: promote the most complete follower, lose the unshipped writes, fence the old leader (who-takes-over, writes-that-vanish, split-brain, fencing)"
+    },
+    {
+      "lesson": "replication",
+      "step": "writes-that-vanish",
+      "title": "Sync to db-2: the failover keeps every confirmed write",
+      "software": "PostgreSQL 14.15",
+      "real": "3 confirmed writes, all on db-2 after the failover (alice 130); the write caught mid-commit got an error (57P01: terminating connection due to immediate shutdown command)",
+      "lesson_says": "sync replay: 0 confirmed writes lost; 11 writes failed loudly with an error",
+      "pass": true,
+      "test": "replication on real PostgreSQL > with a sync follower, a failover keeps every confirmed write (writes-that-vanish)"
+    },
+    {
+      "lesson": "replication",
+      "step": "single-point-of-failure",
+      "title": "Crash, then restart",
+      "software": "PostgreSQL 14.15",
+      "real": "while down: connect ECONNREFUSED 127.0.0.1:65335; after the restart all 200 committed deposits were there (alice 300)",
+      "lesson_says": "every query fails while it's down (8 errors); after a restart the data is intact, only downtime was lost",
+      "pass": true,
+      "test": "replication on real PostgreSQL > a crashed database refuses every query; restarted, it has every commit (single-point-of-failure)"
+    },
+    {
+      "lesson": "replication",
+      "step": "multi-leader",
+      "title": "Two leaders inserting at the same time",
+      "software": "MySQL 9.2.0",
+      "real": "us-east got 1, 3, 5, eu-west 2, 4, 6; after replicating both ways each had 1:us 2:eu 3:us 4:eu 5:us 6:eu, no duplicate-key error; later inserts continued from the highest ID seen (us-east 7, eu-west 8)",
+      "lesson_says": "us-east: 1, 3, 5… (eu-west uses 2: 2, 4, 6…)",
+      "pass": true,
+      "test": "replication: the MySQL lines > two leaders hand out odd and even IDs (multi-leader)"
+    },
+    {
+      "lesson": "replication",
+      "step": "multi-leader",
+      "title": "A write conflict between two MySQL leaders",
+      "software": "MySQL 9.2.0",
+      "real": "us-east ended with 120, eu-west with 150: each applied the other's row over its own; replication kept running with no error on either side",
+      "lesson_says": "note: MySQL doesn’t resolve conflicts; the leaders can end up with different balances and nothing reports an error (the animation's generic leaders use last write wins: both → $120)",
+      "pass": true,
+      "test": "replication: the MySQL lines > two leaders change the same row at the same time (multi-leader)"
+    },
+    {
+      "lesson": "replication",
+      "step": "followers-run-behind",
+      "title": "Seconds_Behind_Source while a long transaction holds up the replica",
+      "software": "MySQL 9.2.0",
+      "real": "Seconds_Behind_Source rose to 4 while a 3.5 s transaction on the replica held the row, then went back to 0",
+      "lesson_says": "SHOW REPLICA STATUS; -- Seconds_Behind_Source: 2",
+      "pass": true,
+      "test": "replication: the MySQL lines > SHOW REPLICA STATUS: Seconds_Behind_Source while replay is held up (followers-run-behind)"
+    },
+    {
+      "lesson": "replication",
+      "step": "one-sync-rest-async",
+      "title": "MySQL semi-sync, then the timeout",
+      "software": "MySQL 9.2.0",
+      "real": "semi-sync ON with 1 replica; a commit took 15 ms. Replica stopped: the next commit took 10.0 s, semi-sync switched OFF, the one after took 15 ms; ON again once the replica reconnected. Default timeout 10000 ms. Without plugin-load-add, mysqld refuses the lines: unknown variable 'rpl_semi_sync_source_enabled=1'.",
+      "lesson_says": "the leader waits until at least one replica has the entry; gives up after a timeout (10 seconds by default) and falls back to async",
+      "pass": true,
+      "test": "replication: the MySQL lines > semi-sync waits for a replica, then falls back to async after the timeout (one-sync-rest-async)"
+    },
+    {
+      "lesson": "sharding",
+      "step": "copies-dont-add-room",
+      "title": "A replica holds all the data and replays every write",
+      "software": "PostgreSQL 14.15",
+      "real": "after 20,000 inserts on the primary, orders (heap + index) is 1640 kB on both, byte for byte the same size; the replica served SELECT count(*) = 20000 and refused an INSERT (25006)",
+      "lesson_says": "every replica holds all of the data, so its disk is as full as the primary’s, and replays every write",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > a replica is a full copy that replays every write (copies-dont-add-room)"
+    },
+    {
+      "lesson": "sharding",
+      "step": "split-the-rows",
+      "title": "The slice on shard-0",
+      "software": "PostgreSQL 14.15",
+      "real": "min, max on shard-0: alice | frank; 12 + 12 + 11 + 10 users over 4 shards, each exactly once",
+      "lesson_says": "-- alice | frank",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > every shard runs the same schema but holds a different slice (split-the-rows)"
+    },
+    {
+      "lesson": "sharding",
+      "software": "PostgreSQL 14.15",
+      "step": "what-hashing-costs",
+      "title": "queries.sql on four hash partitions",
+      "real": "customer_id = 1042 → 1 of 4 partitions; created_at >= '2026-09-01' → 4 of 4",
+      "lesson_says": "-- 1 shard / -- every shard",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > a query with the shard key touches one shard, anything else all of them (what-hashing-costs, keep-related-together, pick-a-key)"
+    },
+    {
+      "lesson": "sharding",
+      "software": "PostgreSQL 14.15",
+      "step": "keep-related-together",
+      "title": "How many shards each prediction query needs",
+      "real": "customer_id = 42 → 1; order_id = 90017 → 4; created_at >= '2026-09-01' → 4; customer_id = 1042 AND status = 'paid' → 1; ORDER BY total DESC LIMIT 5 → 4",
+      "lesson_says": "customer_id = 42 → 1; order_id = 90017 → all; created_at >= '2026-09-01' → all; customer_id = 1042 AND status = 'paid' → 1; ORDER BY total DESC LIMIT 5 → all",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > a query with the shard key touches one shard, anything else all of them (what-hashing-costs, keep-related-together, pick-a-key)"
+    },
+    {
+      "lesson": "sharding",
+      "software": "PostgreSQL 14.15",
+      "step": "pick-a-key",
+      "title": "Range of created_at instead",
+      "real": "the report → 1 partition, customer_id = 42 → 4; 500 orders created today all went to orders_y2026",
+      "lesson_says": "the report asks 1 shard, Alice’s orders all 4, and every new write hits the 2026 shard",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > a query with the shard key touches one shard, anything else all of them (what-hashing-costs, keep-related-together, pick-a-key)"
+    },
+    {
+      "lesson": "sharding",
+      "step": "directory",
+      "title": "Give acme its own shard",
+      "software": "PostgreSQL 14.15",
+      "real": "acme → 0; UPDATE 1; acme → 4; everyone else unchanged (birch→1 cove→2 dune→3 echo→0 fern→1 gale→2 halo→3)",
+      "lesson_says": "acme → 0, then one entry flips to acme → 4; no other tenant moves",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > moving one tenant is one UPDATE (directory)"
+    },
+    {
+      "lesson": "sharding",
+      "step": "scatter-gather",
+      "title": "Merging partial results",
+      "software": "PostgreSQL 14.15",
+      "real": "avg over all rows 27.2060; sum of sums / sum of counts 27.2060; average of the four averages 402.0000",
+      "lesson_says": "sum of the sums / sum of the counts; you can’t average the averages",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > merge partial sums, don’t average the averages (scatter-gather)"
+    },
+    {
+      "lesson": "sharding",
+      "step": "transactions",
+      "software": "PostgreSQL 14.15",
+      "title": "Needs max_prepared_transactions > 0",
+      "real": "with the default: 55000: prepared transactions are disabled",
+      "lesson_says": "Needs max_prepared_transactions > 0.",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > two-phase commit: prepared transactions wait, holding their locks (transactions)"
+    },
+    {
+      "lesson": "sharding",
+      "step": "transactions",
+      "software": "PostgreSQL 14.15",
+      "title": "The coordinator crashes after both votes",
+      "real": "phase 1: BEGIN, UPDATE 1, PREPARE TRANSACTION, BEGIN, UPDATE 1, PREPARE TRANSACTION; after the crash both shards still hold transfer-7731 and transfer-7731; a write to alice waited; after restarting shard-0 it was still prepared (transfer-7731) and writes still waited (true)",
+      "lesson_says": "the shards wait in doubt, holding their locks (animation: both \"in doubt: wait\", locks held)",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > two-phase commit: prepared transactions wait, holding their locks (transactions)"
+    },
+    {
+      "lesson": "sharding",
+      "step": "transactions",
+      "software": "PostgreSQL 14.15",
+      "title": "Reads during the doubt",
+      "real": "a plain SELECT on alice returned 100 in 3 ms while an UPDATE waited",
+      "lesson_says": "Any write to Alice’s or Bob’s row is stuck behind those locks. Plain reads still get the old balances.",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > two-phase commit: prepared transactions wait, holding their locks (transactions)"
+    },
+    {
+      "lesson": "sharding",
+      "step": "transactions",
+      "software": "PostgreSQL 14.15",
+      "title": "The coordinator restarts and commits",
+      "real": "COMMIT PREPARED, COMMIT PREPARED; the waiting write went through (UPDATE 1); alice 51, bob 130",
+      "lesson_says": "it finishes the commit; nothing lost (animation: COMMIT sent, locks released)",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > two-phase commit: prepared transactions wait, holding their locks (transactions)"
+    },
+    {
+      "lesson": "sharding",
+      "step": "one-machine",
+      "title": "What the psql command prints",
+      "software": "PostgreSQL 14.15",
+      "real": "on a small table it printed \"120 kB\"; pg_size_pretty of 3212 GiB prints \"3212 GB\"",
+      "lesson_says": "3212 GB",
+      "pass": true,
+      "test": "sharding on real PostgreSQL > the size format in the psql output (one-machine)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "check-then-act",
+      "title": "book.sql · racy: the same interleaving, step by step",
+      "software": "PostgreSQL 14.15",
+      "real": "A:RD(free) B:RD(free) A:IF(yes) B:IF(yes) A:WR(alice) B:WR(bob) → {\"seat\":\"bob\"}",
+      "lesson_says": "A:RD(free) B:RD(free) A:IF(yes) B:IF(yes) A:WR(alice) B:WR(bob) → {\"seat\":\"bob\"} (Both got a confirmation. The seat says bob.)",
+      "pass": true,
+      "test": "race conditions on real PostgreSQL > seat · check, then book: the animation's interleaving, replayed on PostgreSQL (check-then-act)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "check-then-act",
+      "title": "book.sql · atomic: the same interleaving, step by step",
+      "software": "PostgreSQL 14.15",
+      "real": "A:BOOK(ok) B:BOOK(no) → {\"seat\":\"alice\"}",
+      "lesson_says": "A:BOOK(ok) B:BOOK(no) → {\"seat\":\"alice\"} (One booking (alice). The other was told it's sold out.)",
+      "pass": true,
+      "test": "race conditions on real PostgreSQL > seat · one conditional UPDATE: the animation's interleaving, replayed on PostgreSQL (check-then-act)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "double-spend",
+      "title": "withdraw.sql · racy: the same interleaving, step by step",
+      "software": "PostgreSQL 14.15",
+      "real": "A:SEL(100) B:SEL(100) A:IF(yes) B:IF(yes) A:UPD(20) B:UPD(20) → {\"balance\":20,\"version\":7}",
+      "lesson_says": "A:SEL(100) B:SEL(100) A:IF(yes) B:IF(yes) A:UPD(20) B:UPD(20) → {\"balance\":20,\"version\":7} (Paid out $160 from $100, balance says $20.)",
+      "pass": true,
+      "test": "race conditions on real PostgreSQL > bank · no lock: the animation's interleaving, replayed on PostgreSQL (double-spend)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "double-spend",
+      "title": "withdraw.sql · pessimistic: the same interleaving, step by step",
+      "software": "PostgreSQL 14.15",
+      "real": "A:SEL(100) B:SEL(wait) A:IF(yes) A:UPD(20) A:COM B:SEL(20) B:IF(no) B:COM → {\"balance\":20,\"version\":7}; plain SELECT meanwhile: 100 in 2 ms",
+      "lesson_says": "A:SEL(100) B:SEL(wait) A:IF(yes) A:UPD(20) A:COM B:SEL(20) B:IF(no) B:COM → {\"balance\":20,\"version\":7} (Paid $80, balance $20. The books balance.)",
+      "pass": true,
+      "test": "race conditions on real PostgreSQL > bank · FOR UPDATE: the animation's interleaving, replayed on PostgreSQL (double-spend)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "double-spend",
+      "title": "withdraw.sql · optimistic: the same interleaving, step by step",
+      "software": "PostgreSQL 14.15",
+      "real": "A:SEL(100, 7) B:SEL(100, 7) A:IF(yes) B:IF(yes) A:UPD(ok) B:UPD(retry) B:SEL(20, 8) B:IF(no) → {\"balance\":20,\"version\":8}",
+      "lesson_says": "A:SEL(100, 7) B:SEL(100, 7) A:IF(yes) B:IF(yes) A:UPD(ok) B:UPD(retry) B:SEL(20, 8) B:IF(no) → {\"balance\":20,\"version\":8} (Paid $80, balance $20. The books balance.)",
+      "pass": true,
+      "test": "race conditions on real PostgreSQL > bank · version check: the animation's interleaving, replayed on PostgreSQL (double-spend)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "check-then-act",
+      "title": "Two conditional UPDATEs at the same moment",
+      "software": "PostgreSQL 14.15",
+      "real": "alice's UPDATE (not yet committed): UPDATE 1; bob's waited for it (true), then UPDATE 0; the seat is alice's",
+      "lesson_says": "the check and the write happen in one statement; the loser updates 0 rows",
+      "pass": true,
+      "test": "race conditions on real PostgreSQL > the conditional UPDATE is atomic even when both run at once (check-then-act)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "double-spend",
+      "title": "Isolation levels",
+      "software": "PostgreSQL 14.15",
+      "real": "default_transaction_isolation = read committed; under REPEATABLE READ both read 100 and 100, the first withdrawal committed, the second UPDATE got ERROR 40001: could not serialize access due to concurrent update; the retry read 20 and would refuse",
+      "lesson_says": "READ COMMITTED is PostgreSQL’s default and doesn’t stop it; under REPEATABLE READ the second update fails with a serialization error and the app retries",
+      "pass": true,
+      "test": "race conditions on real PostgreSQL > READ COMMITTED is the default; REPEATABLE READ turns the double spend into a serialization error (double-spend)"
+    },
+    {
+      "lesson": "race-conditions",
+      "step": "cheat-sheet",
+      "title": "FOR UPDATE: lock-order deadlocks",
+      "software": "PostgreSQL 14.15",
+      "real": "after 1001 ms one got ERROR 40P01: deadlock detected; the other got its row",
+      "lesson_says": "FOR UPDATE: watch out for lock-order deadlocks",
+      "pass": true,
+      "test": "race conditions on real PostgreSQL > FOR UPDATE in opposite orders deadlocks, and PostgreSQL breaks it (cheat-sheet)"
+    }
+  ],
+  "stamps": [
+    {
+      "hash": "1wfreha",
+      "lesson": "replication",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: with these lines and an empty standby.signal, the follower streamed from the leader as db2, replayed each write a moment later, and refused writes of its own.",
+      "test": "replication on real PostgreSQL > a follower set up with the lesson’s lines streams and replays (the-leader-streams-its-log, spread-the-reads)"
+    },
+    {
+      "hash": "g2gg41",
+      "lesson": "replication",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: the LSN has the same shape as 0/3000148, and the UPDATE moved it forward by the bytes of its log record.",
+      "test": "replication on real PostgreSQL > pg_current_wal_lsn is a byte position that moves with each write (one-leader-orders-the-writes)"
+    },
+    {
+      "hash": "uxopmf",
+      "lesson": "replication",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: while a long transaction on one follower held up replay, its replay_lag climbed to seconds; the other stayed in milliseconds.",
+      "test": "replication on real PostgreSQL > replay_lag: a long transaction on a follower holds up replay (followers-run-behind)"
+    },
+    {
+      "hash": "1q6o8gy",
+      "lesson": "replication",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: on a follower that was behind, the check returned false and a read there showed the old balance; once it passed her LSN, the read included the deposit.",
+      "test": "replication on real PostgreSQL > a lagging follower returns the balance from before the deposit (where-did-my-deposit-go, read-your-own-writes)"
+    },
+    {
+      "hash": "1gf4n9p",
+      "lesson": "replication",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: with db2's replay paused, a commit still returned once db2 had the entry on disk (a read there still showed the old balance). remote_apply waited for the replay; local didn't wait at all.",
+      "test": "replication on real PostgreSQL > synchronous_commit: on waits for the flush, remote_apply for the replay, local for nobody (who-waits-for-whom)"
+    },
+    {
+      "hash": "19of4ho",
+      "lesson": "replication",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: with the only sync standby crashed, commits waited in SyncRep with no error and all finished when it came back. Cancelling one printed that warning word for word.",
+      "test": "replication on real PostgreSQL > the only sync follower crashes: commits wait with no error, then finish (when-the-sync-follower-dies)"
+    },
+    {
+      "hash": "py0ccp",
+      "lesson": "replication",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: db2 was sync and db3 potential; when db2 crashed, db3 took over and commits kept flowing; with both down, commits waited. With ANY 1, one follower was enough.",
+      "test": "replication on real PostgreSQL > FIRST 1 (db2, db3) and ANY 1: who the leader waits for (one-sync-rest-async)"
+    },
+    {
+      "hash": "rst4fk",
+      "lesson": "replication",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: after the leader crashed, the follower that had received the most log was promoted, and it replayed what it had received but not yet applied.",
+      "test": "replication on real PostgreSQL > the leader crashes: promote the most complete follower, lose the unshipped writes, fence the old leader (who-takes-over, writes-that-vanish, split-brain, fencing)"
+    },
+    {
+      "hash": "12hjmds",
+      "lesson": "replication",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: the pg_rewind line threw away the writes nobody else had, and the old leader came back as a read-only follower of db-2. (The pcs line needs Pacemaker and wasn't run.)",
+      "test": "replication on real PostgreSQL > the leader crashes: promote the most complete follower, lose the unshipped writes, fence the old leader (who-takes-over, writes-that-vanish, split-brain, fencing)"
+    },
+    {
+      "hash": "bc04pn",
+      "lesson": "replication",
+      "by": "MySQL 9.2.0",
+      "kind": "ran",
+      "note": "Ran it on MySQL 9.2.0: with two leaders replicating to each other, us-east handed out 1, 3, 5 and eu-west (offset 2) 2, 4, 6. Both ended up with all six rows and no collisions.",
+      "test": "replication: the MySQL lines > two leaders hand out odd and even IDs (multi-leader)"
+    },
+    {
+      "hash": "uxopmf",
+      "lesson": "replication",
+      "by": "MySQL 9.2.0",
+      "kind": "ran",
+      "note": "Ran it on MySQL 9.2.0: while a long transaction on the replica held up the applier, Seconds_Behind_Source climbed past 2, then fell back to 0.",
+      "test": "replication: the MySQL lines > SHOW REPLICA STATUS: Seconds_Behind_Source while replay is held up (followers-run-behind)"
+    },
+    {
+      "hash": "py0ccp",
+      "lesson": "replication",
+      "by": "MySQL 9.2.0",
+      "kind": "ran",
+      "note": "Ran it on MySQL 9.2.0: commits waited for the replica's ack; with the replica stopped, one commit waited out the 10 s timeout, then the source fell back to async until the replica returned.",
+      "test": "replication: the MySQL lines > semi-sync waits for a replica, then falls back to async after the timeout (one-sync-rest-async)"
+    },
+    {
+      "hash": "1cmvi0",
+      "lesson": "sharding",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: with these lines and an empty standby.signal, the replica served reads, refused writes, and after replaying the primary's inserts its orders table was exactly as big as the primary's.",
+      "test": "sharding on real PostgreSQL > a replica is a full copy that replays every write (copies-dont-add-room)"
+    },
+    {
+      "hash": "w97x3b",
+      "lesson": "sharding",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: with four shard databases and the lesson's users split by first letter, shard-0 answered alice | frank.",
+      "test": "sharding on real PostgreSQL > every shard runs the same schema but holds a different slice (split-the-rows)"
+    },
+    {
+      "hash": "r92c5k",
+      "lesson": "sharding",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: with orders hash-partitioned four ways on customer_id (partitions standing in for shards), the first query touched 1 partition and the report all 4.",
+      "test": "sharding on real PostgreSQL > a query with the shard key touches one shard, anything else all of them (what-hashing-costs, keep-related-together, pick-a-key)"
+    },
+    {
+      "hash": "1q7qao0",
+      "lesson": "sharding",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: with the lesson's tenants loaded, acme's lookup returned 0, the UPDATE changed exactly one row, and no other tenant moved.",
+      "test": "sharding on real PostgreSQL > moving one tenant is one UPDATE (directory)"
+    },
+    {
+      "hash": "1on9hq5",
+      "lesson": "sharding",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: over four shards of very different sizes, the merged sums and counts gave exactly avg(total) of all rows; averaging the averages was far off.",
+      "test": "sharding on real PostgreSQL > merge partial sums, don’t average the averages (scatter-gather)"
+    },
+    {
+      "hash": "diib0i",
+      "lesson": "sharding",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: on two shards, after PREPARE the coordinator disconnected; both transactions stayed prepared (even across a shard restart) and writes to the two rows waited until COMMIT PREPARED.",
+      "test": "sharding on real PostgreSQL > two-phase commit: prepared transactions wait, holding their locks (transactions)"
+    },
+    {
+      "hash": "wub1cz",
+      "lesson": "race-conditions",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, both read NULL, both UPDATEs went through, and the row ended up saying bob.",
+      "test": "race conditions on real PostgreSQL > seat · check, then book: the animation's interleaving, replayed on PostgreSQL (check-then-act)"
+    },
+    {
+      "hash": "1om1vzj",
+      "lesson": "race-conditions",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, the first UPDATE matched 1 row and the second 0.",
+      "test": "race conditions on real PostgreSQL > seat · one conditional UPDATE: the animation's interleaving, replayed on PostgreSQL (check-then-act)"
+    },
+    {
+      "hash": "28q86r",
+      "lesson": "race-conditions",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, both read 100, both passed the check, both wrote 20.",
+      "test": "race conditions on real PostgreSQL > bank · no lock: the animation's interleaving, replayed on PostgreSQL (double-spend)"
+    },
+    {
+      "hash": "1bdcok3",
+      "lesson": "race-conditions",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, the second SELECT … FOR UPDATE waited for the first COMMIT, then read 20. A plain SELECT didn’t wait.",
+      "test": "race conditions on real PostgreSQL > bank · FOR UPDATE: the animation's interleaving, replayed on PostgreSQL (double-spend)"
+    },
+    {
+      "hash": "jz9gd7",
+      "lesson": "race-conditions",
+      "by": "PostgreSQL 14.15",
+      "kind": "ran",
+      "note": "Ran it on PostgreSQL 14.15: in two sessions, in the animation's order, the second UPDATE matched 0 rows; the retry read 20, 8 and stopped.",
+      "test": "race conditions on real PostgreSQL > bank · version check: the animation's interleaving, replayed on PostgreSQL (double-spend)"
+    }
+  ]
+}

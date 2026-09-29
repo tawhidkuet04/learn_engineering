@@ -27,7 +27,8 @@ interface Badge {
   ok: boolean;
 }
 
-function script(getset: boolean) {
+/** The exchange the diagram draws (verify/ replays it against real Redis). */
+export function raceScript(getset: boolean) {
   const key = 'rl:203.0.113.66';
   const messages: SeqMessage[] = getset
     ? [
@@ -61,7 +62,7 @@ export function RaceScene({ sim }: { sim: RateSim }) {
   const g = raceGeo(sim);
   const getset = sim.cfg.race === 'getset';
   const now = Math.min(sim.raceT, SHOWN);
-  const { key, messages, notes, badges } = script(getset);
+  const { key, messages, notes, badges } = raceScript(getset);
   const value = getset ? (now >= 3.3 ? 5 : 4) : now >= 1.35 ? 6 : now >= 1.1 ? 5 : 4;
   const done = now >= (getset ? 3.9 : 2.3);
   return (

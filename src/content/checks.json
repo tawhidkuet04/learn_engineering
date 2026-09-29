@@ -1,0 +1,2885 @@
+{
+ "ran": "2026-09-29",
+ "checks": [
+  {
+   "lesson": "caching",
+   "step": "out-of-room",
+   "title": "redis-server starts with the redis.conf snippet and reads back every value",
+   "software": "Redis 7.2.5",
+   "real": "maxmemory 2147483648, maxmemory-policy allkeys-lru, maxmemory-samples 5",
+   "lesson_says": "maxmemory 2gb, maxmemory-policy allkeys-lru, maxmemory-samples 5",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "lru-lfu-fifo",
+   "title": "redis-server starts with the redis.conf snippet and reads back every value",
+   "software": "Redis 7.2.5",
+   "real": "maxmemory-policy allkeys-lfu, lfu-log-factor 10, lfu-decay-time 1",
+   "lesson_says": "maxmemory-policy allkeys-lfu, lfu-log-factor 10, lfu-decay-time 1",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "lookup-race",
+   "title": "redis-server starts with the redis.conf snippet and reads back every value",
+   "software": "Redis 7.2.5",
+   "real": "hash-max-listpack-entries 512, hash-max-listpack-value 64",
+   "lesson_says": "hash-max-listpack-entries 512, hash-max-listpack-value 64",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "playground",
+   "title": "redis-server starts with every config the playground generates",
+   "software": "Redis 7.2.5",
+   "real": "576 variants accepted; policies used: allkeys-lfu, allkeys-lru, allkeys-random, volatile-ttl",
+   "lesson_says": "the \"your settings · live\" block is a redis.conf",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "out-of-room",
+   "title": "Default eviction policy",
+   "software": "Redis 7.2.5",
+   "real": "noeviction",
+   "lesson_says": "noeviction",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "out-of-room",
+   "title": "Keys sampled per eviction by default",
+   "software": "Redis 7.2.5",
+   "real": "5",
+   "lesson_says": "5",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "lru-lfu-fifo",
+   "title": "Default lfu-log-factor and lfu-decay-time",
+   "software": "Redis 7.2.5",
+   "real": "10, 1",
+   "lesson_says": "10, 1",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "ttl",
+   "title": "How often the background expiry job runs (hz)",
+   "software": "Redis 7.2.5",
+   "real": "10 times a second",
+   "lesson_says": "about 10 times a second",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "lookup-race",
+   "title": "Default listpack limits for hashes",
+   "software": "Redis 7.2.5",
+   "real": "512 entries, 64 bytes",
+   "lesson_says": "512 entries, 64 bytes (\"these are the defaults\")",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "out-of-room",
+   "title": "Default policy with memory full",
+   "software": "Redis 7.2.5",
+   "real": "writes: 200000 | 200000 | OOM command not allowed when used memory > 'maxmemory'. | OOM command not allowed when used memory > 'maxmemory'.; reads still work, DEL still works; evicted_keys 0",
+   "lesson_says": "noeviction: when memory is full, writes fail with an OOM error",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "lru-lfu-fifo",
+   "title": "Redis has no FIFO policy",
+   "software": "Redis 7.2.5",
+   "real": "allkeys-fifo rejected; the only choices: volatile-lru, volatile-lfu, volatile-random, volatile-ttl, allkeys-lru, allkeys-lfu, allkeys-random, noeviction",
+   "lesson_says": "Redis has no FIFO policy",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "playground",
+   "title": "volatile-ttl when no key has a TTL",
+   "software": "Redis 7.2.5",
+   "real": "writes OK OOM OOM, evicted_keys 0: nothing it may evict",
+   "lesson_says": "FIFO without TTLs maps to allkeys-random",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "out-of-room",
+   "title": "volatile-lru only evicts keys that have a TTL",
+   "software": "Redis 7.2.5",
+   "real": "writes OK OK OK OK OOM; left: plain:0, plain:1, plain:2, plain:3, plain:4, plain:5, plain:6 (all three TTL keys evicted, then OOM)",
+   "lesson_says": "volatile-lru (only keys that have a TTL)",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "out-of-room",
+   "title": "Memory for 100,000 keys, with and without LRU eviction",
+   "software": "Redis 7.2.5",
+   "real": "dataset 7263480 bytes under noeviction, 7263480 under allkeys-lru",
+   "lesson_says": "it needs no extra memory per key",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "memory-is-faster",
+   "title": "--latency output",
+   "software": "Redis 7.2.5",
+   "real": "min: 0, max: 1, avg: 0.09 (209 samples) (Redis counted 209 PINGs)",
+   "lesson_says": "min: 0, max: 1, avg: 0.21 (1532 samples); the note: --latency pings Redis over and over",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "memory-is-faster",
+   "title": "GET product:42 in redis-cli",
+   "software": "Redis 7.2.5",
+   "real": "\"{\\\"name\\\":\\\"Trail boots\\\",\\\"price\\\":89}\"",
+   "lesson_says": "\"{\\\"name\\\":\\\"Trail boots\\\",\\\"price\\\":89}\"",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "memory-is-faster",
+   "title": "Redis’s own time per GET",
+   "software": "Redis 7.2.5",
+   "real": "0.13 µs per GET inside Redis (INFO commandstats); the keyspace is a hash table (Hash table 0 stats (main hash table):)",
+   "lesson_says": "about 1 ms, most of that is the network hop; Redis looks the key up in an in-memory hash table",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "hit-or-miss",
+   "title": "SCAN output",
+   "software": "Redis 7.2.5",
+   "real": "1) \"0\" / 2) 1) \"product:42\" /    2) \"product:13\" /    3) \"product:7\"",
+   "lesson_says": "1) \"0\" / 2) 1) \"product:42\" /    2) \"product:7\" /    3) \"product:13\"",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "hit-or-miss",
+   "title": "KEYS blocks, SCAN doesn’t (1,000,000 keys)",
+   "software": "Redis 7.2.5",
+   "real": "KEYS took 188 ms inside Redis and a PING sent meanwhile waited 177 ms; each SCAN COUNT 100 took 28 µs and returned 100 keys on average",
+   "lesson_says": "Avoid KEYS in production: it blocks Redis while it scans everything",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "hit-ratio",
+   "title": "INFO stats | grep keyspace after the hit-or-miss reads",
+   "software": "Redis 7.2.5",
+   "real": "keyspace_hits:6, keyspace_misses:4",
+   "lesson_says": "the same reads in the animation: 6 hits, 4 misses; the snippet's math: 95.0%",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "ttl",
+   "title": "SET … EX 60",
+   "software": "Redis 7.2.5",
+   "real": "OK",
+   "lesson_says": "OK",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "ttl",
+   "title": "TTL counts down",
+   "software": "Redis 7.2.5",
+   "real": "(integer) 60 right away, (integer) 42 after 18.0 s",
+   "lesson_says": "(integer) 42 (18 s after the SET)",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "ttl",
+   "title": "GET a minute later",
+   "software": "Redis 7.2.5",
+   "real": "(nil)",
+   "lesson_says": "(nil)",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "ttl",
+   "title": "TTL of a key with no expiry, and of a missing key",
+   "software": "Redis 7.2.5",
+   "real": "(integer) -1, (integer) -2",
+   "lesson_says": "-1 and -2",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "ttl",
+   "title": "How expired keys disappear",
+   "software": "Redis 7.2.5",
+   "real": "background job off: the expired key stayed (DBSIZE 1) until GET touched it (then 0); job on: 1,000 expired keys that nobody touched were gone 86 ms after expiring",
+   "lesson_says": "deleted when something touches it; a background job cleans up the rest about 10 times a second",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "taming-the-herd",
+   "title": "SET lock:product:42 <token> NX PX 5000 from two app servers",
+   "software": "Redis 7.2.5",
+   "real": "first OK, second (nil); after 5.1 s the second got OK",
+   "lesson_says": "the winner runs the query; the others wait briefly and retry",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "caches-all-the-way-down",
+   "title": "Deleting a Redis key",
+   "software": "Redis 7.2.5",
+   "real": "0.02 ms per DEL, round trip included (localhost)",
+   "lesson_says": "You can delete a Redis key in a millisecond",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "a-race-you-can-lose",
+   "title": "GET and DEL replies in the race diagram",
+   "software": "Redis 7.2.5",
+   "real": "GET → (nil); DEL → (integer) 0 when not cached, (integer) 1 when cached",
+   "lesson_says": "(nil): a miss; DEL → 0: nothing to delete",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "which-key-goes",
+   "title": "Which keys LRU evicts, read by read (maxmemory-samples 10)",
+   "software": "Redis 7.2.5",
+   "real": "10 of 10 runs: 7 hit, 99 miss→8, 42 hit, 3 miss→21, 13 hit, 64 miss→5, 5 miss→5, 17 miss→7, 42 hit, 11 miss→99",
+   "lesson_says": "7 hit, 99 miss→8, 42 hit, 3 miss→21, 13 hit, 64 miss→5, 5 miss→7, 17 miss→99, 42 hit, 11 miss→3",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "which-key-goes",
+   "title": "Which keys LRU evicts, read by read (maxmemory-samples 5, the snippet)",
+   "software": "Redis 7.2.5",
+   "real": "18 different outcomes in 30 runs; 1 matched the animation; 8 evicted product:5 the moment they wrote it; most common: 7 hit, 99 miss→8, 42 hit, 3 miss→21, 13 hit, 64 miss→5, 5 miss→13, 17 miss→7, 42 hit, 11 miss→99 (4×)",
+   "lesson_says": "7 hit, 99 miss→8, 42 hit, 3 miss→21, 13 hit, 64 miss→5, 5 miss→7, 17 miss→99, 42 hit, 11 miss→3 (the aside: real Redis doesn’t always agree, and sometimes evicts product:5 the moment it’s written)",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "which-key-goes",
+   "title": "Hits on these ten reads",
+   "software": "Redis 7.2.5",
+   "real": "4 to 5 hits across all runs",
+   "lesson_says": "4 hits",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "which-key-goes",
+   "title": "OBJECT IDLETIME",
+   "software": "Redis 7.2.5",
+   "real": "a key just read: (integer) 0; product:3, last read 6 s earlier: 6",
+   "lesson_says": "seconds since a key was last read or written (0 right after a read)",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "out-of-room",
+   "title": "Hit ratio over 12,000 reads (6 of 16 products fit)",
+   "software": "Redis 7.2.5",
+   "real": "maxmemory-samples 5: 65.7%; maxmemory-samples 10: 65.1% (reads placed 10 s apart on Redis’s LRU clock); evicted_keys 4133 / 4197",
+   "lesson_says": "exact LRU (the animation’s cache): 65.7%; the aside: within about two points of exact LRU’s 66%",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "out-of-room",
+   "title": "How often the hot key product:42 gets evicted",
+   "software": "Redis 7.2.5",
+   "real": "Redis: 157× (samples 5), 146× (samples 10) in 12,000 reads",
+   "lesson_says": "exact LRU: 178× in 12,000 reads; the animation, 10 minutes: evicted 3×, at the very bottom 3.4% of the time, back on its next read: always",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "lru-lfu-fifo",
+   "title": "LFU on stable popularity",
+   "software": "Redis 7.2.5",
+   "real": "allkeys-lfu, six runs: 72.5%, 71.6%, 70.8%, 61.3%, 64.5% (product:42 evicted 12×), 72.7%; allkeys-lru: 65.7%",
+   "lesson_says": "LFU wins when popularity is stable (the readout’s exact LFU: 74.8%); Redis’s LFU scores below that, though it usually still beats LRU",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "lru-lfu-fifo",
+   "title": "FIFO in Redis: volatile-ttl with one TTL on every key",
+   "software": "Redis 7.2.5",
+   "real": "volatile-ttl: 60.5% hits, product:42 evicted 595×, 72.1% of evictions the same key, read for read, as FIFO",
+   "lesson_says": "the animation’s FIFO: 60.5%, product:42 evicted 594×; the note: volatile-ttl acts much like FIFO when every key has the same TTL",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "lru-lfu-fifo",
+   "title": "Without TTLs the playground falls back to allkeys-random",
+   "software": "Redis 7.2.5",
+   "real": "allkeys-random: 58.0% hits, product:42 evicted 682× (the pick depends on the hash table's layout, so this varies from run to run)",
+   "lesson_says": "no FIFO in Redis; without TTLs, this evicts at random instead",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "lru-lfu-fifo",
+   "title": "LFU count after N reads (lfu-log-factor 10)",
+   "software": "Redis 7.2.5",
+   "real": "100: 12, 1,000: 20, 10,000: 50, 100,000: 141, 1,000,000: 255",
+   "lesson_says": "grow ever more slowly: about 10 after 100 reads, 255 (the max) by a million",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "lru-lfu-fifo",
+   "title": "An idle key’s count when a minute passes (lfu-decay-time 1)",
+   "software": "Redis 7.2.5",
+   "real": "27 → 26 after 1 minute boundary",
+   "lesson_says": "drops by 1 each minute",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "working-set",
+   "title": "INFO memory: the fields shown, in order, \"…\" where lines are skipped",
+   "software": "Redis 7.2.5",
+   "real": "used_memory_human:2.50M, maxmemory_human:2.00G (maxmemory 2gb)",
+   "lesson_says": "used_memory_human:1.83G, maxmemory_human:2.00G",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "working-set",
+   "title": "INFO stats | grep evicted_keys",
+   "software": "Redis 7.2.5",
+   "real": "evicted_keys:110 after 110 evictions",
+   "lesson_says": "evicted_keys:48213",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "three-ways-to-write",
+   "title": "Out of the box: snapshots, and a crash after one",
+   "software": "Redis 7.2.5",
+   "real": "save \"3600 1 300 100 60 10000\", appendonly no; after 10,000 writes a snapshot came 61 s after startup; killed with 100 more writes, it restarted with 10000 keys and 0 of the 100",
+   "lesson_says": "snapshots at most once a minute, and a crash loses every write since the last snapshot",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "three-ways-to-write",
+   "title": "Append-only file on, then kill -9",
+   "software": "Redis 7.2.5",
+   "real": "appendfsync everysec; 20000 writes acknowledged, 20000 there after the restart",
+   "lesson_says": "a killed Redis came back with every write it had acknowledged, though by default it syncs that file to disk only once a second",
+   "pass": true
+  },
+  {
+   "lesson": "caching",
+   "step": "three-ways-to-write",
+   "title": "No snapshot to reload",
+   "software": "Redis 7.2.5",
+   "real": "killed with 1,000 keys, restarted with 0",
+   "lesson_says": "Redis comes back cold, because this one has no snapshot to reload",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "lookup-race",
+   "title": "When a hash stops being a flat list",
+   "software": "Redis 7.2.5",
+   "real": "512 fields: listpack, 513: hashtable; a 64-byte value: listpack, 65 bytes: hashtable",
+   "lesson_says": "hash-max-listpack-entries 512, hash-max-listpack-value 64",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "lookup-race",
+   "title": "Flat list vs hash table",
+   "software": "Redis 7.2.5",
+   "real": "4 fields: 136 vs 368 bytes, 63 vs 58 ns per HGET inside Redis; 512 fields: 10296 vs 32880 bytes, 1260 vs 70 ns per HGET inside Redis",
+   "lesson_says": "the flat list takes about a third of the memory, but lookups slow down as it grows",
+   "pass": true
+  },
+  {
+   "lesson": "stack-heap",
+   "step": "fragmentation",
+   "title": "INFO memory: the fields shown, in order, \"…\" where lines are skipped",
+   "software": "Redis 7.2.5",
+   "real": "ok (mem_allocator:libc)",
+   "lesson_says": "… used_memory_human:1.02G … used_memory_rss_human:1.48G … mem_fragmentation_ratio:1.45 …",
+   "pass": true
+  },
+  {
+   "lesson": "stack-heap",
+   "step": "fragmentation",
+   "title": "Deleting every other key of a million",
+   "software": "Redis 7.2.5",
+   "real": "used_memory 177 MB → 93 MB, RSS 184 MB → 184 MB, ratio 1.04 → 1.98; 500,000 new keys: used 177 MB, RSS 184 MB",
+   "lesson_says": "1.02G used, 1.48G held, ratio 1.45: \"45% overhead, mostly holes\"",
+   "pass": true
+  },
+  {
+   "lesson": "stack-heap",
+   "step": "fragmentation",
+   "title": "mem_fragmentation_ratio is RSS divided by used memory",
+   "software": "Redis 7.2.5",
+   "real": "1.98 reported, 1.98 computed",
+   "lesson_says": "1.45 = 1.48G / 1.02G (1.45)",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "call-stack",
+   "title": "greet.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: Hi, Ada; Node: Hi, Ada ×8",
+   "lesson_says": "Hi, Ada",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "hand-it-off",
+   "title": "checkout.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×2: Order placed | Show receipt | Email sent; Node: Order placed | Show receipt | Email sent ×8",
+   "lesson_says": "Order placed | Show receipt | Email sent",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "zero-is-not-now",
+   "title": "zero.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: A | C | B; Node: A | C | B ×8",
+   "lesson_says": "A | C | B (quiz answer \"A C B\")",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "zero-is-not-now",
+   "title": "timers.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: 3 | 2 | 1; Node: 3 | 2 | 1 ×8",
+   "lesson_says": "3 | 2 | 1 (quiz answer \"3 2 1\")",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "zero-is-not-now",
+   "title": "busy.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: Y | X; Node: Y | X ×8",
+   "lesson_says": "Y | X (quiz answer \"Y X\")",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "the-microtask-queue",
+   "title": "queues.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: A | D | C | B; Node: A | D | C | B ×8",
+   "lesson_says": "A | D | C | B",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "task-or-microtask",
+   "title": "classic.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: script start | script end | promise1 | promise2 | setTimeout; Node: script start | script end | promise1 | promise2 | setTimeout ×8",
+   "lesson_says": "script start | script end | promise1 | promise2 | setTimeout",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "task-or-microtask",
+   "title": "nested.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: sync | m1 | m2 | t1 | t2; Node: sync | m1 | m2 | t1 | t2 ×8",
+   "lesson_says": "sync | m1 | m2 | t1 | t2",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "drained-until-empty",
+   "title": "drain.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: micro 1 | micro 2 | micro 3 | timeout; Node: micro 1 | micro 2 | micro 3 | timeout ×8",
+   "lesson_says": "micro 1 | micro 2 | micro 3 | timeout",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "where-rendering-fits",
+   "title": "animate.js: console output",
+   "software": "Chrome 154",
+   "real": "Chrome ×3: task",
+   "lesson_says": "task",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "await-splits-a-function",
+   "title": "checkout.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: 1 · checkout starts | 2 · back in the script | 3 · after await; Node: 1 · checkout starts | 2 · back in the script | 3 · after await ×8",
+   "lesson_says": "1 · checkout starts | 2 · back in the script | 3 · after await",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "awaiting-the-network",
+   "title": "cart.js: console output",
+   "software": "Chrome 154",
+   "real": "Chrome ×3: loading… | page is interactive | status 200",
+   "lesson_says": "loading… | page is interactive | status 200",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "predict-the-async-order",
+   "title": "order.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: 1 | 5 | 2 | 4 | 3; Node: 1 | 5 | 2 | 4 | 3 ×8",
+   "lesson_says": "1 | 5 | 2 | 4 | 3 (quiz answer \"1 5 2 4 3\")",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "predict-the-async-order",
+   "title": "nested-await.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: a1 | b | end | a2; Node: a1 | b | end | a2 ×8",
+   "lesson_says": "a1 | b | end | a2 (quiz answer \"a1 b end a2\")",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "predict-the-async-order",
+   "title": "sleep.js: console output",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome ×3: f1 | s | m | f2; Node: f1 | s | m | f2 ×8",
+   "lesson_says": "f1 | s | m | f2 (quiz answer \"f1 s m f2\")",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "timers-are-a-minimum",
+   "title": "What late.js prints after the 300 ms busy loop",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome: 304; Node: 301, 302 (always after \"loop done\")",
+   "lesson_says": "the animation prints \"loop done\", \"timer 300\"; the text says timer 300 or a few ms more, never timer 100",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "timers-are-a-minimum",
+   "title": "Quiz: a click 50 ms into the busy loop",
+   "software": "Chrome 154",
+   "real": "loop done at 300 ms, click at 300 ms, timer at 301 ms",
+   "lesson_says": "the handler runs after the loop ends",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "where-rendering-fits",
+   "title": "animate.js (stage): three rAF frames move the box 50 px each; the timer vs the first frame",
+   "software": "Chrome 154",
+   "real": "at page load: task, frame:50px, frame:100px, frame:150px ×10; from a click handler: frame:50px, task, frame:100px, frame:150px ×6; rAF every 16.65 ms",
+   "lesson_says": "animation: task, frame, frame, frame, 3 frames painted; aside: the timer usually runs first, but from a click handler Chrome paints the frame first",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "every-click-is-a-task",
+   "title": "A click that arrives while the tick waits runs first",
+   "software": "Chrome 154",
+   "real": "quick clicks: click 1, click 2, click 3; tick came due during a busy 500 ms, a click arrived after it: click 4, tick",
+   "lesson_says": "click 1, click 2, click 3, click 4, tick",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "a-long-task",
+   "title": "The \"long\" strategy: frames, longest task, click delay",
+   "software": "Chrome 154",
+   "real": "work 1500 ms, 0/90 frames painted, longest task 1502 ms, clicks waited 1052/650/253 ms",
+   "lesson_says": "work 1503 ms, 1/90 frames painted, longest task 1500 ms, clicks waited 1038/643/265 ms",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "break-it-up",
+   "title": "The \"chunk\" strategy: frames, longest task, click delay",
+   "software": "Chrome 154",
+   "real": "work 2040 ms, 122/122 frames painted, no task over 50 ms, clicks waited 12/11/6 ms",
+   "lesson_says": "work 2065 ms, 123/123 frames painted, longest task 12 ms, clicks waited 3/3/3 ms",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "microtasks-cant-yield",
+   "title": "The \"micro\" strategy: frames, longest task, click delay",
+   "software": "Chrome 154",
+   "real": "work 1500 ms, 0/90 frames painted, longest task 1500 ms, clicks waited 1050/649/249 ms",
+   "lesson_says": "work 1518 ms, 1/91 frames painted, longest task 1515 ms, clicks waited 1054/659/280 ms",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "web-workers",
+   "title": "The \"worker\" strategy: frames, longest task, click delay",
+   "software": "Chrome 154",
+   "real": "work 1505 ms, 91/90 frames painted, no task over 50 ms, clicks waited 0/0/0 ms",
+   "lesson_says": "work 1506 ms, 90/90 frames painted, longest task 5 ms, clicks waited 3/3/3 ms",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "break-it-up",
+   "title": "Chunks with setTimeout take longer than one long task",
+   "software": "Chrome 154",
+   "real": "2040 ms vs 1500 ms (×1.36)",
+   "lesson_says": "about a third longer; the timeline shows ×1.37",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "microtasks-cant-yield",
+   "title": "yield.js: a microtask yield vs a task yield between 12 ms chunks",
+   "software": "Chrome 154",
+   "real": "await Promise.resolve(); → 0 frames, clicks waited up to 1050 ms; await new Promise((r) => setTimeout(r)); → 122/122 frames, clicks within 12 ms",
+   "lesson_says": "a microtask: no frame, no click in between; a task: the loop gets a turn",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "microtasks-cant-yield",
+   "title": "Yielding with a message instead of a timer",
+   "software": "Chrome 154",
+   "real": "MessageChannel: work 1510 ms, 90/91 frames painted, no task over 50 ms, clicks waited 7/4/3 ms; setTimeout: work 2040 ms, 122/122 frames painted, no task over 50 ms, clicks waited 12/11/6 ms",
+   "lesson_says": "a real task boundary (a timer, a message, or scheduler.yield()) gives rendering and input a turn",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "a-long-task",
+   "title": "orders.js runs as one long task",
+   "software": "Chrome 154",
+   "real": "work 1500 ms, 0/90 frames painted, longest task 1500 ms, clicks waited 1051/651/250 ms",
+   "lesson_says": "3,000 × 0.5 ms = 1.5 s in one task: no frames, clicks wait",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "break-it-up",
+   "title": "scheduler.yield(): front of the queue, clicks fast, fewer frames",
+   "software": "Chrome 154",
+   "real": "work 1503 ms, 36/90 frames painted, no task over 50 ms, clicks waited 1/1/3 ms; setTimeout chunks: 122/122 frames in 2040 ms; order: scheduler.yield continuation → setTimeout queued first → setTimeout queued first → setTimeout continuation",
+   "lesson_says": "continuation goes to the front; clicks still get in and the work finishes sooner, but frames are painted less often",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "web-workers",
+   "title": "A worker crunches 3,000 orders; the main thread stays free",
+   "software": "Chrome 154",
+   "real": "work 1509 ms, 91/91 frames painted, no task over 50 ms, clicks waited 1/0/0 ms; result had 3000 items, first 0 although main set orders[0].id = -1 after posting; typeof document in a worker: undefined",
+   "lesson_says": "frames keep painting, clicks handled instantly, data is copied, workers have no DOM",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "a-long-task",
+   "title": "Compositor animations during a 1.5 s long task",
+   "software": "Chrome 154",
+   "real": "78 frames reached the screen during the task; in 13 of them the CSS transform box was at 10 different places and the CSS opacity box had 8 shades, the rAF-driven box at 1",
+   "lesson_says": "CSS animations of transform and opacity can keep running on the compositor thread; anything your code renders needs the main thread",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "a-long-task",
+   "title": "Which tasks Chrome reports as long tasks",
+   "software": "Chrome 154",
+   "real": "tasks of 40, 47, 55, 70 ms → long tasks reported: 55, 70 ms",
+   "lesson_says": "any task over 50 ms",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "call-stack",
+   "title": "The stack trace DevTools shows",
+   "software": "Chrome 154",
+   "real": "Uncaught Error: out of greetings\n    at greet (greet.js:2:9)\n    at main (greet.js:5:15)\n    at greet.js:8:1",
+   "lesson_says": "Uncaught Error: out of greetings\n    at greet (greet.js:2:9)\n    at main (greet.js:5:15)\n    at greet.js:8:1",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "hand-it-off",
+   "title": "setTimeout returns at once with an id; clearTimeout cancels",
+   "software": "Chrome 154",
+   "real": "id 1, both lines took 0.00 ms; after 1.3 s sendEmail ran: false",
+   "lesson_says": "returns at once, with an id; cancelled before it fires",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "zero-is-not-now",
+   "title": "Focus waits for the script; the 4 ms clamp after 5 levels of nesting",
+   "software": "Chrome 154",
+   "real": "focused during the script: false, after: true; chained setTimeout(…, 0) delays: 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.5, 4.6, 4.5, 4.5, 4.6, 4.4 ms",
+   "lesson_says": "after the current code is done; after 5 levels of nesting the minimum becomes 4 ms",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "every-click-is-a-task",
+   "title": "What is on the stack when the click handler runs",
+   "software": "Chrome 154",
+   "real": "addToCart('A-42') with stack: addToCart ← HTMLButtonElement.<anonymous>",
+   "lesson_says": "runs later, as a task, on an empty stack",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "timers-are-a-minimum",
+   "title": "How late a 100 ms timer fires on an idle thread",
+   "software": "Chrome 154, Node 22.22.0",
+   "real": "Chrome: 2.00, 1.70, 1.00, 1.80 ms; Node: 1.16, 1.11, 0.40, 0.98 ms",
+   "lesson_says": "a minimum, never early",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "the-microtask-queue",
+   "title": "queueMicrotask, .then, await and MutationObserver all run before a task queued first",
+   "software": "Chrome 154",
+   "real": "script → queueMicrotask → then → after await → MutationObserver → task queued first",
+   "lesson_says": "all four run their callbacks as microtasks",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "where-rendering-fits",
+   "title": "rAF runs tick once per frame",
+   "software": "Chrome 154",
+   "real": "37 calls in 600 ms, 16.67 ms apart; transform set from the frame time each call: true",
+   "lesson_says": "once per frame",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "await-splits-a-function",
+   "title": "checkout.js (promises) vs the async checkout() on the stage, in 3 interleavings",
+   "software": "Node 22.22.0",
+   "real": "same: 1 · checkout starts, 2 · back in the script, 3 · after await; same: 1 · checkout starts, sync, m1, 3 · after await, m2, p1, done, p2, p3, task; same: 1 · checkout starts, 3 · after await, p1, awaited, p2, p3, p4",
+   "lesson_says": "the ordering is exactly this",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "awaiting-the-network",
+   "title": "Two awaits: headers first, then the body",
+   "software": "Chrome 154",
+   "real": "headers at 1 ms, a timer ran at 121 ms (stack depth 1), renderCart at 301 ms",
+   "lesson_says": "the body streams in later, so await again; while waiting the stack is empty and the loop is free",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "hand-it-off",
+   "title": "Node reads files on libuv’s thread pool",
+   "software": "Node 22.22.0",
+   "real": "a readFile queued behind a blocked FIFO read finished after 309 ms with a pool of 1 thread, 2 ms with 4",
+   "lesson_says": "libuv has a thread pool for file I/O",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "task-or-microtask",
+   "title": "When the second .then joins the queue",
+   "software": "Node 22.22.0",
+   "real": "promise1 → queued inside promise1 → promise2",
+   "lesson_says": "promise2 isn’t queued until promise1’s callback returns",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "node-js",
+   "title": "app.js on the stage: readFile callback schedules both",
+   "software": "Node 22.22.0",
+   "real": "immediate | timeout ×60",
+   "lesson_says": "immediate | timeout",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "node-js",
+   "title": "setTimeout(…, 0) is a 1 ms timer in Node",
+   "software": "Node 22.22.0",
+   "real": "_idleTimeout = 1",
+   "lesson_says": "the timer card reads \"setTimeout · 0 → 1 ms\"",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "node-js",
+   "title": "setTimeout 0 vs setImmediate from the main module",
+   "software": "Node 22.22.0",
+   "real": "immediate | timeout ×58; timeout | immediate ×2; after a 2 ms busy wait in the module: timeout | immediate ×30",
+   "lesson_says": "the order can flip: it depends on whether 1 ms has passed when the loop first checks its timers",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "node-js",
+   "title": "process.nextTick vs a promise",
+   "software": "Node 22.22.0",
+   "real": "ticks.cjs: nextTick | promise ×6; same code as .mjs: promise | nextTick ×6",
+   "lesson_says": "CommonJS prints nextTick, promise; in an ES module the promise prints first",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "cheat-sheet",
+   "title": "Who goes first: process.nextTick or a promise?",
+   "software": "Node 22.22.0",
+   "real": "CommonJS main module: nextTick; ES module body: promise; setTimeout callback: nextTick; setImmediate callback: nextTick; fs.readFile callback: nextTick; inside a .then callback: promise",
+   "lesson_says": "as soon as control returns to Node, ahead of promises",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "node-js",
+   "title": "Microtasks drain between callbacks of the same phase",
+   "software": "Node 22.22.0",
+   "real": "t1 p1 t2 p2 i1 q1 i2 q2",
+   "lesson_says": "between callbacks, Node drains microtasks",
+   "pass": true
+  },
+  {
+   "lesson": "event-loop",
+   "step": "playground",
+   "title": "Block programs: console order, animation vs Chrome",
+   "software": "Chrome 154",
+   "real": "195 programs (every 1–3 block mix of log, timeout, then, microtask and async, every pair with setTimeout 100 or fetch, 16 longer ones) printed the same order",
+   "lesson_says": "same order in every program",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "hash-function",
+   "title": "hash() vs Java's String.hashCode()",
+   "software": "Node 22.22.0, OpenJDK 18.0.2.1",
+   "real": "hash('bob') = 97717, 97717; 17 short keys: identical to Java; long strings: plain hash differs (no wrap); the note's (Math.imul(h, 31) + ch.charCodeAt(0)) | 0: matches Java on all; Math.imul without | 0 on \"xfjfxtz\": 2147483668 vs Java -2147483628",
+   "lesson_says": "97717 every time; exactly Java's String.hashCode() for short keys; the note's expression reproduces Java's wrap-around",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "hash-to-bucket",
+   "title": "table.js: the values in the comments",
+   "software": "Node 22.22.0",
+   "real": "hash('alice') = 92903040, bucket 0",
+   "lesson_says": "92903040 % 10 = 0",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "lookups",
+   "title": "phone.js: the values in the comments",
+   "software": "Node 22.22.0",
+   "real": "get('dave') = 555-0108, get('zoe') undefined: true, has('alice') = true",
+   "lesson_says": "'555-0108', undefined, true",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "lazy-hash",
+   "title": "lazy.js: the values in the comments",
+   "software": "Node 22.22.0",
+   "real": "jack → 6, jill → 6",
+   "lesson_says": "6, 6",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "python-dict",
+   "title": "order.js: the values in the comments",
+   "software": "Node 22.22.0",
+   "real": "[\"carol\",\"alice\",\"bob\"]",
+   "lesson_says": "['carol', 'alice', 'bob']",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "python-dict",
+   "title": "V8 objects: fixed shapes, then dictionary mode",
+   "software": "Node 22.22.0",
+   "real": "new object fast: true; dictionary mode after 20 computed-key adds; after one delete fast: false",
+   "lesson_says": "objects start with fixed \"shapes\" and turn into hash tables after many adds and deletes",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "scan-a-list",
+   "title": "contacts.find() over the lesson’s 10 contacts",
+   "software": "Node 22.22.0",
+   "real": "dave: 9 comparisons, zoe: 10",
+   "lesson_says": "dave is 9th: 9 comparisons; zoe: all 10",
+   "pass": true
+  },
+  {
+   "lesson": "hash-tables",
+   "step": "separate-chaining",
+   "title": "ChainedTable: bucket 0 and the lookup for frank",
+   "software": "Node 22.22.0",
+   "real": "bucket 0: alice, erin, frank; get('frank') = 3 after 3 comparisons; set('erin') again updated it to 20",
+   "lesson_says": "erin and frank join alice’s chain; looking up frank: 3 comparisons",
+   "pass": true
+  },
+  {
+   "lesson": "big-o",
+   "step": "why-not-seconds",
+   "title": "One timed findMax over 10 million numbers",
+   "software": "Node 22.22.0",
+   "real": "console.timeEnd printed 47.4 ms (Apple M5 Pro)",
+   "lesson_says": "~50 ms on one laptop; yours will differ",
+   "pass": true
+  },
+  {
+   "lesson": "big-o",
+   "step": "constant-time",
+   "title": "constant.js",
+   "software": "Node 22.22.0",
+   "real": "8 bytes per number, 10,000,000 numbers; names.has('carol') = true",
+   "lesson_says": "8 bytes per number",
+   "pass": true
+  },
+  {
+   "lesson": "big-o",
+   "step": "linear-search",
+   "title": "search.js",
+   "software": "Node 22.22.0",
+   "real": "includes true, indexOf 14, has true",
+   "lesson_says": "indexOf(46) returns 14",
+   "pass": true
+  },
+  {
+   "lesson": "big-o",
+   "step": "binary-search",
+   "title": "binarySearch.js",
+   "software": "Node 22.22.0",
+   "real": "correct on 1200 searches; a miss in 1,048,576 items read 40 elements",
+   "lesson_says": "halves the range each step: about log₂ n looks",
+   "pass": true
+  },
+  {
+   "lesson": "big-o",
+   "step": "merge-back-up",
+   "title": "mergeSort, merge and V8’s Array.prototype.sort",
+   "software": "Node 22.22.0",
+   "real": "[5, 3, 9, 1] → [1, 3, 5, 9]; mergeSort matched sort on 200 random arrays: true; sorting 10,000 sorted numbers took 9999 comparisons (n − 1), random ones 119,911",
+   "lesson_says": "V8 uses TimSort: O(n log n)",
+   "pass": true
+  },
+  {
+   "lesson": "big-o",
+   "step": "exploding-calls",
+   "title": "fib(30) and fib(50): calls and time",
+   "software": "Node 22.22.0",
+   "real": "fib(30) made 2,692,537 calls; counted calls for n = 30…35 all equal 2·fib(n+1) − 1; fib(40) ran at 1.70 ns a call, so fib(50)'s 40,730,022,147 calls take about 69 s; memoized fib(50) made 99 calls",
+   "lesson_says": "2,692,537 calls; 40,730,022,147 calls: over a minute, even on a fast machine; memoized: 99 calls",
+   "pass": true
+  },
+  {
+   "lesson": "big-o",
+   "step": "a-million-items",
+   "title": "a-million.js: the step counts",
+   "software": "Node 22.22.0",
+   "real": "n = 1000000, n·log₂n = 19,931,569, n² = 1e+12, 2ⁿ has 301,030 digits (BigInt)",
+   "lesson_says": "1,000,000; ≈ 20,000,000; 1,000,000,000,000; a 301,030-digit number",
+   "pass": true
+  },
+  {
+   "lesson": "big-o",
+   "step": "space-complexity",
+   "title": "hasDuplicate: all pairs, with a Set, and the one-liner agree",
+   "software": "Node 22.22.0",
+   "real": "500 random arrays: same answer from all three",
+   "lesson_says": "same idea, O(n) with a Set",
+   "pass": true
+  },
+  {
+   "lesson": "garbage-collection",
+   "step": "find-the-leak",
+   "title": "Heap after GC, per open and close of a ~5 MB report",
+   "software": "Chrome 154",
+   "real": "leaky: 0.6 → 5.7 → 10.6 → 15.6 MB; with the fix: 0.6 → 0.7 → 0.7 → 0.7 MB",
+   "lesson_says": "after every open and close, the heap after GC is 5 MB bigger; removing the listener fixes it",
+   "pass": true
+  },
+  {
+   "lesson": "garbage-collection",
+   "step": "mark",
+   "title": "mark() on a graph with two cycles, then sweep()",
+   "software": "Node 22.22.0",
+   "real": "marked user, profile, cart; freed draft, note in address order; marks cleared: true",
+   "lesson_says": "cycles can’t trap the marker; the unreachable draft ↔ note cycle is freed",
+   "pass": true
+  },
+  {
+   "lesson": "garbage-collection",
+   "step": "young-and-old",
+   "title": "node --trace-gc prints Scavenge and Mark-Compact lines in this format",
+   "software": "Node 22.22.0",
+   "real": "printed Scavenge and Mark-Compact lines with pid:isolate, time, heap before (reserved) -> after (reserved) MB, pause, plus a \"pooled: N MB,\" field the lesson’s lines don’t have",
+   "lesson_says": "these fields; the format varies a little between Node versions",
+   "pass": true
+  },
+  {
+   "lesson": "garbage-collection",
+   "step": "copying",
+   "title": "--max-semi-space-size=32",
+   "software": "Node 22.22.0",
+   "real": "new space grew to 64 MB (default 32 MB, starting at 1 MB); scavenges: 16 vs 20",
+   "lesson_says": "sets the maximum size of each half, in MB; they start small and grow",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "the-lost-update",
+   "title": "4 worker threads × 1,000,000 increments on one SharedArrayBuffer",
+   "software": "Node 22.22.0",
+   "real": "count[0] = count[0] + 1 ended at 1,071,043 and 1,858,163; Atomics.add at 4,000,000 and 4,000,000; Atomics.add on 5 returned 5",
+   "lesson_says": "plain: lost updates; atomic: exactly 4,000,000; Atomics.add returns the old value",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "fetch-and-add",
+   "title": "SharedArrayBuffer with and without COOP + COEP",
+   "software": "Chrome 154",
+   "real": "without the headers: typeof SharedArrayBuffer = undefined; with them: function (crossOriginIsolated true)",
+   "lesson_says": "needs a cross-origin isolated page (COOP and COEP headers)",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "ask-to-upgrade",
+   "title": "What the browser sends, and when onopen runs",
+   "software": "Chrome 154",
+   "real": "GET with Upgrade: websocket, Connection: Upgrade, a 16-byte key, version 13, Origin, and the page's cookie; \"connected\" logged after the 101, readyState 1",
+   "lesson_says": "Upgrade + Connection, 16 random bytes base64, version 13, cookies sent; onopen runs after the handshake",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "switching-protocols",
+   "title": "Sec-WebSocket-Accept for the RFC’s sample key",
+   "software": "Node 22.22.0",
+   "real": "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+   "lesson_says": "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "switching-protocols",
+   "title": "A wrong Sec-WebSocket-Accept",
+   "software": "Chrome 154",
+   "real": "open: false, error: true, close code 1006",
+   "lesson_says": "the browser refuses the connection",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "one-connection",
+   "title": "readyState during the handshake",
+   "software": "Chrome 154",
+   "real": "before: 0, in onopen: 1",
+   "lesson_says": "CONNECTING (0), then OPEN (1) when the 101 checks out",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "heartbeats",
+   "title": "The connection is cut without a close frame",
+   "software": "Chrome 154",
+   "real": "close code 1006",
+   "lesson_says": "the browser sees it close (code 1006)",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "heartbeats",
+   "title": "A ping from the server",
+   "software": "Chrome 154",
+   "real": "browser answered with opcode 10 carrying \"hb-1\"; messages seen by the page: 0",
+   "lesson_says": "the browser answers with a pong (opcode 10), automatically, hidden from JavaScript",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "switching-protocols",
+   "title": "A WebSocket to another origin",
+   "software": "Chrome 154",
+   "real": "page on 127.0.0.1 opened ws://localhost: true, Origin sent: http://127.0.0.1:61367",
+   "lesson_says": "the same-origin policy doesn’t stop other sites from opening WebSockets; check Origin",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "one-connection",
+   "title": "chat.js end to end",
+   "software": "Chrome 154",
+   "real": "server got {\"type\":\"join\",\"room\":42} then {\"type\":\"say\",\"text\":\"Sounds good\"}; render() got \"Lunch at noon?\"; console: closed with code 1000",
+   "lesson_says": "join on open, render each message, send on click, log the close code",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "silent-death",
+   "title": "Reconnect backoff against a server that is down",
+   "software": "Chrome 154",
+   "real": "waits: 0.96 s, 1.51 s, 3.80 s",
+   "lesson_says": "about 1 s, then 2, 4… with random jitter (the code waits 50–100% of 1, 2, 4 s)",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "server-sent-events",
+   "title": "EventSource: a GET, events, and a reconnect after a drop",
+   "software": "Chrome 154",
+   "real": "GET with Accept: text/event-stream; render got \"Lunch at noon?\"; after the server dropped the stream, the browser came back with Last-Event-ID: 18 and got \"Sounds good\"; POST body {\"room\":42,\"text\":\"Sounds good\"}",
+   "lesson_says": "an ordinary GET; if the stream drops, the browser reconnects by itself and sends Last-Event-ID",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "server-sent-events",
+   "title": "Seven EventSources to one HTTP/1.1 server, across two tabs",
+   "software": "Chrome 154",
+   "real": "the server saw 6 streams at once; readyStates 1, 1, 1, 1, 1, 1, 0",
+   "lesson_says": "about six connections per server, across all tabs",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "long-polling",
+   "title": "long-poll.js against a server that answers 204, then news",
+   "software": "Chrome 154",
+   "real": "requests with after = 17, 17, 18; after the 204 it asked again 1 ms later; render got id 18",
+   "lesson_says": "204: ask again immediately; then render and move the cursor",
+   "pass": true
+  },
+  {
+   "lesson": "processes-threads",
+   "step": "python-and-node",
+   "title": "worker_threads: the sum, and four at once",
+   "software": "Node 22.22.0",
+   "real": "printed 333333283333717100000; one worker 202 ms, four at once 201 ms",
+   "lesson_says": "real threads, each with its own heap; the result comes back as a message",
+   "pass": true
+  },
+  {
+   "lesson": "message-queues",
+   "step": "the-message-that-always-fails",
+   "title": "parseCharge on a good and a poison message",
+   "software": "Node 22.22.0",
+   "real": "good → {\"orderId\":7,\"amount\":12.5}; \"amount\": \"12\", three tries → TypeError: bad amount: 12",
+   "lesson_says": "a message with a bad amount throws, every time",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "enter-the-load-balancer",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "the-load-balancer-forwards-it",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "round-robin",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "least-connections",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "weighted",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "sticky-sessions",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "layer-7",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "health-checks",
+   "title": "HAProxy accepts the haproxy.cfg snippet",
+   "software": "HAProxy 3.4.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "layer-4",
+   "title": "HAProxy accepts the haproxy.cfg snippet",
+   "software": "HAProxy 3.4.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "playground",
+   "title": "nginx accepts every config the playground generates",
+   "software": "nginx 1.31.6",
+   "real": "72 variants accepted",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "round-robin",
+   "title": "Round robin order",
+   "software": "nginx 1.31.6",
+   "real": "web-1 web-2 web-3 web-1 web-2 web-3 web-1 web-2 web-3",
+   "lesson_says": "web-1 web-2 web-3 web-1 web-2 web-3 web-1 web-2 web-3",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "enter-the-load-balancer",
+   "title": "The whole idea: upstream + proxy_pass, over HTTPS",
+   "software": "nginx 1.31.6",
+   "real": "web-1 web-2 web-3 web-1 web-2 web-3",
+   "lesson_says": "web-1 web-2 web-3 web-1 web-2 web-3",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "the-load-balancer-forwards-it",
+   "title": "web-2 still learns who the visitor is",
+   "software": "nginx 1.31.6",
+   "real": "web-2 saw X-Forwarded-For: 127.0.0.1, Host: shop.example",
+   "lesson_says": "adds X-Forwarded-For with the visitor address",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "unequal-requests",
+   "title": "Round robin sends every heavy request to web-1",
+   "software": "nginx 1.31.6",
+   "real": "heavy requests went to web-1, web-1, web-1, web-1",
+   "lesson_says": "heavy requests went to web-1, web-1, web-1, web-1, web-1, web-1, web-1, web-1, web-1, web-1, web-1",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "least-connections",
+   "title": "New requests avoid the server that is still busy",
+   "software": "nginx 1.31.6",
+   "real": "web-1 busy with a slow request; the next six went to web-2, web-3, web-2, web-3, web-2, web-3",
+   "lesson_says": "new requests flow to web-2 and web-3 until web-1 catches up",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "weighted",
+   "title": "Weighted order, request by request",
+   "software": "nginx 1.31.6",
+   "real": "web-1 web-1 web-2 web-1 web-3 web-1 web-1 web-1 web-2 web-1 web-3 web-1",
+   "lesson_says": "web-1 web-1 web-2 web-1 web-3 web-1 web-1 web-1 web-2 web-1 web-3 web-1",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "sticky-sessions",
+   "title": "Same IP, same server, every time",
+   "software": "nginx 1.31.6",
+   "real": "Alice (198.51.100.42) → web-1; Bob (192.0.2.7) → web-1; Carol (198.51.100.73) → web-1",
+   "lesson_says": "Alice → web-2 (toy sum-of-numbers hash); Bob → web-1 (toy sum-of-numbers hash); Carol → web-3 (toy sum-of-numbers hash)",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "sticky-sessions",
+   "title": "ip_hash groups a whole /24 together",
+   "software": "nginx 1.31.6",
+   "real": "Alice and Carol (same first three numbers) both went to web-1",
+   "lesson_says": "the aside notes that NGINX only hashes the first three numbers",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "adding-a-server-reshuffles",
+   "title": "Going from 3 to 4 servers",
+   "software": "nginx 1.31.6",
+   "real": "ip_hash moved 78% of 200 visitors; hash … consistent moved 24%",
+   "lesson_says": "toy hash moves 79% (\"almost every user\"); consistent hashing about 1 in N",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "layer-4",
+   "title": "One connection, one server",
+   "software": "HAProxy 3.4.6",
+   "real": "mode tcp: six requests on one connection all went to web-3; mode http: web-1, web-2, web-3, web-1, web-2, web-3",
+   "lesson_says": "all of Alice's requests follow her connection (web-1 ×13)",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "layer-7",
+   "title": "/api/ and /media/ go to different pools",
+   "software": "nginx 1.31.6",
+   "real": "/api/cart → web-1, web-2, web-1, web-2; /media/hero.jpg → web-3, web-3",
+   "lesson_says": "/api/* → web-1, web-2; /media/* → web-3",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "What users get while the dead server is still in rotation",
+   "software": "HAProxy 3.4.6",
+   "real": "1 requests failed with 503, each after about 3.0 s of retries",
+   "lesson_says": "503 (after showing the retries)",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "Failed checks before the server is pulled",
+   "software": "HAProxy 3.4.6",
+   "real": "3 (DOWN 5.9 s after the crash)",
+   "lesson_says": "3 (pulled 5.5 s after the crash)",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "Errors once the server is out of rotation",
+   "software": "HAProxy 3.4.6",
+   "real": "0",
+   "lesson_says": "0",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "Passing checks before it gets traffic again",
+   "software": "HAProxy 3.4.6",
+   "real": "2 (UP 3.1 s after the reboot)",
+   "lesson_says": "2 (back 4.1 s after the reboot)",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "Every server down",
+   "software": "HAProxy 3.4.6",
+   "real": "503",
+   "lesson_says": "503 for everyone",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "A request in progress when its server dies",
+   "software": "HAProxy 3.4.6",
+   "real": "502 after 0.4 s",
+   "lesson_says": "502",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "A GET in progress when its server dies",
+   "software": "nginx 1.31.6",
+   "real": "200, finished by web-2 after 2.4 s",
+   "lesson_says": "200 (retried on another server)",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "With option redispatch, a refused request goes to another server",
+   "software": "HAProxy 3.4.6",
+   "real": "200 web-1, 200 web-3, 200 web-3, 200 web-3, 200 web-1, 200 web-3; slowest 1 ms",
+   "lesson_says": "HAProxy retries on another server too if you add option redispatch",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "playground",
+   "title": "One server crashes, the others are fine",
+   "software": "nginx 1.31.6",
+   "real": "0 errors in 118 requests; the retry cost at most 2 ms",
+   "lesson_says": "0 errors in 45 requests (NGINX retries the next server)",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "playground",
+   "title": "Every server down",
+   "software": "nginx 1.31.6",
+   "real": "502",
+   "lesson_says": "502",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "playground",
+   "title": "How often NGINX tries a dead server again",
+   "software": "nginx 1.31.6",
+   "real": "2 attempts in 13 s at 5 req/s, 11 s apart (the first at +-0 s)",
+   "lesson_says": "skipped for 10 s after each refusal",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "hit-ratio",
+   "title": "nginx accepts the nginx.conf · edge server snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "cache-keys",
+   "title": "nginx accepts the nginx.conf · edge snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "fingerprinting",
+   "title": "nginx accepts the nginx.conf · origin snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "flash-crowd",
+   "title": "nginx accepts the nginx.conf · origin snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "one-round-trip",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "resumption",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "downgrade-hsts",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "alt-svc",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "one-server-per-socket",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "life-of-a-request",
+   "step": "why-its-faster",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "processes-threads",
+   "step": "databases-and-web-servers",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "consistent-hashing",
+   "step": "a-server-leaves",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "playground",
+   "title": "nginx accepts every config the playground prints",
+   "software": "nginx 1.31.6",
+   "real": "18 variants accepted",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "playground",
+   "title": "nginx accepts every config the playground prints",
+   "software": "nginx 1.31.6",
+   "real": "8 variants accepted",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "first-request-misses",
+   "title": "Alice misses, Bob hits",
+   "software": "nginx 1.31.6",
+   "real": "MISS HIT; the origin was asked 1 time(s) for three requests",
+   "lesson_says": "1 miss then 1 hit; origin fetches: 1",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "cache-control",
+   "title": "public, max-age=31536000, immutable: kept",
+   "software": "nginx 1.31.6",
+   "real": "MISS HIT HIT",
+   "lesson_says": "MISS HIT HIT",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "hit-ratio",
+   "title": "No Cache-Control: proxy_cache_valid decides",
+   "software": "nginx 1.31.6",
+   "real": "MISS HIT HIT",
+   "lesson_says": "proxy_cache_valid 200 10m applies \"when the origin doesn't say\"",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "cache-control",
+   "title": "s-maxage is for shared caches",
+   "software": "nginx 1.31.6",
+   "real": "max-age=0, s-maxage=60: MISS HIT HIT",
+   "lesson_says": "s-maxage: a max-age just for shared caches like CDNs",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "cache-control",
+   "title": "no-cache at an nginx edge",
+   "software": "nginx 1.31.6",
+   "real": "MISS MISS MISS: never stored, 3 full fetches (0 conditional)",
+   "lesson_says": "the animation's edge keeps it and revalidates (MISS REVAL REVAL); the aside says nginx won't store no-cache at all",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "cache-control",
+   "title": "private passes straight through",
+   "software": "nginx 1.31.6",
+   "real": "MISS MISS MISS; orders of Carol / orders of Dave / orders of Carol",
+   "lesson_says": "BYPASS BYPASS BYPASS: only the browser may keep it",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "cache-control",
+   "title": "no-store: nobody keeps a copy",
+   "software": "nginx 1.31.6",
+   "real": "MISS MISS MISS",
+   "lesson_says": "no-store: nobody keeps a copy, anywhere",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "fresh-then-stale",
+   "title": "A stale copy is checked with the origin, not fetched again",
+   "software": "nginx 1.31.6",
+   "real": "MISS HIT REVAL HIT; origin saw: GET → 200, If-None-Match \"a1b2\" → 304; the stale request took 153 ms",
+   "lesson_says": "MISS HIT REVAL HIT: If-None-Match \"a1b2\", 304 Not Modified",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "stale-while-revalidate",
+   "title": "stale-while-revalidate answers at once and refreshes behind the scenes",
+   "software": "nginx 1.31.6",
+   "real": "MISS HIT STALE HIT; the stale answer took 1 ms; origin saw: GET → 200, If-None-Match \"a1b2\" → 304",
+   "lesson_says": "MISS HIT STALE HIT: the stale copy goes out at once while the edge refreshes",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "private-pages",
+   "title": "private: Carol and Dave each get their own page",
+   "software": "nginx 1.31.6",
+   "real": "orders of Carol (MISS), orders of Dave (MISS)",
+   "lesson_says": "0 leaks: every request goes to the origin",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "private-pages",
+   "title": "public, max-age=60: Dave gets Carol's orders",
+   "software": "nginx 1.31.6",
+   "real": "orders of Carol (MISS), orders of Carol (HIT)",
+   "lesson_says": "7 leaks in 20 s: the edge serves the first page it saw to both",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "even-uncacheable",
+   "title": "The edge keeps a warm connection to the origin",
+   "software": "nginx 1.31.6",
+   "real": "3 origin fetches over 1 connection(s)",
+   "lesson_says": "the edge keeps warm connections open to your origin",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "cache-keys",
+   "title": "Default key ($scheme$proxy_host$request_uri): every tracking tag is a new copy",
+   "software": "nginx 1.31.6",
+   "real": "MISS MISS HIT",
+   "lesson_says": "each variation misses (hit ratio 0% in the animation)",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "cache-keys",
+   "title": "proxy_cache_key $scheme$proxy_host$uri: the variants share one copy",
+   "software": "nginx 1.31.6",
+   "real": "MISS HIT HIT (judged by what reached the origin: 1 request(s) for 3)",
+   "lesson_says": "all variants share one key (hit ratio 96%)",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "cache-keys",
+   "title": "Vary: User-Agent keeps one copy per browser",
+   "software": "nginx 1.31.6",
+   "real": "4 user agents, twice each: MISS MISS MISS MISS HIT HIT HIT HIT",
+   "lesson_says": "Vary: User-Agent can split one file into thousands of copies",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "fingerprinting",
+   "title": "name.hash.js: cached for a year",
+   "software": "nginx 1.31.6",
+   "real": "app.3f9a.js and app.8c1e.js: Cache-Control: public, max-age=31536000, immutable / public, max-age=31536000, immutable",
+   "lesson_says": "public, max-age=31536000, immutable",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "fingerprinting",
+   "title": "The HTML: always check",
+   "software": "nginx 1.31.6",
+   "real": "Cache-Control: no-cache; a check with its ETag got 304",
+   "lesson_says": "no-cache: checked with the origin on every visit",
+   "pass": true
+  },
+  {
+   "lesson": "cdn",
+   "step": "flash-crowd",
+   "title": "Requests that skip the CDN are refused",
+   "software": "nginx 1.31.6",
+   "real": "from 198.51.100.7 (the CDN): 200; from 203.0.113.99: 403; from 127.0.0.1: 403; the app saw 1",
+   "lesson_says": "only the CDN's published ranges get through",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "one-round-trip",
+   "title": "TLS 1.3 by default, TLS 1.2 still allowed",
+   "software": "nginx 1.31.6",
+   "real": "Protocol: TLSv1.3; New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384; a TLS 1.2-only client got TLSv1.2",
+   "lesson_says": "ssl_protocols TLSv1.2 TLSv1.3",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "one-round-trip",
+   "title": "Round trips before the request can leave (after TCP)",
+   "software": "nginx 1.31.6",
+   "real": "TLS 1.3: 1, TLS 1.2: 2 (at 200 ms per round trip)",
+   "lesson_says": "TLS 1.3: 1, TLS 1.2: 2",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "one-round-trip",
+   "title": "First byte of the response (after TCP)",
+   "software": "nginx 1.31.6",
+   "real": "TLS 1.3: 2 round trips, TLS 1.2: 3",
+   "lesson_says": "TLS 1.3: 2, TLS 1.2: 3",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "one-round-trip",
+   "title": "TLS 1.2 sends the certificate in the clear, TLS 1.3 encrypts it",
+   "software": "nginx 1.31.6",
+   "real": "server's certificate readable on the wire: TLS 1.2 yes, TLS 1.3 no",
+   "lesson_says": "Certificate is \"clear\" in TLS 1.2, \"hs\" in TLS 1.3",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "three-goals",
+   "title": "Every encrypted TLS 1.3 record says \"application data\"",
+   "software": "nginx 1.31.6",
+   "real": "10 records from nginx, types 22, 20, 23; after the ServerHello: 8 records, all type 23: true, all version 0x0303: true",
+   "lesson_says": "17 03 03 …: type 23, and the real type is hidden inside",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "client-hello",
+   "title": "The SNI travels in the clear",
+   "software": "nginx 1.31.6",
+   "real": "\"shop.example\" readable in both ClientHellos",
+   "lesson_says": "server_name shop.example   # the SNI (in the clear)",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "resumption",
+   "title": "Coming back: resumed, and no certificate this time",
+   "software": "nginx 1.31.6",
+   "real": "Reused, TLSv1.3; certificate sent: first visit yes, return no",
+   "lesson_says": "both sides skip the certificate: that's resumption",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "resumption",
+   "title": "0-RTT: the request rides along with the ClientHello",
+   "software": "nginx 1.31.6",
+   "real": "Early data was accepted; the app got GET /account with Early-Data: 1 0.5 round trips after connecting",
+   "lesson_says": "request leaves after 0 TLS round trips; the answer comes in the server's first flight",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "resumption",
+   "title": "Only safe requests as early data",
+   "software": "nginx 1.31.6",
+   "real": "POST /buy as early data: the app saw Early-Data: 1 and answered 425",
+   "lesson_says": "the app answers 425 Too Early if unsafe",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "resumption",
+   "title": "A replayed 0-RTT first flight runs the request again",
+   "software": "nginx 1.31.6",
+   "real": "replaying Alice's first flight: the app ran GET /account (Early-Data: 1)",
+   "lesson_says": "answers GET early; GET /account served again",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "resumption",
+   "title": "Without early data, a replayed hello runs nothing",
+   "software": "nginx 1.31.6",
+   "real": "replaying a resumed hello without early data: the app ran 0 request(s)",
+   "lesson_says": "no keys, no data: nothing runs",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "playground",
+   "title": "Each live config against the diagram's round trips",
+   "software": "nginx 1.31.6",
+   "real": "http/full: first byte after 1 round trip(s) (diagram: 0 TLS round trips); tls12/full: TLSv1.2, return visit resumed: false, handshake 2 round trip(s) (diagram: 2 TLS round trips); tls12/ticket: TLSv1.2, return visit resumed: true, handshake 1 round trip(s) (diagram: 1 TLS round trips); tls13/full: TLSv1.3, return visit resumed: false, handshake 1 round trip(s) (diagram: 1 TLS round trips); tls13/ticket: TLSv1.3, return visit resumed: true, handshake 1 round trip(s) (diagram: 1 TLS round trips); tls13/0rtt: Early data was accepted (diagram: 0 TLS round trips)",
+   "lesson_says": "New: tickets off; Resumed: tickets on; 0-RTT: ssl_early_data on",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "downgrade-hsts",
+   "title": "Plain http only ever redirects",
+   "software": "nginx 1.31.6",
+   "real": "< HTTP/1.1 301 Moved Permanently, < Location: https://shop.example/login",
+   "lesson_says": "return 301 https://$host$request_uri",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "downgrade-hsts",
+   "title": "Every HTTPS answer carries the header, even an error",
+   "software": "nginx 1.31.6",
+   "real": "< HTTP/1.1 404 Not Found with < Strict-Transport-Security: max-age=63072000; includeSubDomains; preload",
+   "lesson_says": "add_header Strict-Transport-Security \"max-age=63072000; includeSubDomains; preload\" always",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "downgrade-hsts",
+   "title": "Once seen, http:// becomes https:// before anything is sent",
+   "software": "nginx 1.31.6",
+   "real": "Switched from HTTP to HTTPS due to HSTS => https://shop.example/login; connections to the port-80 server: 0; remembered for 729 days, subdomains too",
+   "lesson_says": "the browser rewrites every http:// to https:// before sending anything; max-age=63072000 is two years",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "chain-of-trust",
+   "title": "The abridged s_client output, line by line",
+   "software": "nginx 1.31.6, OpenSSL 4.0.2",
+   "real": "all 17 lines, in order (OpenSSL 4.0.2)",
+   "lesson_says": "17 lines of OpenSSL output",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "fake-certificates",
+   "title": "Mallory's three certificates",
+   "software": "nginx 1.31.6, OpenSSL 4.0.2",
+   "real": "verify error:num=18:self-signed certificate | verify error:num=62:hostname mismatch | verify error:num=10:certificate has expired",
+   "lesson_says": "verify error:num=18:self-signed certificate | verify error:num=62:hostname mismatch | verify error:num=10:certificate has expired",
+   "pass": true
+  },
+  {
+   "lesson": "tls",
+   "step": "what-eve-sees",
+   "title": "With ECH, the wire shows only the front server's name",
+   "software": "nginx 1.31.6 (ssl_ech_file), OpenSSL 4.0.2",
+   "real": "with ECH: ech=SUCCESS outer=cdn.example name=shop.example, without: ech=NOT_TRIED; \"shop.example\" on the wire: with ECH no, without yes",
+   "lesson_says": "outer SNI cdn.example · real hello encrypted · TLS 1.3 · x25519 share (ECH off: SNI shop.example · TLS 1.3 · x25519 share)",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "alt-svc",
+   "title": "curl --http2 gets HTTP/2, chosen in the TLS handshake",
+   "software": "nginx 1.31.6",
+   "real": "HTTP/2 200; ALPN: server accepted h2; the same port also answered HTTP/1.1 200 OK",
+   "lesson_says": "listen 443 ssl + http2 on: HTTP/1.1 and HTTP/2 over TCP",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "alt-svc",
+   "title": "The response advertises HTTP/3",
+   "software": "nginx 1.31.6",
+   "real": "alt-svc: h3=\":443\"; ma=86400",
+   "lesson_says": "alt-svc: h3=\":443\"; ma=86400",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "alt-svc",
+   "title": "nginx listens on UDP for QUIC (HTTP/3 itself not tested: no HTTP/3 client here)",
+   "software": "nginx 1.31.6",
+   "real": "nginx holds the same port number over UDP",
+   "lesson_says": "listen 443 quic reuseport;   # HTTP/3 over UDP",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "alt-svc",
+   "title": "Only one listen line per address and port may say reuseport",
+   "software": "nginx 1.31.6",
+   "real": "two servers both saying reuseport: nginx: [emerg] duplicate listen options for 127.0.0.1:18443; only the first: accepted",
+   "lesson_says": "only one listen line per address and port may say reuseport",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "multiplexing",
+   "title": "HTTP/2 header names are lowercase",
+   "software": "nginx 1.31.6",
+   "real": "server, date, content-type, content-length, last-modified, etag, alt-svc, accept-ranges",
+   "lesson_says": "HTTP/2 header names are always lowercase",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "multiplexing",
+   "title": "Twelve files, one connection",
+   "software": "nginx 1.31.6",
+   "real": "12 responses (200) over 1 TCP connection(s), ALPN h2",
+   "lesson_says": "HTTP/2: 1 connection; HTTP/1.1: 6",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "multiplexing",
+   "title": "Slices of different files arrive interleaved",
+   "software": "nginx 1.31.6",
+   "real": "6 of 12 files had other files' data arrive in the middle of them",
+   "lesson_says": "the server interleaves slices of all the responses on the same connection",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "frames",
+   "title": "The browser numbers its streams 1, 3, 5…",
+   "software": "nginx 1.31.6",
+   "real": "1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23",
+   "lesson_says": "odd numbers from the browser, even ones belong to the server",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "handshakes",
+   "title": "TLS takes one round trip, the request another",
+   "software": "nginx 1.31.6",
+   "real": "tcp 0.000195  tls 0.203258  first byte 0.405293 at 200 ms per round trip: TLS 1, request 1 (the relay can't slow down TCP's own handshake)",
+   "lesson_says": "tcp 0.101  tls 0.203  first byte 0.305 at 100 ms; the animation opens the connection after 2 (TCP + TLS)",
+   "pass": true
+  },
+  {
+   "lesson": "http-versions",
+   "step": "playground",
+   "title": "What each live config does with two requests from curl --http2",
+   "software": "nginx 1.31.6",
+   "real": "h1.0: HTTP/1.1 200 OK, two files over 2 connection(s) (animation: 2 handshake(s)); h1.1: HTTP/1.1 200 OK, two files over 1 connection(s) (animation: 1 handshake(s)); h2: HTTP/2 200, two files over 1 connection(s) (animation: 1 handshake(s)); h3: HTTP/2 200, two files over 1 connection(s), Alt-Svc h3, UDP open (animation: 1 handshake(s))",
+   "lesson_says": "h1.0 closes after each response; h1.1 stays on HTTP/1.1; h2 and h3 speak HTTP/2 over TCP; h3 adds Alt-Svc and QUIC",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "one-server-per-socket",
+   "title": "The handshake: 101 Switching Protocols",
+   "software": "nginx 1.31.6",
+   "real": "101, Upgrade: websocket, Sec-WebSocket-Accept correct",
+   "lesson_says": "the upgrade request passes through; the server answers 101",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "one-server-per-socket",
+   "title": "Messages both ways, and a ping answered by a pong",
+   "software": "nginx 1.31.6",
+   "real": "opened: true; server said \"hello from ws-2\", then \"echo: hi (ws-2)\"; pongs back: 1",
+   "lesson_says": "a two-way pipe; the browser answers pings with pongs on its own",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "one-server-per-socket",
+   "title": "Without the Upgrade and Connection lines",
+   "software": "nginx 1.31.6",
+   "real": "the handshake failed; the chat server got a plain GET (Upgrade header: none) and answered 426",
+   "lesson_says": "nginx drops them (they are hop-by-hop) and the handshake fails",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "one-server-per-socket",
+   "title": "Restart ws-1: its users move to ws-2 and stay there",
+   "software": "nginx 1.31.6",
+   "real": "before: ws-1: 2, ws-2: 2; ws-1 closed its sockets with 1001, 1001; they reconnected to ws-2, ws-2; after ws-1 came back: ws-1: 0, ws-2: 4",
+   "lesson_says": "before: ws-1 2, ws-2 2; after the restart: ws-1 0, ws-2 4",
+   "pass": true
+  },
+  {
+   "lesson": "consistent-hashing",
+   "step": "a-server-leaves",
+   "title": "Remove one of five servers: hash $uri consistent",
+   "software": "nginx 1.31.6",
+   "real": "moved 19%, 21%, 17%, 19%, 23% of 600 URIs (one run per server removed)",
+   "lesson_says": "about 1/N = 20%; the lesson's one-seat ring moves 19%, 22%, 16%, 20%, 23% (average 20%)",
+   "pass": true
+  },
+  {
+   "lesson": "consistent-hashing",
+   "step": "a-server-leaves",
+   "title": "Remove one of five servers: plain hash $uri (mod N)",
+   "software": "nginx 1.31.6",
+   "real": "moved 81%, 81%, 82%, 81%, 79%",
+   "lesson_says": "about 4 in 5; the lesson's hash mod N moves 80%",
+   "pass": true
+  },
+  {
+   "lesson": "consistent-hashing",
+   "step": "a-server-leaves",
+   "title": "cache-b crashes but stays in the list",
+   "software": "nginx 1.31.6",
+   "real": "consistent: 21% moved, 0 of them not cache-b's; plain hash: 20% moved, 0 not cache-b's; errors: 0",
+   "lesson_says": "its keys continue to the next server; every other key stays (the note: a crashed server that stays listed only loses its own keys)",
+   "pass": true
+  },
+  {
+   "lesson": "processes-threads",
+   "step": "databases-and-web-servers",
+   "title": "worker_processes auto",
+   "software": "nginx 1.31.6",
+   "real": "1 master (1 thread) + 15 workers on 15 cores, 1 thread each; event method kqueue",
+   "lesson_says": "a master and one single-threaded worker per core (the animation: 1 master + 2 workers on 2 cores)",
+   "pass": true
+  },
+  {
+   "lesson": "life-of-a-request",
+   "step": "why-its-faster",
+   "title": "Cache-Control on the cart and on the assets",
+   "software": "nginx 1.31.6",
+   "real": "/cart: no-store; /app.3f9a1c.css: public, max-age=31536000, immutable; /app.js: public, max-age=31536000, immutable",
+   "lesson_says": "Cache-Control: no-store on /cart; max-age=31536000, immutable on app.css and app.js",
+   "pass": true
+  },
+  {
+   "lesson": "life-of-a-request",
+   "step": "why-its-faster",
+   "title": "A minute later, the connection is still open",
+   "software": "nginx 1.31.6",
+   "real": "/cart: no-store; after 64 s idle, the same connection answered again: /app.3f9a1c.css with public, max-age=31536000, immutable",
+   "lesson_says": "keepalive_timeout 75s: the server hasn't closed it yet",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "one-server-per-socket",
+   "title": "proxy_read_timeout 3600s keeps an idle socket open",
+   "software": "nginx 1.31.6",
+   "real": "still open",
+   "lesson_says": "the load balancer must allow long idle times",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "heartbeats",
+   "title": "Without it, nginx cuts an idle socket at 60 s",
+   "software": "nginx 1.31.6",
+   "real": "closed after 60 s of silence, code 1006",
+   "lesson_says": "the 60-second default of nginx's proxy_read_timeout; the browser sees code 1006",
+   "pass": true
+  },
+  {
+   "lesson": "websockets",
+   "step": "heartbeats",
+   "title": "Pings every 20 s keep it open under the 60 s default",
+   "software": "nginx 1.31.6",
+   "real": "still open; 3 pongs came back",
+   "lesson_says": "real servers ping every 20 to 30 seconds, comfortably inside the 60-second default",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "the-leader-streams-its-log",
+   "title": "PostgreSQL accepts every setting in the postgresql.conf snippet",
+   "software": "PostgreSQL 14.15",
+   "real": "wal_level = replica; max_wal_senders = 10; primary_conninfo = host=10.0.2.11 user=replicator application_name=db2",
+   "lesson_says": "wal_level = replica; max_wal_senders = 10; primary_conninfo = 'host=10.0.2.11 user=replicator application_name=db2'",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "who-waits-for-whom",
+   "title": "PostgreSQL accepts every setting in the postgresql.conf · on the leader snippet",
+   "software": "PostgreSQL 14.15",
+   "real": "synchronous_standby_names = FIRST 1 (db2); synchronous_commit = on; synchronous_commit = remote_apply; synchronous_commit = local",
+   "lesson_says": "synchronous_standby_names = 'FIRST 1 (db2)'; synchronous_commit = on; synchronous_commit = remote_apply; synchronous_commit = local",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "one-sync-rest-async",
+   "title": "PostgreSQL accepts every setting in the replication settings snippet",
+   "software": "PostgreSQL 14.15",
+   "real": "synchronous_standby_names = FIRST 1 (db2, db3); synchronous_standby_names = ANY 1 (db2, db3, db4)",
+   "lesson_says": "synchronous_standby_names = 'FIRST 1 (db2, db3)'; synchronous_standby_names = 'ANY 1 (db2, db3, db4)'",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "copies-dont-add-room",
+   "title": "PostgreSQL accepts every setting in the postgresql.conf · on each replica snippet",
+   "software": "PostgreSQL 14.15",
+   "real": "primary_conninfo = host=10.0.2.10 user=replicator; hot_standby = on",
+   "lesson_says": "primary_conninfo = 'host=10.0.2.10 user=replicator'; hot_standby = on",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "playground",
+   "title": "PostgreSQL accepts every config the playground shows",
+   "software": "PostgreSQL 14.15",
+   "real": "19 configs, 11 distinct settings, all accepted (e.g. synchronous_standby_names = 'FIRST 1 (db2)'; synchronous_standby_names = 'FIRST 1 (db3)'; synchronous_standby_names = 'FIRST 1 (db1)')",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "the-leader-streams-its-log",
+   "title": "A follower set up with the lesson’s lines streams and replays",
+   "software": "PostgreSQL 14.15",
+   "real": "db2 streams as application_name db2 (user replicator, streaming); the $50 deposit showed up on db2 (alice = 150); 2 WAL sender processes for 2 followers",
+   "lesson_says": "the leader streams its log; each follower replays it in order; one sender process per follower",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "spread-the-reads",
+   "title": "Followers answer reads but refuse writes",
+   "software": "PostgreSQL 14.15",
+   "real": "read alice = 150; UPDATE → ERROR 25006: cannot execute UPDATE in a read-only transaction",
+   "lesson_says": "Followers can’t take writes, but they can answer reads.",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "the-leader-streams-its-log",
+   "title": "standby.signal: \"you are a follower\"",
+   "software": "PostgreSQL 14.15",
+   "real": "db2 (with the file) is in recovery: t; the same kind of clone without it started as a leader (pg_is_in_recovery() = f)",
+   "lesson_says": "...plus an empty standby.signal file: \"you are a follower\"",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "the-leader-streams-its-log",
+   "title": "What pg_basebackup -R writes for you",
+   "software": "PostgreSQL 14.15",
+   "real": "an empty standby.signal and primary_conninfo (host, port, user…); application_name only when passed with -d; without it the follower streamed as \"walreceiver\", and FIRST 1 (db3) left a commit waiting",
+   "lesson_says": "pg_basebackup -R writes the follower settings; the note: application_name only if you pass one, otherwise commits just wait",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "one-leader-orders-the-writes",
+   "title": "Every write moves the log position forward",
+   "software": "PostgreSQL 14.15",
+   "real": "pg_current_wal_lsn() 0/175E098 → 0/175E108 after the UPDATE: 112 bytes of log",
+   "lesson_says": "LSNs are byte positions in the log, like 0/3000148",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "followers-run-behind",
+   "title": "A follower held up by a long query falls behind",
+   "software": "PostgreSQL 14.15",
+   "real": "db3's replay waited for the report; worst replay_lag: db2 0.000 s, db3 2.31 s; the lesson's query returned 127.0.0.1 | streaming | ; 127.0.0.1 | streaming | 00:00:02.309829",
+   "lesson_says": "db3 lags (80 ms vs 15 ms for db2); lag grows to seconds while a long-running query holds up replay",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "where-did-my-deposit-go",
+   "title": "Alice reads her balance from a lagging follower right after depositing",
+   "software": "PostgreSQL 14.15",
+   "real": "deposit UPDATE 1 on the leader; db-3 (behind) returned 100, db-2 returned 150",
+   "lesson_says": "\"What does db-3 return?\" → old: db-3 has only replayed up to #100. The deposit is #102, still on its way, so Alice sees $100.",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "read-your-own-writes",
+   "title": "Waiting for her LSN",
+   "software": "PostgreSQL 14.15",
+   "real": "pg_last_wal_replay_lsn() >= '0/4000128': f on db-3, true on db-2; once db-3 passed it (1 ms after replay resumed) the read returned 150",
+   "lesson_says": "stale reads: any follower 2/4, leader after a write 0/4, wait for her LSN 0/4",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "dont-go-back-in-time",
+   "title": "Monotonic reads: random followers vs. one follower",
+   "software": "PostgreSQL 14.15",
+   "real": "db-2, db-3, db-2: 125 → 105 → 125 (back 1×); always db-3: 105 → 105 → 130 → 135 (back 0×)",
+   "lesson_says": "random follower: back in time 3× in 40 s; the same follower: 0×",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "who-waits-for-whom",
+   "title": "Asynchronous is the default",
+   "software": "PostgreSQL 14.15",
+   "real": "PostgreSQL: synchronous_standby_names = '', the follower's sync_state is async; MySQL 9.2.0: rpl_semi_sync_source_enabled defaults to FALSE",
+   "lesson_says": "Asynchronous, the default in Postgres and MySQL",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "who-waits-for-whom",
+   "title": "synchronous_commit = on",
+   "software": "PostgreSQL 14.15",
+   "real": "with db2's replay paused the commit returned in 5 ms: db2 had flushed it (true) but a read there still showed 100",
+   "lesson_says": "on: wait until db2 has flushed the entry to disk",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "who-waits-for-whom",
+   "title": "synchronous_commit = remote_apply",
+   "software": "PostgreSQL 14.15",
+   "real": "waited while replay was paused (true), returned after it resumed; right after, db2 showed bob = 81",
+   "lesson_says": "remote_apply: wait until db2 has replayed it (so reads there see it)",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "who-waits-for-whom",
+   "title": "synchronous_commit = local",
+   "software": "PostgreSQL 14.15",
+   "real": "with db2 down, the commit returned in 0 ms",
+   "lesson_says": "local: don’t wait for any standby at all",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "who-waits-for-whom",
+   "title": "Copies that exist when COMMIT comes back",
+   "software": "PostgreSQL 14.15",
+   "real": "sync: only after db2 had the entry (2 copies); async: in 1 ms with db2 down (1 copy)",
+   "lesson_says": "sequence diagram: 2 copies at COMMIT when sync, 1 when async",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "when-the-sync-follower-dies",
+   "title": "The next writes after db-2 crashes",
+   "software": "PostgreSQL 14.15",
+   "real": "both still waiting after 1.5 s, no error; the lesson's query: 76551 | SyncRep | active; 76552 | SyncRep | active",
+   "lesson_says": "prediction: \"What happens to this write?\" → wait (The leader promised never to confirm a write until db-2 has it. So it wrote the change locally and now it waits. Every write after it waits too.); commits stalled (1 → 1), 7 waiting, 0 errors",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "when-the-sync-follower-dies",
+   "title": "db-2 comes back",
+   "software": "PostgreSQL 14.15",
+   "real": "both commits returned (UPDATE 1, UPDATE 1) 117 ms after db-2 was started",
+   "lesson_says": "the stuck writes commit in a burst (8 commits right after db-2 revives)",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "when-the-sync-follower-dies",
+   "title": "Clearing synchronous_standby_names",
+   "software": "PostgreSQL 14.15",
+   "real": "a stuck commit returned right after the reload (UPDATE 1)",
+   "lesson_says": "releases every stuck commit at once (5 waiting → 0)",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "when-the-sync-follower-dies",
+   "title": "Cancelling a stuck commit",
+   "software": "PostgreSQL 14.15",
+   "real": "WARNING: canceling wait for synchronous replication due to user request DETAIL: The transaction has already committed locally, but might not have been replicated to the standby. (the client still got UPDATE 1)",
+   "lesson_says": "The transaction has already committed locally, but might not have been replicated to the standby.",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "one-sync-rest-async",
+   "title": "FIRST 1 (db2, db3) with every follower up",
+   "software": "PostgreSQL 14.15",
+   "real": "db2 sync, db3 potential, db4 async",
+   "lesson_says": "db2 sync, db3 potential, db4 async",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "one-sync-rest-async",
+   "title": "db-2 crashes",
+   "software": "PostgreSQL 14.15",
+   "real": "db3 sync, db4 async; the next commit took 10 ms",
+   "lesson_says": "db3 sync, db4 async; 4 commits in the next 5 s",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "one-sync-rest-async",
+   "title": "db-2 and db-3 both down",
+   "software": "PostgreSQL 14.15",
+   "real": "a commit waited (true) until db-3 came back, then returned",
+   "lesson_says": "0 commits in 5 s: writes stall again",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "one-sync-rest-async",
+   "title": "ANY 1 (db2, db3, db4)",
+   "software": "PostgreSQL 14.15",
+   "real": "db2 quorum, db3 quorum, db4 quorum; with db2 and db3 down a commit took 3 ms: db4 was enough",
+   "lesson_says": "db2 quorum, db3 quorum, db4 quorum; 4 commits in 5 s with db2 and db3 down",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "who-takes-over",
+   "title": "Which follower to promote",
+   "software": "PostgreSQL 14.15",
+   "real": "received/replayed: db2 0/40056B0 / 0/4005640, db3 0/40055D0 / 0/40055D0; promoted db2 (pg_promote → t); it replayed the entry it had received but not applied (alice 140, bob 100)",
+   "lesson_says": "promote the follower with the most complete log (the animation: \"db-3 has #105, the newest log position. Promoting it throws away the fewest writes.\"); promotion applies everything it received (applied #109 of #109)",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "writes-that-vanish",
+   "title": "Async: confirmed writes that never left the leader",
+   "software": "PostgreSQL 14.15",
+   "real": "db-1 confirmed 2 more writes (UPDATE 1, UPDATE 1; alice 200, bob 70) that no follower had; after the failover db-2 has alice 140, bob 100: 2 confirmed writes gone",
+   "lesson_says": "async replay: 1 confirmed write(s) lost in the failover",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "fencing",
+   "title": "The failover starts a new term",
+   "software": "PostgreSQL 14.15",
+   "real": "db-2 now runs on timeline 2 (was 1); db-3, re-pointed at it, caught up (alice 140, bob 100)",
+   "lesson_says": "every failover bumps the term (term 2 after the promotion)",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "split-brain",
+   "title": "The old leader reboots as a leader",
+   "software": "PostgreSQL 14.15",
+   "real": "pg_is_in_recovery() = f; app-2's write → UPDATE 1; the promoted db-2 took a write too (UPDATE 1); db-1 has alice 200, bob 77; db-2 has alice 100, bob 100",
+   "lesson_says": "2 leaders, each with its own balances",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "fencing",
+   "title": "pg_rewind without --write-recovery-conf",
+   "software": "PostgreSQL 14.15",
+   "real": "rewound (exit 0) and started with pg_is_in_recovery() = f: a leader again",
+   "lesson_says": "note: without --write-recovery-conf, the rewound node starts up as a leader again",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "fencing",
+   "title": "pg_rewind needs wal_log_hints",
+   "software": "PostgreSQL 14.15",
+   "real": "on a copy last run with wal_log_hints = off: pg_rewind: fatal: target server needs to use either data checksums or \"wal_log_hints = on\"",
+   "lesson_says": "note: pg_rewind needs wal_log_hints = on (or data checksums), set before the failover",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "fencing",
+   "title": "The lesson’s pg_rewind command",
+   "software": "PostgreSQL 14.15",
+   "real": "exit 0; db-1 came back with pg_is_in_recovery() = t, following db-2: alice 100, bob 100 (db-2: 100, 100); its own writes are gone; app-2's write → ERROR 25006 cannot execute UPDATE in a read-only transaction",
+   "lesson_says": "db-1 steps down (follower), throws away what nobody else has, follows db-2 and refuses writes; 1 leader, 1 read-only error(s)",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "writes-that-vanish",
+   "title": "Sync to db-2: the failover keeps every confirmed write",
+   "software": "PostgreSQL 14.15",
+   "real": "3 confirmed writes, all on db-2 after the failover (alice 130); the write caught mid-commit got an error (57P01: terminating connection due to immediate shutdown command)",
+   "lesson_says": "sync replay: 0 confirmed writes lost; 11 writes failed loudly with an error",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "single-point-of-failure",
+   "title": "Crash, then restart",
+   "software": "PostgreSQL 14.15",
+   "real": "while down: connect ECONNREFUSED 127.0.0.1:65335; after the restart all 200 committed deposits were there (alice 300)",
+   "lesson_says": "every query fails while it's down (8 errors); after a restart the data is intact, only downtime was lost",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "multi-leader",
+   "title": "Two leaders inserting at the same time",
+   "software": "MySQL 9.2.0",
+   "real": "us-east got 1, 3, 5, eu-west 2, 4, 6; after replicating both ways each had 1:us 2:eu 3:us 4:eu 5:us 6:eu, no duplicate-key error; later inserts continued from the highest ID seen (us-east 7, eu-west 8)",
+   "lesson_says": "us-east: 1, 3, 5… (eu-west uses 2: 2, 4, 6…)",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "multi-leader",
+   "title": "A write conflict between two MySQL leaders",
+   "software": "MySQL 9.2.0",
+   "real": "us-east ended with 120, eu-west with 150: each applied the other's row over its own; replication kept running with no error on either side",
+   "lesson_says": "note: MySQL doesn’t resolve conflicts; the leaders can end up with different balances and nothing reports an error (the animation's generic leaders use last write wins: both → $120)",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "followers-run-behind",
+   "title": "Seconds_Behind_Source while a long transaction holds up the replica",
+   "software": "MySQL 9.2.0",
+   "real": "Seconds_Behind_Source rose to 4 while a 3.5 s transaction on the replica held the row, then went back to 0",
+   "lesson_says": "SHOW REPLICA STATUS; -- Seconds_Behind_Source: 2",
+   "pass": true
+  },
+  {
+   "lesson": "replication",
+   "step": "one-sync-rest-async",
+   "title": "MySQL semi-sync, then the timeout",
+   "software": "MySQL 9.2.0",
+   "real": "semi-sync ON with 1 replica; a commit took 15 ms. Replica stopped: the next commit took 10.0 s, semi-sync switched OFF, the one after took 15 ms; ON again once the replica reconnected. Default timeout 10000 ms. Without plugin-load-add, mysqld refuses the lines: unknown variable 'rpl_semi_sync_source_enabled=1'.",
+   "lesson_says": "the leader waits until at least one replica has the entry; gives up after a timeout (10 seconds by default) and falls back to async",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "copies-dont-add-room",
+   "title": "A replica holds all the data and replays every write",
+   "software": "PostgreSQL 14.15",
+   "real": "after 20,000 inserts on the primary, orders (heap + index) is 1640 kB on both, byte for byte the same size; the replica served SELECT count(*) = 20000 and refused an INSERT (25006)",
+   "lesson_says": "every replica holds all of the data, so its disk is as full as the primary’s, and replays every write",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "split-the-rows",
+   "title": "The slice on shard-0",
+   "software": "PostgreSQL 14.15",
+   "real": "min, max on shard-0: alice | frank; 12 + 12 + 11 + 10 users over 4 shards, each exactly once",
+   "lesson_says": "-- alice | frank",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "what-hashing-costs",
+   "title": "queries.sql on four hash partitions",
+   "software": "PostgreSQL 14.15",
+   "real": "customer_id = 1042 → 1 of 4 partitions; created_at >= '2026-09-01' → 4 of 4",
+   "lesson_says": "-- 1 shard / -- every shard",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "keep-related-together",
+   "title": "How many shards each prediction query needs",
+   "software": "PostgreSQL 14.15",
+   "real": "customer_id = 42 → 1; order_id = 90017 → 4; created_at >= '2026-09-01' → 4; customer_id = 1042 AND status = 'paid' → 1; ORDER BY total DESC LIMIT 5 → 4",
+   "lesson_says": "customer_id = 42 → 1; order_id = 90017 → all; created_at >= '2026-09-01' → all; customer_id = 1042 AND status = 'paid' → 1; ORDER BY total DESC LIMIT 5 → all",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "pick-a-key",
+   "title": "Range of created_at instead",
+   "software": "PostgreSQL 14.15",
+   "real": "the report → 1 partition, customer_id = 42 → 4; 500 orders created today all went to orders_y2026",
+   "lesson_says": "the report asks 1 shard, Alice’s orders all 4, and every new write hits the 2026 shard",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "directory",
+   "title": "Give acme its own shard",
+   "software": "PostgreSQL 14.15",
+   "real": "acme → 0; UPDATE 1; acme → 4; everyone else unchanged (birch→1 cove→2 dune→3 echo→0 fern→1 gale→2 halo→3)",
+   "lesson_says": "acme → 0, then one entry flips to acme → 4; no other tenant moves",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "scatter-gather",
+   "title": "Merging partial results",
+   "software": "PostgreSQL 14.15",
+   "real": "avg over all rows 27.2060; sum of sums / sum of counts 27.2060; average of the four averages 402.0000",
+   "lesson_says": "sum of the sums / sum of the counts; you can’t average the averages",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "transactions",
+   "title": "Needs max_prepared_transactions > 0",
+   "software": "PostgreSQL 14.15",
+   "real": "with the default: 55000: prepared transactions are disabled",
+   "lesson_says": "Needs max_prepared_transactions > 0.",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "transactions",
+   "title": "The coordinator crashes after both votes",
+   "software": "PostgreSQL 14.15",
+   "real": "phase 1: BEGIN, UPDATE 1, PREPARE TRANSACTION, BEGIN, UPDATE 1, PREPARE TRANSACTION; after the crash both shards still hold transfer-7731 and transfer-7731; a write to alice waited; after restarting shard-0 it was still prepared (transfer-7731) and writes still waited (true)",
+   "lesson_says": "the shards wait in doubt, holding their locks (animation: both \"in doubt: wait\", locks held)",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "transactions",
+   "title": "Reads during the doubt",
+   "software": "PostgreSQL 14.15",
+   "real": "a plain SELECT on alice returned 100 in 3 ms while an UPDATE waited",
+   "lesson_says": "Any write to Alice’s or Bob’s row is stuck behind those locks. Plain reads still get the old balances.",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "transactions",
+   "title": "The coordinator restarts and commits",
+   "software": "PostgreSQL 14.15",
+   "real": "COMMIT PREPARED, COMMIT PREPARED; the waiting write went through (UPDATE 1); alice 51, bob 130",
+   "lesson_says": "it finishes the commit; nothing lost (animation: COMMIT sent, locks released)",
+   "pass": true
+  },
+  {
+   "lesson": "sharding",
+   "step": "one-machine",
+   "title": "What the psql command prints",
+   "software": "PostgreSQL 14.15",
+   "real": "on a small table it printed \"120 kB\"; pg_size_pretty of 3212 GiB prints \"3212 GB\"",
+   "lesson_says": "3212 GB",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "check-then-act",
+   "title": "book.sql · racy: the same interleaving, step by step",
+   "software": "PostgreSQL 14.15",
+   "real": "A:RD(free) B:RD(free) A:IF(yes) B:IF(yes) A:WR(alice) B:WR(bob) → {\"seat\":\"bob\"}",
+   "lesson_says": "A:RD(free) B:RD(free) A:IF(yes) B:IF(yes) A:WR(alice) B:WR(bob) → {\"seat\":\"bob\"} (Both got a confirmation. The seat says bob.)",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "check-then-act",
+   "title": "book.sql · atomic: the same interleaving, step by step",
+   "software": "PostgreSQL 14.15",
+   "real": "A:BOOK(ok) B:BOOK(no) → {\"seat\":\"alice\"}",
+   "lesson_says": "A:BOOK(ok) B:BOOK(no) → {\"seat\":\"alice\"} (One booking (alice). The other was told it's sold out.)",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "double-spend",
+   "title": "withdraw.sql · racy: the same interleaving, step by step",
+   "software": "PostgreSQL 14.15",
+   "real": "A:SEL(100) B:SEL(100) A:IF(yes) B:IF(yes) A:UPD(20) B:UPD(20) → {\"balance\":20,\"version\":7}",
+   "lesson_says": "A:SEL(100) B:SEL(100) A:IF(yes) B:IF(yes) A:UPD(20) B:UPD(20) → {\"balance\":20,\"version\":7} (Paid out $160 from $100, balance says $20.)",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "double-spend",
+   "title": "withdraw.sql · pessimistic: the same interleaving, step by step",
+   "software": "PostgreSQL 14.15",
+   "real": "A:SEL(100) B:SEL(wait) A:IF(yes) A:UPD(20) A:COM B:SEL(20) B:IF(no) B:COM → {\"balance\":20,\"version\":7}; plain SELECT meanwhile: 100 in 2 ms",
+   "lesson_says": "A:SEL(100) B:SEL(wait) A:IF(yes) A:UPD(20) A:COM B:SEL(20) B:IF(no) B:COM → {\"balance\":20,\"version\":7} (Paid $80, balance $20. The books balance.)",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "double-spend",
+   "title": "withdraw.sql · optimistic: the same interleaving, step by step",
+   "software": "PostgreSQL 14.15",
+   "real": "A:SEL(100, 7) B:SEL(100, 7) A:IF(yes) B:IF(yes) A:UPD(ok) B:UPD(retry) B:SEL(20, 8) B:IF(no) → {\"balance\":20,\"version\":8}",
+   "lesson_says": "A:SEL(100, 7) B:SEL(100, 7) A:IF(yes) B:IF(yes) A:UPD(ok) B:UPD(retry) B:SEL(20, 8) B:IF(no) → {\"balance\":20,\"version\":8} (Paid $80, balance $20. The books balance.)",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "check-then-act",
+   "title": "Two conditional UPDATEs at the same moment",
+   "software": "PostgreSQL 14.15",
+   "real": "alice's UPDATE (not yet committed): UPDATE 1; bob's waited for it (true), then UPDATE 0; the seat is alice's",
+   "lesson_says": "the check and the write happen in one statement; the loser updates 0 rows",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "double-spend",
+   "title": "Isolation levels",
+   "software": "PostgreSQL 14.15",
+   "real": "default_transaction_isolation = read committed; under REPEATABLE READ both read 100 and 100, the first withdrawal committed, the second UPDATE got ERROR 40001: could not serialize access due to concurrent update; the retry read 20 and would refuse",
+   "lesson_says": "READ COMMITTED is PostgreSQL’s default and doesn’t stop it; under REPEATABLE READ the second update fails with a serialization error and the app retries",
+   "pass": true
+  },
+  {
+   "lesson": "race-conditions",
+   "step": "cheat-sheet",
+   "title": "FOR UPDATE: lock-order deadlocks",
+   "software": "PostgreSQL 14.15",
+   "real": "after 1001 ms one got ERROR 40P01: deadlock detected; the other got its row",
+   "lesson_says": "FOR UPDATE: watch out for lock-order deadlocks",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "burst-then-trickle",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted (limit_req_zone moved to the http level; wrapped in server {}; stub upstream backend)",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "leaky-bucket",
+   "title": "nginx accepts the nginx.conf snippet",
+   "software": "nginx 1.31.6",
+   "real": "accepted (added the \"api\" zone the lesson defined earlier; wrapped in server {}; stub upstream backend)",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "burst-then-trickle",
+   "title": "An idle client sends 20 requests at once",
+   "software": "nginx 1.31.6",
+   "real": "11 passed, 9 rejected (each burst reached nginx within 1 ms)",
+   "lesson_says": "11 (burst + 1); the lesson's token bucket on the same arrivals: 11",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "burst-then-trickle",
+   "title": "Then a steady 10 requests a second",
+   "software": "nginx 1.31.6",
+   "real": "15 of 31 passed, one every 200 ms on average: 5.0 per second",
+   "lesson_says": "5 per second; the lesson's token bucket: 15 of 31",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "burst-then-trickle",
+   "title": "Every decision, request by request",
+   "software": "nginx 1.31.6",
+   "real": "42 passed, 34 rejected of 76; after a 1 s pause 5 of 10, after 2.5 s 11 of 15",
+   "lesson_says": "token bucket of 11 refilling at 5/s: 0 disagreements (0 decided on the 1 ms clock difference)",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "burst-then-trickle",
+   "title": "Status of the rejected requests",
+   "software": "nginx 1.31.6",
+   "real": "429",
+   "lesson_says": "limit_req_status 429",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "burst-then-trickle",
+   "title": "The default status for a rejected request",
+   "software": "nginx 1.31.6",
+   "real": "11 × 200, 4 × 503",
+   "lesson_says": "default: 503",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "leaky-bucket",
+   "title": "15 requests at once",
+   "software": "nginx 1.31.6",
+   "real": "1 passed, 10 delayed, 4 rejected (each burst reached nginx in the same millisecond)",
+   "lesson_says": "leaky bucket with 10 slots: 1 passed, 10 delayed, 4 rejected",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "leaky-bucket",
+   "title": "Held requests go to the server at a fixed pace",
+   "software": "nginx 1.31.6",
+   "real": "23 releases, 199–201 ms apart (average 200.0 ms)",
+   "lesson_says": "one every 200 ms (\"exactly the configured rate\")",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "leaky-bucket",
+   "title": "Every decision and release time, request by request",
+   "software": "nginx 1.31.6",
+   "real": "2 passed, 22 delayed, 13 rejected; every release within 1 ms of the lesson's",
+   "lesson_says": "0 disagreements (0 decided on the 1 ms clock difference)",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "leaky-bucket",
+   "title": "Status when the bucket is full",
+   "software": "nginx 1.31.6",
+   "real": "429",
+   "lesson_says": "429 (limit_req_status 429)",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "burst-then-trickle",
+   "title": "How many client IPs a 10m zone remembers",
+   "software": "nginx 1.31.6",
+   "real": "remembered the last 81,017 of 200,000 IPv4 addresses, forgetting the oldest first (a 1m zone: 7,863)",
+   "lesson_says": "about 80,000",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "atomic-counters",
+   "title": "The Lua script on the animation's own request times",
+   "software": "Redis 7.2.5",
+   "real": "EVALSHA allowed 430 and denied 589 of 1019 requests from 5 steps (times in whole ms)",
+   "lesson_says": "the animation allowed 430: 0 disagreements; limiter.ts on the same times: 0",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "atomic-counters",
+   "title": "The Lua script on random arrivals",
+   "software": "Redis 7.2.5",
+   "real": "1200 requests into buckets of 5 @ 1/s, 11 @ 5/s and 5 @ 0.5/s",
+   "lesson_says": "limiter.ts: 0 disagreements",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "atomic-counters",
+   "title": "20 requests at the same moment from 4 gateways, bucket of 5",
+   "software": "Redis 7.2.5",
+   "real": "as one Lua script (EVALSHA): 5 allowed; as separate HMGET and HSET calls: 20 allowed",
+   "lesson_says": "Redis executes the script without interleaving any other command",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "atomic-counters",
+   "title": "GET, then SET, from two gateways at once",
+   "software": "Redis 7.2.5",
+   "real": "both read 4 and 4, 2 allowed, the counter says 5",
+   "lesson_says": "both read 4 and 4, \"both\" get through, the counter says 5",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "atomic-counters",
+   "title": "INCR from two gateways at once",
+   "software": "Redis 7.2.5",
+   "real": "replies 5 and 6: 1 allowed, 1 refused; counter 6",
+   "lesson_says": "replies 5 and 6: gw-1 allows, gw-2 sends a 429",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "distributed-counters",
+   "title": "Local counters: the most the scraper got through in one 10 s window",
+   "software": "Redis 7.2.5",
+   "real": "15 (gateway.js against a separate Redis per gateway)",
+   "lesson_says": "15 (\"15 per window, three times the limit\"); 0 of 131 decisions differ",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "distributed-counters",
+   "title": "Shared counter in Redis: the most the scraper got through in one 10 s window",
+   "software": "Redis 7.2.5",
+   "real": "5 (gateway.js, three gateways, one Redis); the counter's TTL was 10 s",
+   "lesson_says": "5 (\"the limit holds at 5\"); 0 of 129 decisions differ",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "sliding-window-log",
+   "title": "The boundary attack against the sliding log",
+   "software": "Redis 7.2.5",
+   "real": "6 bursts; the second of each pair got 0/5, 0/5, 0/5 through",
+   "lesson_says": "the second burst is rejected in full; 0 of 30 decisions differ from the animation",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "sliding-window-log",
+   "title": "The two timestamps and the expiry in the snippet",
+   "software": "Redis 7.2.5",
+   "real": "ZREMRANGEBYSCORE cuts at 1790424590000, ZADD scores 1790424600000: 10000 ms apart; PEXPIRE 10000; ZCARD of 4 then allowed 3 times",
+   "lesson_says": "10 s window; \"4 in the window: room for 1\"",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "sliding-window-log",
+   "title": "Two servers run the commands at once, 4 in the window",
+   "software": "Redis 7.2.5",
+   "real": "both counted 4 and 4, the set now holds 6",
+   "lesson_says": "\"two servers can both count 4 and both add\" without a Lua script",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "http-429",
+   "title": "Headers on a 429 from limit_req",
+   "software": "nginx 1.31.6",
+   "real": "9 × 429 with headers: connection, content-length, content-type, date, server",
+   "lesson_says": "a bare 429, no Retry-After or RateLimit headers",
+   "pass": true
+  },
+  {
+   "lesson": "rate-limiting",
+   "step": "backoff-and-jitter",
+   "title": "client.js waits for Retry-After in either form, else jitters",
+   "software": "Node 22.22.0 & nginx 1.31.6",
+   "real": "Retry-After: 4 → waited 4000 ms; an HTTP date 3 s ahead → 2064 ms; no header → 445 ms (random); against limit_req: 200 after 1 retries",
+   "lesson_says": "honor Retry-After (seconds or HTTP date); otherwise full jitter",
+   "pass": true
+  }
+ ]
+}

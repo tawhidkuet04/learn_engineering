@@ -224,18 +224,30 @@ function mulberry32(seed: number) {
 }
 
 /**
+ * The synthetic read trace behind the long-run numbers: `n` reads, each a
+ * popularity rank (0 = most popular), drawn from the Zipf weights.
+ */
+export function zipfTrace(keys: number, skew: number, n = 12000, seed = 7): number[] {
+  const w = zipfWeights(keys, skew);
+  const rnd = mulberry32(seed);
+  return Array.from({ length: n }, () => sampleRank(w, rnd()));
+}
+
+/** Reads skipped before counting hits, so a cold cache doesn't drag the long-run ratio down. */
+export const WARMUP_SHARE = 0.15;
+
+/**
  * Long-run hit ratio of a policy on the Zipf workload, measured by running
  * the real Cache over a long synthetic trace (after a warm-up).
  */
 export function longRunHitRatio(policy: Policy, size: number, keys: number, skew: number, n = 12000, seed = 7): number {
-  const w = zipfWeights(keys, skew);
-  const rnd = mulberry32(seed);
+  const trace = zipfTrace(keys, skew, n, seed);
   const c = new Cache(size, policy);
-  const warm = Math.floor(n * 0.15);
+  const warm = Math.floor(n * WARMUP_SHARE);
   let hits = 0;
   let count = 0;
   for (let i = 0; i < n; i++) {
-    const k = sampleRank(w, rnd());
+    const k = trace[i];
     const hit = c.get(k, i) != null;
     if (!hit) c.set(k, 0, i, 0);
     if (i >= warm) {

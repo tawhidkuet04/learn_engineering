@@ -190,11 +190,13 @@ clearTimeout(id);`,
               next.
             </p>
             <p>
-              The interval&apos;s <code>tick</code> gets no special treatment. It waits its turn behind your clicks: first come, first served.
+              The interval&apos;s <code>tick</code> gets no special treatment. It never interrupts a click handler: it waits for the stack to empty,
+              like every other task.
             </p>
             <Aside>
-              Browsers really keep several task queues (input, timers, networking…) and may favor some, often user input. What never changes: one task
-              at a time, and each runs to completion.
+              Browsers really keep several task queues (input, timers, networking…) and favor some. Chrome runs a waiting click before a timer that
+              came due earlier, so here a click can overtake a tick that is already queued. What never changes: one task at a time, and each runs to
+              completion.
             </Aside>
           </>
         ),
@@ -223,7 +225,7 @@ clearTimeout(id);`,
             </p>
             <p>
               The timer does expire at 100 ms, and its callback lands in the <Term k="q:task">task queue</Term> right on time. But it can&apos;t run
-              until the stack is empty, so it prints <code>timer 300</code>, not <code>timer 100</code>.
+              until the stack is empty, so it prints <code>timer 300</code> or a few ms more, never <code>timer 100</code>.
             </p>
             <p>
               The delay you pass to <code>setTimeout</code> is a <strong>minimum</strong>, not a promise. Every long task delays everything queued
@@ -298,7 +300,8 @@ setTimeout(() => {
           code: `!queueMicrotask(() => flushUpdates());
 promise.then(onDone).catch(onError);
 !await somePromise; // the rest of the function
-new MutationObserver(onChange);`,
+new MutationObserver(onChange)
+  .observe(list, { childList: true });`,
           note: 'All four run their callbacks as microtasks: queueMicrotask directly, promise reactions, the code after an await, and MutationObserver change records.',
         },
       },
@@ -364,7 +367,11 @@ new MutationObserver(onChange);`,
               Watch the <Term k="screen">screen</Term>: the box only moves when the loop passes the render step and paints. The dashed outline is where
               the DOM already says it is. Most turns skip rendering because no frame is due yet.
             </p>
-            <Aside>Time is slowed way down here. Frames are 16.7 ms apart, and a turn of the loop often takes a fraction of a millisecond.</Aside>
+            <Aside>
+              Time is slowed way down here. Frames are 16.7 ms apart, and a turn of the loop often takes a fraction of a millisecond. The timer&apos;s
+              task usually runs before the first frame, as it does here, but that isn&apos;t guaranteed: run the same code from a click handler and
+              Chrome paints the frame first, because it hurries a frame after input.
+            </Aside>
           </>
         ),
         legend: [L_SYNC, L_TASK, L_RENDER, L_LOOP],
@@ -555,12 +562,13 @@ function checkout() {
               so between chunks the loop can paint a frame and run any clicks that came in.
             </p>
             <p>
-              Switch strategies and compare the timelines. The total work is the same (it even takes a little longer), but the spinner keeps turning and
-              every click is handled within milliseconds.
+              Switch strategies and compare the timelines. The total work is the same (it even takes about a third longer), but the spinner keeps
+              turning and every click is handled within milliseconds.
             </p>
             <p>
-              Where it&apos;s supported (Chromium browsers first), <code>await scheduler.yield()</code> does this even better: your continuation goes
-              to the front of the queue instead of the back, so you stay responsive without losing your place.
+              Where it&apos;s supported (Chromium browsers first), <code>await scheduler.yield()</code> puts your continuation at the front of the
+              queue instead of the back. Clicks still get in and the work finishes sooner, but in Chrome it also goes ahead of rendering, so frames are
+              painted less often.
             </p>
           </>
         ),

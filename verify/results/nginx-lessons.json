@@ -1,0 +1,931 @@
+{
+  "file": "nginx-lessons",
+  "checks": [
+    {
+      "lesson": "cdn",
+      "step": "hit-ratio",
+      "title": "nginx accepts the nginx.conf · edge server snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > cdn / hit-ratio / nginx.conf · edge server"
+    },
+    {
+      "lesson": "cdn",
+      "step": "cache-keys",
+      "title": "nginx accepts the nginx.conf · edge snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > cdn / cache-keys / nginx.conf · edge"
+    },
+    {
+      "lesson": "cdn",
+      "step": "fingerprinting",
+      "title": "nginx accepts the nginx.conf · origin snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > cdn / fingerprinting / nginx.conf · origin"
+    },
+    {
+      "lesson": "cdn",
+      "step": "flash-crowd",
+      "title": "nginx accepts the nginx.conf · origin snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > cdn / flash-crowd / nginx.conf · origin"
+    },
+    {
+      "lesson": "tls",
+      "step": "one-round-trip",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > tls / one-round-trip / nginx.conf"
+    },
+    {
+      "lesson": "tls",
+      "step": "resumption",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > tls / resumption / nginx.conf"
+    },
+    {
+      "lesson": "tls",
+      "step": "downgrade-hsts",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > tls / downgrade-hsts / nginx.conf"
+    },
+    {
+      "lesson": "http-versions",
+      "step": "alt-svc",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > http-versions / alt-svc / nginx.conf"
+    },
+    {
+      "lesson": "websockets",
+      "step": "one-server-per-socket",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > websockets / one-server-per-socket / nginx.conf"
+    },
+    {
+      "lesson": "life-of-a-request",
+      "step": "why-its-faster",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > life-of-a-request / why-its-faster / nginx.conf"
+    },
+    {
+      "lesson": "processes-threads",
+      "step": "databases-and-web-servers",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > processes-threads / databases-and-web-servers / nginx.conf"
+    },
+    {
+      "lesson": "consistent-hashing",
+      "step": "a-server-leaves",
+      "title": "nginx accepts the nginx.conf snippet",
+      "software": "nginx 1.31.6",
+      "real": "accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > consistent-hashing / a-server-leaves / nginx.conf"
+    },
+    {
+      "lesson": "tls",
+      "step": "playground",
+      "title": "nginx accepts every config the playground prints",
+      "software": "nginx 1.31.6",
+      "real": "18 variants accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > TLS playground: every \"nginx.conf · live\" it can print"
+    },
+    {
+      "lesson": "http-versions",
+      "step": "playground",
+      "title": "nginx accepts every config the playground prints",
+      "software": "nginx 1.31.6",
+      "real": "8 variants accepted",
+      "pass": true,
+      "test": "every nginx snippet loads (nginx -t) > HTTP versions playground: every \"nginx.conf · live\" it can print"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "first-request-misses",
+      "title": "Alice misses, Bob hits",
+      "real": "MISS HIT; the origin was asked 1 time(s) for three requests",
+      "lesson_says": "1 miss then 1 hit; origin fetches: 1",
+      "pass": true,
+      "test": "CDN > a MISS, then HITs, and what Cache-Control lets the edge keep (first-request-misses, hit-ratio, cache-control)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "cache-control",
+      "title": "public, max-age=31536000, immutable: kept",
+      "real": "MISS HIT HIT",
+      "lesson_says": "MISS HIT HIT",
+      "pass": true,
+      "test": "CDN > a MISS, then HITs, and what Cache-Control lets the edge keep (first-request-misses, hit-ratio, cache-control)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "hit-ratio",
+      "title": "No Cache-Control: proxy_cache_valid decides",
+      "real": "MISS HIT HIT",
+      "lesson_says": "proxy_cache_valid 200 10m applies \"when the origin doesn't say\"",
+      "pass": true,
+      "test": "CDN > a MISS, then HITs, and what Cache-Control lets the edge keep (first-request-misses, hit-ratio, cache-control)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "cache-control",
+      "title": "s-maxage is for shared caches",
+      "real": "max-age=0, s-maxage=60: MISS HIT HIT",
+      "lesson_says": "s-maxage: a max-age just for shared caches like CDNs",
+      "pass": true,
+      "test": "CDN > a MISS, then HITs, and what Cache-Control lets the edge keep (first-request-misses, hit-ratio, cache-control)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "cache-control",
+      "title": "no-cache at an nginx edge",
+      "real": "MISS MISS MISS: never stored, 3 full fetches (0 conditional)",
+      "lesson_says": "the animation's edge keeps it and revalidates (MISS REVAL REVAL); the aside says nginx won't store no-cache at all",
+      "pass": true,
+      "test": "CDN > a MISS, then HITs, and what Cache-Control lets the edge keep (first-request-misses, hit-ratio, cache-control)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "cache-control",
+      "title": "private passes straight through",
+      "real": "MISS MISS MISS; orders of Carol / orders of Dave / orders of Carol",
+      "lesson_says": "BYPASS BYPASS BYPASS: only the browser may keep it",
+      "pass": true,
+      "test": "CDN > a MISS, then HITs, and what Cache-Control lets the edge keep (first-request-misses, hit-ratio, cache-control)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "cache-control",
+      "title": "no-store: nobody keeps a copy",
+      "real": "MISS MISS MISS",
+      "lesson_says": "no-store: nobody keeps a copy, anywhere",
+      "pass": true,
+      "test": "CDN > a MISS, then HITs, and what Cache-Control lets the edge keep (first-request-misses, hit-ratio, cache-control)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "fresh-then-stale",
+      "title": "A stale copy is checked with the origin, not fetched again",
+      "real": "MISS HIT REVAL HIT; origin saw: GET → 200, If-None-Match \"a1b2\" → 304; the stale request took 153 ms",
+      "lesson_says": "MISS HIT REVAL HIT: If-None-Match \"a1b2\", 304 Not Modified",
+      "pass": true,
+      "test": "CDN > stale copies: revalidated, or served while revalidating (fresh-then-stale, stale-while-revalidate)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "stale-while-revalidate",
+      "title": "stale-while-revalidate answers at once and refreshes behind the scenes",
+      "real": "MISS HIT STALE HIT; the stale answer took 1 ms; origin saw: GET → 200, If-None-Match \"a1b2\" → 304",
+      "lesson_says": "MISS HIT STALE HIT: the stale copy goes out at once while the edge refreshes",
+      "pass": true,
+      "test": "CDN > stale copies: revalidated, or served while revalidating (fresh-then-stale, stale-while-revalidate)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "private-pages",
+      "title": "private: Carol and Dave each get their own page",
+      "real": "orders of Carol (MISS), orders of Dave (MISS)",
+      "lesson_says": "0 leaks: every request goes to the origin",
+      "pass": true,
+      "test": "CDN > an account page: private stays private, public leaks (private-pages, even-uncacheable)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "private-pages",
+      "title": "public, max-age=60: Dave gets Carol's orders",
+      "real": "orders of Carol (MISS), orders of Carol (HIT)",
+      "lesson_says": "7 leaks in 20 s: the edge serves the first page it saw to both",
+      "pass": true,
+      "test": "CDN > an account page: private stays private, public leaks (private-pages, even-uncacheable)"
+    },
+    {
+      "lesson": "cdn",
+      "software": "nginx 1.31.6",
+      "step": "even-uncacheable",
+      "title": "The edge keeps a warm connection to the origin",
+      "real": "3 origin fetches over 1 connection(s)",
+      "lesson_says": "the edge keeps warm connections open to your origin",
+      "pass": true,
+      "test": "CDN > an account page: private stays private, public leaks (private-pages, even-uncacheable)"
+    },
+    {
+      "lesson": "cdn",
+      "step": "cache-keys",
+      "software": "nginx 1.31.6",
+      "title": "Default key ($scheme$proxy_host$request_uri): every tracking tag is a new copy",
+      "real": "MISS MISS HIT",
+      "lesson_says": "each variation misses (hit ratio 0% in the animation)",
+      "pass": true,
+      "test": "CDN > cache keys: the query string splits copies, $uri joins them (cache-keys)"
+    },
+    {
+      "lesson": "cdn",
+      "step": "cache-keys",
+      "software": "nginx 1.31.6",
+      "title": "proxy_cache_key $scheme$proxy_host$uri: the variants share one copy",
+      "real": "MISS HIT HIT (judged by what reached the origin: 1 request(s) for 3)",
+      "lesson_says": "all variants share one key (hit ratio 96%)",
+      "pass": true,
+      "test": "CDN > cache keys: the query string splits copies, $uri joins them (cache-keys)"
+    },
+    {
+      "lesson": "cdn",
+      "step": "cache-keys",
+      "software": "nginx 1.31.6",
+      "title": "Vary: User-Agent keeps one copy per browser",
+      "real": "4 user agents, twice each: MISS MISS MISS MISS HIT HIT HIT HIT",
+      "lesson_says": "Vary: User-Agent can split one file into thousands of copies",
+      "pass": true,
+      "test": "CDN > cache keys: the query string splits copies, $uri joins them (cache-keys)"
+    },
+    {
+      "lesson": "cdn",
+      "step": "fingerprinting",
+      "software": "nginx 1.31.6",
+      "title": "name.hash.js: cached for a year",
+      "real": "app.3f9a.js and app.8c1e.js: Cache-Control: public, max-age=31536000, immutable / public, max-age=31536000, immutable",
+      "lesson_says": "public, max-age=31536000, immutable",
+      "pass": true,
+      "test": "CDN > fingerprinted files get a year, the HTML gets no-cache (fingerprinting)"
+    },
+    {
+      "lesson": "cdn",
+      "step": "fingerprinting",
+      "software": "nginx 1.31.6",
+      "title": "The HTML: always check",
+      "real": "Cache-Control: no-cache; a check with its ETag got 304",
+      "lesson_says": "no-cache: checked with the origin on every visit",
+      "pass": true,
+      "test": "CDN > fingerprinted files get a year, the HTML gets no-cache (fingerprinting)"
+    },
+    {
+      "lesson": "cdn",
+      "step": "flash-crowd",
+      "title": "Requests that skip the CDN are refused",
+      "software": "nginx 1.31.6",
+      "real": "from 198.51.100.7 (the CDN): 200; from 203.0.113.99: 403; from 127.0.0.1: 403; the app saw 1",
+      "lesson_says": "only the CDN's published ranges get through",
+      "pass": true,
+      "test": "CDN > only the CDN may talk to the origin (flash-crowd)"
+    },
+    {
+      "lesson": "tls",
+      "step": "one-round-trip",
+      "software": "nginx 1.31.6",
+      "title": "TLS 1.3 by default, TLS 1.2 still allowed",
+      "real": "Protocol: TLSv1.3; New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384; a TLS 1.2-only client got TLSv1.2",
+      "lesson_says": "ssl_protocols TLSv1.2 TLSv1.3",
+      "pass": true,
+      "test": "TLS > the server block: versions, round trips, and what travels in the clear (one-round-trip)"
+    },
+    {
+      "lesson": "tls",
+      "step": "one-round-trip",
+      "software": "nginx 1.31.6",
+      "title": "Round trips before the request can leave (after TCP)",
+      "real": "TLS 1.3: 1, TLS 1.2: 2 (at 200 ms per round trip)",
+      "lesson_says": "TLS 1.3: 1, TLS 1.2: 2",
+      "pass": true,
+      "test": "TLS > the server block: versions, round trips, and what travels in the clear (one-round-trip)"
+    },
+    {
+      "lesson": "tls",
+      "step": "one-round-trip",
+      "software": "nginx 1.31.6",
+      "title": "First byte of the response (after TCP)",
+      "real": "TLS 1.3: 2 round trips, TLS 1.2: 3",
+      "lesson_says": "TLS 1.3: 2, TLS 1.2: 3",
+      "pass": true,
+      "test": "TLS > the server block: versions, round trips, and what travels in the clear (one-round-trip)"
+    },
+    {
+      "lesson": "tls",
+      "step": "one-round-trip",
+      "software": "nginx 1.31.6",
+      "title": "TLS 1.2 sends the certificate in the clear, TLS 1.3 encrypts it",
+      "real": "server's certificate readable on the wire: TLS 1.2 yes, TLS 1.3 no",
+      "lesson_says": "Certificate is \"clear\" in TLS 1.2, \"hs\" in TLS 1.3",
+      "pass": true,
+      "test": "TLS > the server block: versions, round trips, and what travels in the clear (one-round-trip)"
+    },
+    {
+      "lesson": "tls",
+      "step": "three-goals",
+      "software": "nginx 1.31.6",
+      "title": "Every encrypted TLS 1.3 record says \"application data\"",
+      "real": "10 records from nginx, types 22, 20, 23; after the ServerHello: 8 records, all type 23: true, all version 0x0303: true",
+      "lesson_says": "17 03 03 …: type 23, and the real type is hidden inside",
+      "pass": true,
+      "test": "TLS > the server block: versions, round trips, and what travels in the clear (one-round-trip)"
+    },
+    {
+      "lesson": "tls",
+      "step": "client-hello",
+      "software": "nginx 1.31.6",
+      "title": "The SNI travels in the clear",
+      "real": "\"shop.example\" readable in both ClientHellos",
+      "lesson_says": "server_name shop.example   # the SNI (in the clear)",
+      "pass": true,
+      "test": "TLS > the server block: versions, round trips, and what travels in the clear (one-round-trip)"
+    },
+    {
+      "lesson": "tls",
+      "step": "resumption",
+      "software": "nginx 1.31.6",
+      "title": "Coming back: resumed, and no certificate this time",
+      "real": "Reused, TLSv1.3; certificate sent: first visit yes, return no",
+      "lesson_says": "both sides skip the certificate: that's resumption",
+      "pass": true,
+      "test": "TLS > resumption, 0-RTT and a replayed first flight (resumption)"
+    },
+    {
+      "lesson": "tls",
+      "step": "resumption",
+      "software": "nginx 1.31.6",
+      "title": "0-RTT: the request rides along with the ClientHello",
+      "real": "Early data was accepted; the app got GET /account with Early-Data: 1 0.5 round trips after connecting",
+      "lesson_says": "request leaves after 0 TLS round trips; the answer comes in the server's first flight",
+      "pass": true,
+      "test": "TLS > resumption, 0-RTT and a replayed first flight (resumption)"
+    },
+    {
+      "lesson": "tls",
+      "step": "resumption",
+      "software": "nginx 1.31.6",
+      "title": "Only safe requests as early data",
+      "real": "POST /buy as early data: the app saw Early-Data: 1 and answered 425",
+      "lesson_says": "the app answers 425 Too Early if unsafe",
+      "pass": true,
+      "test": "TLS > resumption, 0-RTT and a replayed first flight (resumption)"
+    },
+    {
+      "lesson": "tls",
+      "step": "resumption",
+      "software": "nginx 1.31.6",
+      "title": "A replayed 0-RTT first flight runs the request again",
+      "real": "replaying Alice's first flight: the app ran GET /account (Early-Data: 1)",
+      "lesson_says": "answers GET early; GET /account served again",
+      "pass": true,
+      "test": "TLS > resumption, 0-RTT and a replayed first flight (resumption)"
+    },
+    {
+      "lesson": "tls",
+      "step": "resumption",
+      "software": "nginx 1.31.6",
+      "title": "Without early data, a replayed hello runs nothing",
+      "real": "replaying a resumed hello without early data: the app ran 0 request(s)",
+      "lesson_says": "no keys, no data: nothing runs",
+      "pass": true,
+      "test": "TLS > resumption, 0-RTT and a replayed first flight (resumption)"
+    },
+    {
+      "lesson": "tls",
+      "step": "playground",
+      "title": "Each live config against the diagram's round trips",
+      "software": "nginx 1.31.6",
+      "real": "http/full: first byte after 1 round trip(s) (diagram: 0 TLS round trips); tls12/full: TLSv1.2, return visit resumed: false, handshake 2 round trip(s) (diagram: 2 TLS round trips); tls12/ticket: TLSv1.2, return visit resumed: true, handshake 1 round trip(s) (diagram: 1 TLS round trips); tls13/full: TLSv1.3, return visit resumed: false, handshake 1 round trip(s) (diagram: 1 TLS round trips); tls13/ticket: TLSv1.3, return visit resumed: true, handshake 1 round trip(s) (diagram: 1 TLS round trips); tls13/0rtt: Early data was accepted (diagram: 0 TLS round trips)",
+      "lesson_says": "New: tickets off; Resumed: tickets on; 0-RTT: ssl_early_data on",
+      "pass": true,
+      "test": "TLS > the playground's live config does what the diagram shows (playground)"
+    },
+    {
+      "lesson": "tls",
+      "step": "downgrade-hsts",
+      "software": "nginx 1.31.6",
+      "title": "Plain http only ever redirects",
+      "real": "< HTTP/1.1 301 Moved Permanently, < Location: https://shop.example/login",
+      "lesson_says": "return 301 https://$host$request_uri",
+      "pass": true,
+      "test": "TLS > HSTS: redirect once, then https:// before anything is sent (downgrade-hsts)"
+    },
+    {
+      "lesson": "tls",
+      "step": "downgrade-hsts",
+      "software": "nginx 1.31.6",
+      "title": "Every HTTPS answer carries the header, even an error",
+      "real": "< HTTP/1.1 404 Not Found with < Strict-Transport-Security: max-age=63072000; includeSubDomains; preload",
+      "lesson_says": "add_header Strict-Transport-Security \"max-age=63072000; includeSubDomains; preload\" always",
+      "pass": true,
+      "test": "TLS > HSTS: redirect once, then https:// before anything is sent (downgrade-hsts)"
+    },
+    {
+      "lesson": "tls",
+      "step": "downgrade-hsts",
+      "software": "nginx 1.31.6",
+      "title": "Once seen, http:// becomes https:// before anything is sent",
+      "real": "Switched from HTTP to HTTPS due to HSTS => https://shop.example/login; connections to the port-80 server: 0; remembered for 729 days, subdomains too",
+      "lesson_says": "the browser rewrites every http:// to https:// before sending anything; max-age=63072000 is two years",
+      "pass": true,
+      "test": "TLS > HSTS: redirect once, then https:// before anything is sent (downgrade-hsts)"
+    },
+    {
+      "lesson": "tls",
+      "software": "nginx 1.31.6, OpenSSL 4.0.2",
+      "step": "chain-of-trust",
+      "title": "The abridged s_client output, line by line",
+      "real": "all 17 lines, in order (OpenSSL 4.0.2)",
+      "lesson_says": "17 lines of OpenSSL output",
+      "pass": true,
+      "test": "TLS > what openssl s_client prints: the chain, and Mallory's fakes (chain-of-trust, fake-certificates)"
+    },
+    {
+      "lesson": "tls",
+      "software": "nginx 1.31.6, OpenSSL 4.0.2",
+      "step": "fake-certificates",
+      "title": "Mallory's three certificates",
+      "real": "verify error:num=18:self-signed certificate | verify error:num=62:hostname mismatch | verify error:num=10:certificate has expired",
+      "lesson_says": "verify error:num=18:self-signed certificate | verify error:num=62:hostname mismatch | verify error:num=10:certificate has expired",
+      "pass": true,
+      "test": "TLS > what openssl s_client prints: the chain, and Mallory's fakes (chain-of-trust, fake-certificates)"
+    },
+    {
+      "lesson": "tls",
+      "step": "what-eve-sees",
+      "title": "With ECH, the wire shows only the front server's name",
+      "software": "nginx 1.31.6 (ssl_ech_file), OpenSSL 4.0.2",
+      "real": "with ECH: ech=SUCCESS outer=cdn.example name=shop.example, without: ech=NOT_TRIED; \"shop.example\" on the wire: with ECH no, without yes",
+      "lesson_says": "outer SNI cdn.example · real hello encrypted · TLS 1.3 · x25519 share (ECH off: SNI shop.example · TLS 1.3 · x25519 share)",
+      "pass": true,
+      "test": "TLS > ECH hides the site name (what-eve-sees)"
+    },
+    {
+      "lesson": "http-versions",
+      "software": "nginx 1.31.6",
+      "step": "alt-svc",
+      "title": "curl --http2 gets HTTP/2, chosen in the TLS handshake",
+      "real": "HTTP/2 200; ALPN: server accepted h2; the same port also answered HTTP/1.1 200 OK",
+      "lesson_says": "listen 443 ssl + http2 on: HTTP/1.1 and HTTP/2 over TCP",
+      "pass": true,
+      "test": "HTTP versions > HTTP/2 through ALPN, the Alt-Svc header, and a UDP port for QUIC (alt-svc)"
+    },
+    {
+      "lesson": "http-versions",
+      "software": "nginx 1.31.6",
+      "step": "alt-svc",
+      "title": "The response advertises HTTP/3",
+      "real": "alt-svc: h3=\":443\"; ma=86400",
+      "lesson_says": "alt-svc: h3=\":443\"; ma=86400",
+      "pass": true,
+      "test": "HTTP versions > HTTP/2 through ALPN, the Alt-Svc header, and a UDP port for QUIC (alt-svc)"
+    },
+    {
+      "lesson": "http-versions",
+      "software": "nginx 1.31.6",
+      "step": "alt-svc",
+      "title": "nginx listens on UDP for QUIC (HTTP/3 itself not tested: no HTTP/3 client here)",
+      "real": "nginx holds the same port number over UDP",
+      "lesson_says": "listen 443 quic reuseport;   # HTTP/3 over UDP",
+      "pass": true,
+      "test": "HTTP versions > HTTP/2 through ALPN, the Alt-Svc header, and a UDP port for QUIC (alt-svc)"
+    },
+    {
+      "lesson": "http-versions",
+      "software": "nginx 1.31.6",
+      "step": "alt-svc",
+      "title": "Only one listen line per address and port may say reuseport",
+      "real": "two servers both saying reuseport: nginx: [emerg] duplicate listen options for 127.0.0.1:18443; only the first: accepted",
+      "lesson_says": "only one listen line per address and port may say reuseport",
+      "pass": true,
+      "test": "HTTP versions > HTTP/2 through ALPN, the Alt-Svc header, and a UDP port for QUIC (alt-svc)"
+    },
+    {
+      "lesson": "http-versions",
+      "software": "nginx 1.31.6",
+      "step": "multiplexing",
+      "title": "HTTP/2 header names are lowercase",
+      "real": "server, date, content-type, content-length, last-modified, etag, alt-svc, accept-ranges",
+      "lesson_says": "HTTP/2 header names are always lowercase",
+      "pass": true,
+      "test": "HTTP versions > HTTP/2 through ALPN, the Alt-Svc header, and a UDP port for QUIC (alt-svc)"
+    },
+    {
+      "lesson": "http-versions",
+      "software": "nginx 1.31.6",
+      "step": "multiplexing",
+      "title": "Twelve files, one connection",
+      "real": "12 responses (200) over 1 TCP connection(s), ALPN h2",
+      "lesson_says": "HTTP/2: 1 connection; HTTP/1.1: 6",
+      "pass": true,
+      "test": "HTTP versions > one connection, every file at once, slices interleaved (multiplexing, frames)"
+    },
+    {
+      "lesson": "http-versions",
+      "software": "nginx 1.31.6",
+      "step": "multiplexing",
+      "title": "Slices of different files arrive interleaved",
+      "real": "6 of 12 files had other files' data arrive in the middle of them",
+      "lesson_says": "the server interleaves slices of all the responses on the same connection",
+      "pass": true,
+      "test": "HTTP versions > one connection, every file at once, slices interleaved (multiplexing, frames)"
+    },
+    {
+      "lesson": "http-versions",
+      "software": "nginx 1.31.6",
+      "step": "frames",
+      "title": "The browser numbers its streams 1, 3, 5…",
+      "real": "1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23",
+      "lesson_says": "odd numbers from the browser, even ones belong to the server",
+      "pass": true,
+      "test": "HTTP versions > one connection, every file at once, slices interleaved (multiplexing, frames)"
+    },
+    {
+      "lesson": "http-versions",
+      "step": "handshakes",
+      "title": "TLS takes one round trip, the request another",
+      "software": "nginx 1.31.6",
+      "real": "tcp 0.000195  tls 0.203258  first byte 0.405293 at 200 ms per round trip: TLS 1, request 1 (the relay can't slow down TCP's own handshake)",
+      "lesson_says": "tcp 0.101  tls 0.203  first byte 0.305 at 100 ms; the animation opens the connection after 2 (TCP + TLS)",
+      "pass": true,
+      "test": "HTTP versions > curl's timings: one round trip for TLS, one for the request (handshakes)"
+    },
+    {
+      "lesson": "http-versions",
+      "step": "playground",
+      "title": "What each live config does with two requests from curl --http2",
+      "software": "nginx 1.31.6",
+      "real": "h1.0: HTTP/1.1 200 OK, two files over 2 connection(s) (animation: 2 handshake(s)); h1.1: HTTP/1.1 200 OK, two files over 1 connection(s) (animation: 1 handshake(s)); h2: HTTP/2 200, two files over 1 connection(s) (animation: 1 handshake(s)); h3: HTTP/2 200, two files over 1 connection(s), Alt-Svc h3, UDP open (animation: 1 handshake(s))",
+      "lesson_says": "h1.0 closes after each response; h1.1 stays on HTTP/1.1; h2 and h3 speak HTTP/2 over TCP; h3 adds Alt-Svc and QUIC",
+      "pass": true,
+      "test": "HTTP versions > the playground's live config, version by version (playground)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "one-server-per-socket",
+      "software": "nginx 1.31.6",
+      "title": "The handshake: 101 Switching Protocols",
+      "real": "101, Upgrade: websocket, Sec-WebSocket-Accept correct",
+      "lesson_says": "the upgrade request passes through; the server answers 101",
+      "pass": true,
+      "test": "WebSockets > the upgrade through nginx: 101, then messages both ways (one-server-per-socket)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "one-server-per-socket",
+      "software": "nginx 1.31.6",
+      "title": "Messages both ways, and a ping answered by a pong",
+      "real": "opened: true; server said \"hello from ws-2\", then \"echo: hi (ws-2)\"; pongs back: 1",
+      "lesson_says": "a two-way pipe; the browser answers pings with pongs on its own",
+      "pass": true,
+      "test": "WebSockets > the upgrade through nginx: 101, then messages both ways (one-server-per-socket)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "one-server-per-socket",
+      "software": "nginx 1.31.6",
+      "title": "Without the Upgrade and Connection lines",
+      "real": "the handshake failed; the chat server got a plain GET (Upgrade header: none) and answered 426",
+      "lesson_says": "nginx drops them (they are hop-by-hop) and the handshake fails",
+      "pass": true,
+      "test": "WebSockets > the upgrade through nginx: 101, then messages both ways (one-server-per-socket)"
+    },
+    {
+      "lesson": "websockets",
+      "step": "one-server-per-socket",
+      "title": "Restart ws-1: its users move to ws-2 and stay there",
+      "software": "nginx 1.31.6",
+      "real": "before: ws-1: 2, ws-2: 2; ws-1 closed its sockets with 1001, 1001; they reconnected to ws-2, ws-2; after ws-1 came back: ws-1: 0, ws-2: 4",
+      "lesson_says": "before: ws-1 2, ws-2 2; after the restart: ws-1 0, ws-2 4",
+      "pass": true,
+      "test": "WebSockets > least_conn picks once; a restart does not rebalance (one-server-per-socket)"
+    },
+    {
+      "lesson": "consistent-hashing",
+      "step": "a-server-leaves",
+      "software": "nginx 1.31.6",
+      "title": "Remove one of five servers: hash $uri consistent",
+      "real": "moved 19%, 21%, 17%, 19%, 23% of 600 URIs (one run per server removed)",
+      "lesson_says": "about 1/N = 20%; the lesson's one-seat ring moves 19%, 22%, 16%, 20%, 23% (average 20%)",
+      "pass": true,
+      "test": "Consistent hashing > hash $uri consistent moves about 1/N; without it, about 4 in 5 (a-server-leaves)"
+    },
+    {
+      "lesson": "consistent-hashing",
+      "step": "a-server-leaves",
+      "software": "nginx 1.31.6",
+      "title": "Remove one of five servers: plain hash $uri (mod N)",
+      "real": "moved 81%, 81%, 82%, 81%, 79%",
+      "lesson_says": "about 4 in 5; the lesson's hash mod N moves 80%",
+      "pass": true,
+      "test": "Consistent hashing > hash $uri consistent moves about 1/N; without it, about 4 in 5 (a-server-leaves)"
+    },
+    {
+      "lesson": "consistent-hashing",
+      "step": "a-server-leaves",
+      "software": "nginx 1.31.6",
+      "title": "cache-b crashes but stays in the list",
+      "real": "consistent: 21% moved, 0 of them not cache-b's; plain hash: 20% moved, 0 not cache-b's; errors: 0",
+      "lesson_says": "its keys continue to the next server; every other key stays (the note: a crashed server that stays listed only loses its own keys)",
+      "pass": true,
+      "test": "Consistent hashing > hash $uri consistent moves about 1/N; without it, about 4 in 5 (a-server-leaves)"
+    },
+    {
+      "lesson": "processes-threads",
+      "step": "databases-and-web-servers",
+      "title": "worker_processes auto",
+      "software": "nginx 1.31.6",
+      "real": "1 master (1 thread) + 15 workers on 15 cores, 1 thread each; event method kqueue",
+      "lesson_says": "a master and one single-threaded worker per core (the animation: 1 master + 2 workers on 2 cores)",
+      "pass": true,
+      "test": "Processes and threads > a master and one single-threaded worker per core (databases-and-web-servers)"
+    },
+    {
+      "lesson": "life-of-a-request",
+      "step": "why-its-faster",
+      "title": "Cache-Control on the cart and on the assets",
+      "software": "nginx 1.31.6",
+      "real": "/cart: no-store; /app.3f9a1c.css: public, max-age=31536000, immutable; /app.js: public, max-age=31536000, immutable",
+      "lesson_says": "Cache-Control: no-store on /cart; max-age=31536000, immutable on app.css and app.js",
+      "pass": true,
+      "test": "Life of a request > the cart is never cached, hashed files are cached for a year (why-its-faster)"
+    },
+    {
+      "software": "nginx 1.31.6",
+      "lesson": "life-of-a-request",
+      "step": "why-its-faster",
+      "title": "A minute later, the connection is still open",
+      "real": "/cart: no-store; after 64 s idle, the same connection answered again: /app.3f9a1c.css with public, max-age=31536000, immutable",
+      "lesson_says": "keepalive_timeout 75s: the server hasn't closed it yet",
+      "pass": true,
+      "test": "idle connections > a minute of silence: keep-alive, proxy_read_timeout and heartbeats (why-its-faster, one-server-per-socket, heartbeats)"
+    },
+    {
+      "software": "nginx 1.31.6",
+      "lesson": "websockets",
+      "step": "one-server-per-socket",
+      "title": "proxy_read_timeout 3600s keeps an idle socket open",
+      "real": "still open",
+      "lesson_says": "the load balancer must allow long idle times",
+      "pass": true,
+      "test": "idle connections > a minute of silence: keep-alive, proxy_read_timeout and heartbeats (why-its-faster, one-server-per-socket, heartbeats)"
+    },
+    {
+      "software": "nginx 1.31.6",
+      "lesson": "websockets",
+      "step": "heartbeats",
+      "title": "Without it, nginx cuts an idle socket at 60 s",
+      "real": "closed after 60 s of silence, code 1006",
+      "lesson_says": "the 60-second default of nginx's proxy_read_timeout; the browser sees code 1006",
+      "pass": true,
+      "test": "idle connections > a minute of silence: keep-alive, proxy_read_timeout and heartbeats (why-its-faster, one-server-per-socket, heartbeats)"
+    },
+    {
+      "software": "nginx 1.31.6",
+      "lesson": "websockets",
+      "step": "heartbeats",
+      "title": "Pings every 20 s keep it open under the 60 s default",
+      "real": "still open; 3 pongs came back",
+      "lesson_says": "real servers ping every 20 to 30 seconds, comfortably inside the 60-second default",
+      "pass": true,
+      "test": "idle connections > a minute of silence: keep-alive, proxy_read_timeout and heartbeats (why-its-faster, one-server-per-socket, heartbeats)"
+    }
+  ],
+  "stamps": [
+    {
+      "hash": "1hmptw",
+      "lesson": "cdn",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > cdn / hit-ratio / nginx.conf · edge server"
+    },
+    {
+      "hash": "w7yr1g",
+      "lesson": "cdn",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > cdn / cache-keys / nginx.conf · edge"
+    },
+    {
+      "hash": "eo0mf",
+      "lesson": "cdn",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > cdn / fingerprinting / nginx.conf · origin"
+    },
+    {
+      "hash": "1vzfke4",
+      "lesson": "cdn",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > cdn / flash-crowd / nginx.conf · origin"
+    },
+    {
+      "hash": "grtcqj",
+      "lesson": "tls",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > tls / one-round-trip / nginx.conf"
+    },
+    {
+      "hash": "26dvpk",
+      "lesson": "tls",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > tls / resumption / nginx.conf"
+    },
+    {
+      "hash": "1d5zby",
+      "lesson": "tls",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > tls / downgrade-hsts / nginx.conf"
+    },
+    {
+      "hash": "ai7fmx",
+      "lesson": "http-versions",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > http-versions / alt-svc / nginx.conf"
+    },
+    {
+      "hash": "yxbkks",
+      "lesson": "websockets",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > websockets / one-server-per-socket / nginx.conf"
+    },
+    {
+      "hash": "dib700",
+      "lesson": "life-of-a-request",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > life-of-a-request / why-its-faster / nginx.conf"
+    },
+    {
+      "hash": "18fjmz7",
+      "lesson": "processes-threads",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > processes-threads / databases-and-web-servers / nginx.conf"
+    },
+    {
+      "hash": "1yvpb7u",
+      "lesson": "consistent-hashing",
+      "by": "nginx 1.31.6",
+      "kind": "loads",
+      "note": "nginx 1.31.6 loads this config (nginx -t).",
+      "test": "every nginx snippet loads (nginx -t) > consistent-hashing / a-server-leaves / nginx.conf"
+    },
+    {
+      "hash": "1hmptw",
+      "lesson": "cdn",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: the first request was a MISS and the next ones were HITs from disk. A stale copy was checked with If-None-Match (304), and with stale-while-revalidate the old copy went out at once.",
+      "test": "CDN > stale copies: revalidated, or served while revalidating (fresh-then-stale, stale-while-revalidate)"
+    },
+    {
+      "hash": "w7yr1g",
+      "lesson": "cdn",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: with the default key each ?utm_ variant was a separate MISS; with $uri as the key they all shared one copy.",
+      "test": "CDN > cache keys: the query string splits copies, $uri joins them (cache-keys)"
+    },
+    {
+      "hash": "eo0mf",
+      "lesson": "cdn",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: app.3f9a.js came back with the one-year immutable header, and the HTML with no-cache.",
+      "test": "CDN > fingerprinted files get a year, the HTML gets no-cache (fingerprinting)"
+    },
+    {
+      "hash": "1vzfke4",
+      "lesson": "cdn",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: a request from 198.51.100.7 reached the app; anyone else got 403 Forbidden.",
+      "test": "CDN > only the CDN may talk to the origin (flash-crowd)"
+    },
+    {
+      "hash": "grtcqj",
+      "lesson": "tls",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: clients got TLS 1.3 by default and TLS 1.2 on request. TLS 1.3 was ready after one round trip, TLS 1.2 after two, and only TLS 1.2 showed the certificate on the wire.",
+      "test": "TLS > the server block: versions, round trips, and what travels in the clear (one-round-trip)"
+    },
+    {
+      "hash": "26dvpk",
+      "lesson": "tls",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: a returning client resumed with its ticket, its 0-RTT GET reached the app with Early-Data: 1 before the handshake finished, and a replayed copy of that first flight ran the GET again.",
+      "test": "TLS > resumption, 0-RTT and a replayed first flight (resumption)"
+    },
+    {
+      "hash": "1d5zby",
+      "lesson": "tls",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: http:// got a 301 to https://, every HTTPS answer (even a 404) carried the header, and curl, having seen it once, went straight to https:// the next time.",
+      "test": "TLS > HSTS: redirect once, then https:// before anything is sent (downgrade-hsts)"
+    },
+    {
+      "hash": "8nhksq",
+      "lesson": "tls",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: with a leaf + intermediate chain like this one, OpenSSL 4.0.2 printed every line shown here.",
+      "test": "TLS > what openssl s_client prints: the chain, and Mallory's fakes (chain-of-trust, fake-certificates)"
+    },
+    {
+      "hash": "s5fodo",
+      "lesson": "tls",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: serving each of Mallory's certificates in turn, OpenSSL 4.0.2 stopped with exactly these errors.",
+      "test": "TLS > what openssl s_client prints: the chain, and Mallory's fakes (chain-of-trust, fake-certificates)"
+    },
+    {
+      "hash": "ai7fmx",
+      "lesson": "http-versions",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: curl got HTTP/2 through ALPN with the Alt-Svc header, and nginx opened the UDP port for QUIC. HTTP/3 itself wasn't tested: there's no HTTP/3 client here.",
+      "test": "HTTP versions > HTTP/2 through ALPN, the Alt-Svc header, and a UDP port for QUIC (alt-svc)"
+    },
+    {
+      "hash": "yxbkks",
+      "lesson": "websockets",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: the upgrade got 101 and messages flowed both ways. With the Upgrade and Connection lines removed, the chat server got a plain GET and the handshake failed.",
+      "test": "WebSockets > the upgrade through nginx: 101, then messages both ways (one-server-per-socket)"
+    },
+    {
+      "hash": "1yvpb7u",
+      "lesson": "consistent-hashing",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: removing any one of the five servers moved about a fifth of the URIs. With plain hash $uri, about four in five moved.",
+      "test": "Consistent hashing > hash $uri consistent moves about 1/N; without it, about 4 in 5 (a-server-leaves)"
+    },
+    {
+      "hash": "18fjmz7",
+      "lesson": "processes-threads",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: one master process plus one worker per core, each worker with a single thread.",
+      "test": "Processes and threads > a master and one single-threaded worker per core (databases-and-web-servers)"
+    },
+    {
+      "hash": "dib700",
+      "lesson": "life-of-a-request",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: /cart came back with no-store and the hashed CSS with the one-year immutable header, over a connection that was still open after a minute of silence.",
+      "test": "idle connections > a minute of silence: keep-alive, proxy_read_timeout and heartbeats (why-its-faster, one-server-per-socket, heartbeats)"
+    }
+  ]
+}

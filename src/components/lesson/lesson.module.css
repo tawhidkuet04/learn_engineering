@@ -488,6 +488,40 @@
   font-style: italic;
 }
 
+.codeTested {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sig-res);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.codeTested:hover {
+  text-decoration: underline;
+}
+
+.codeProof {
+  margin: 0;
+  padding: 8px 14px 10px;
+  border-top: 1px solid var(--rule);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-3);
+}
+
+.codeProof::before {
+  content: 'Tested · ';
+  color: var(--sig-res);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+}
+
 .codeNote {
   margin: 0;
   padding: 9px 14px 11px;

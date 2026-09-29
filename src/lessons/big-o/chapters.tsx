@@ -81,7 +81,7 @@ function findMax(arr) {
 
 console.time('findMax');
 findMax(numbers);              // 10,000,000 numbers
-console.timeEnd('findMax');    // 6 ms? 14 ms? depends on the machine`,
+console.timeEnd('findMax');    // ~50 ms on one laptop; yours will differ`,
         },
       },
       {
@@ -552,7 +552,7 @@ function fib(n) {
 }
 
 fib(30);   // ${commas(fibCalls(30))} calls
-fib(50);   // ${commas(fibCalls(50))} calls: minutes, even on a fast machine`,
+fib(50);   // ${commas(fibCalls(50))} calls: over a minute, even on a fast machine`,
         },
       },
       {

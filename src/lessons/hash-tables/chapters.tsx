@@ -157,7 +157,7 @@ function hash(key) {
 
 hash('bob');   // 97717
 hash('bob');   // 97717, every single time`,
-          note: 'Java computes the same thing in 32-bit ints, so long strings wrap around. In JavaScript, Math.imul(h, 31) reproduces that.',
+          note: 'Java computes the same thing in 32-bit ints, so long strings wrap around. In JavaScript, h = (Math.imul(h, 31) + ch.charCodeAt(0)) | 0 reproduces that.',
         },
       },
       {
@@ -307,9 +307,9 @@ phone.has('alice');  // true`,
           code: `
 # small hashes are stored as a flat list,
 # big ones get a real hash table
-!hash-max-listpack-entries 128
+!hash-max-listpack-entries 512
 !hash-max-listpack-value 64`,
-          note: 'Redis scans small hashes instead of hashing them: for a few entries that is faster and uses less memory.',
+          note: 'Redis scans small hashes instead of hashing them (these are the defaults). The flat list takes about a third of the memory, but lookups slow down as it grows, so past 512 entries it switches to a hash table.',
         },
       },
     ],

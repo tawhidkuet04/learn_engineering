@@ -72,6 +72,8 @@ export interface LB extends Box {
   /** Open connections this balancer has to each server */
   conns: Map<string, number>;
   health: Map<string, HealthState>;
+  /** NGINX passive health: a server that refused a connection is skipped until this time */
+  benched: Map<string, number>;
   lastPick: string | null;
   decision: Decision | null;
   decisionVt: number;

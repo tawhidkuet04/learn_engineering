@@ -11,6 +11,7 @@ import {
   LIGHT_PATHS,
   MEDIA_PATHS,
   MS_PER_S,
+  RETRY,
   SIZE_WEIGHT,
   SIZE_WORKERS,
   VIP,
@@ -40,6 +41,10 @@ export interface Req {
   tour: boolean;
   done: boolean;
   forceServer?: string;
+  /** Servers that refused this request (NGINX tries each one once) */
+  tried?: string[];
+  /** Connection attempts that failed on req.server (HAProxy retries) */
+  fails?: number;
 }
 
 type PacketKind = 'req' | 'res' | 'hc' | 'hcack' | 'hb' | 'sess';
@@ -83,6 +88,14 @@ interface Timer {
   at: number;
   fn: () => void;
 }
+
+/** Events recorded when `world.trace` is set (headless checks in verify/). */
+export type TraceEvent =
+  | { t: number; kind: 'route'; req: number; server: string; client: string; heavy: boolean; path: string }
+  | { t: number; kind: 'done'; req: number; server: string | null; status: number }
+  | { t: number; kind: 'health'; server: string; inRot: boolean }
+  | { t: number; kind: 'refused'; req: number; server: string }
+  | { t: number; kind: 'crash' | 'revive'; server: string };
 
 export type TourStage = 'toLb' | 'atLb' | 'toServer' | 'atServer' | 'processing' | 'toLbBack' | 'toClient' | 'done';
 
@@ -390,6 +403,8 @@ export class World {
   frozen = false;
   /** Bumped whenever UI-facing state changes; panels poll it */
   rev = 0;
+  /** Set to [] to record routing, responses and health changes (verify/ uses this). */
+  trace: TraceEvent[] | null = null;
 
   private packets: Packet[] = [];
   private timers: Timer[] = [];
@@ -430,6 +445,7 @@ export class World {
     for (const lb of this.lbs.values()) {
       lb.rr = 0;
       lb.wrr = new Map();
+      lb.benched.clear();
       lb.lastPick = null;
       lb.decision = null;
     }
@@ -461,6 +477,7 @@ export class World {
     }
     for (const lb of this.lbs.values()) {
       lb.conns.clear();
+      lb.benched.clear();
       lb.decision = null;
     }
   }
@@ -628,6 +645,7 @@ export class World {
       wrr: new Map(),
       conns: new Map(),
       health: new Map(),
+      benched: new Map(),
       lastPick: null,
       decision: null,
       decisionVt: -10,
@@ -968,8 +986,14 @@ export class World {
     this.serverReceive(s, req, p);
   }
 
+  /** Would this balancer send new traffic to the server right now? */
+  private inRotation(lb: LB, id: string) {
+    if (!(lb.health.get(id)?.inRot ?? true)) return false;
+    return this.cfg.proxy !== 'nginx' || (lb.benched.get(id) ?? -Infinity) <= this.t;
+  }
+
   private candidates(lb: LB, req: Req) {
-    let cands = this.liveServers().filter((s) => lb.health.get(s.id)?.inRot ?? true);
+    let cands = this.liveServers().filter((s) => this.inRotation(lb, s.id) && !req.tried?.includes(s.id));
     let route: Decision['route'];
     if (this.cfg.routeByPath && this.cfg.layer === 'l7') {
       cands = cands.filter((s) => s.pool === req.pool);
@@ -983,8 +1007,10 @@ export class World {
     if (!client) return void this.reqs.delete(req.id);
     const { cands, route } = this.candidates(lb, req);
     if (!cands.length) {
-      this.fx({ kind: 'text', at: { key: lk(lb.id), dy: -lb.h / 2 - 14 }, text: '503 · no healthy servers', color: C.err, dur: 1.4 });
-      this.sendFromLB(lb, req, 503, false);
+      // What each one answers when it has nowhere left to send the request
+      const [status, text] = this.cfg.proxy === 'nginx' ? [502, '502 · no live upstreams'] : [503, '503 · no server available'];
+      this.fx({ kind: 'text', at: { key: lk(lb.id), dy: -lb.h / 2 - 14 }, text, color: C.err, dur: 1.4 });
+      this.sendFromLB(lb, req, status, false);
       return;
     }
 
@@ -1000,7 +1026,7 @@ export class World {
     decision.route = route;
 
     const pr = this.predict;
-    if (pr && !pr.done && !pr.pending && !req.tour) {
+    if (pr && !pr.done && !pr.pending && !req.tour && !req.tried) {
       pr.pending = { reqId: req.id, lbId: lb.id, decision, clientId: client.id };
       this.frozen = true;
       this.rev++;
@@ -1034,6 +1060,7 @@ export class World {
     lb.decisionVt = this.vt;
     lb.conns.set(chosen, (lb.conns.get(chosen) ?? 0) + 1);
     req.server = chosen;
+    this.trace?.push({ t: this.t, kind: 'route', req: req.id, server: chosen, client: req.clientId, heavy: req.heavy, path: req.path });
     this.flashWire(`${lk(lb.id)}>${sk(chosen)}`);
     const client = this.clients.get(req.clientId);
     this.emit({
@@ -1052,7 +1079,7 @@ export class World {
   private serverReceive(s: Server, req: Req, p: Packet) {
     if (!s.up) {
       this.fx({ kind: 'x', at: { key: sk(s.id), dx: -s.w / 2 - 6 }, color: C.err, dur: 0.8 });
-      if (req.lb) this.after(GATEWAY_TIMEOUT, () => this.gatewayError(req, 502));
+      if (req.lb) this.refused(req, s);
       else this.timeoutAtClient(req);
       return;
     }
@@ -1168,6 +1195,57 @@ export class World {
     this.complete(req, p.status, p.warn);
   }
 
+  /** The balancer's connection to a crashed server was refused. */
+  private refused(req: Req, s: Server) {
+    const lb = req.lb ? this.lbs.get(req.lb) : null;
+    if (!lb || lb.removing) return void this.reqs.delete(req.id);
+    if (!lb.up) return this.timeoutAtClient(req);
+    this.trace?.push({ t: this.t, kind: 'refused', req: req.id, server: s.id });
+    const at = { key: lk(lb.id), dy: -lb.h / 2 - 14 };
+
+    if (this.cfg.proxy === 'nginx') {
+      // NGINX: bench the server for fail_timeout and try the next one right away.
+      this.release(lb, s.id);
+      lb.benched.set(s.id, this.t + RETRY.nginxBench);
+      (req.tried ??= []).push(s.id);
+      this.fx({ kind: 'text', at, text: `refused · trying the next server`, color: C.warn, dur: 1.2 });
+      this.fx({ kind: 'text', at: { key: sk(s.id), dy: -s.h / 2 - 26 }, text: `skipped for ${RETRY.nginxBench} s`, color: C.warn, dur: 1.6 });
+      this.route(lb, req);
+      return;
+    }
+
+    // HAProxy: retry the same server, a second apart, then give up with 503.
+    req.fails = (req.fails ?? 0) + 1;
+    if (req.fails <= RETRY.haproxyTries) {
+      const n = req.fails;
+      this.after(Math.max(0, RETRY.haproxyGap - HOP.lbServer), () => {
+        if (req.done || !lb.up) return;
+        this.fx({ kind: 'text', at, text: `retry ${n}/${RETRY.haproxyTries}`, color: C.warn, dur: HOP.lbServer });
+        this.resend(lb, req, s.id);
+      });
+      return;
+    }
+    this.release(lb, s.id);
+    this.fx({ kind: 'text', at: { key: lk(lb.id), dy: -lb.h / 2 - 32 }, text: '503 · gave up', color: C.err, dur: 1.2 });
+    this.sendFromLB(lb, req, 503, false);
+  }
+
+  /** Send the same request to the same server again (no new routing decision). */
+  private resend(lb: LB, req: Req, sid: string) {
+    const client = this.clients.get(req.clientId);
+    this.flashWire(`${lk(lb.id)}>${sk(sid)}`);
+    this.emit({
+      kind: 'req',
+      reqId: req.id,
+      from: lk(lb.id),
+      to: sk(sid),
+      dur: HOP.lbServer,
+      color: client ? this.reqColor(req, client) : C.req,
+      heavy: req.heavy,
+      sealed: this.cfg.layer === 'l4',
+    });
+  }
+
   private gatewayError(req: Req, status: number) {
     if (req.done) return;
     const lb = req.lb ? this.lbs.get(req.lb) : null;
@@ -1189,6 +1267,7 @@ export class World {
     const ok = status > 0 && status < 500;
     const lat = (this.t - req.t0) * MS_PER_S;
     this.metrics.push(this.t, lat, ok ? (warn ? 'warn' : 'ok') : 'err');
+    this.trace?.push({ t: this.t, kind: 'done', req: req.id, server: req.server, status });
     if (c) {
       c.pulse = { color: ok ? (warn ? C.warn : C.res) : C.err, vt: this.vt };
       const dy = -c.h / 2 - 12;
@@ -1245,6 +1324,7 @@ export class World {
       hs.fails = 0;
       if (!hs.inRot && hs.passes >= HC.rise) {
         hs.inRot = true;
+        this.trace?.push({ t: this.t, kind: 'health', server: sid, inRot: true });
         this.fx({ kind: 'text', at: { key: sk(sid), dy: -s.h / 2 - 26 }, text: 'back in rotation', color: C.res, dur: 1.6 });
       }
     } else {
@@ -1252,6 +1332,7 @@ export class World {
       hs.passes = 0;
       if (hs.inRot && hs.fails >= HC.fall) {
         hs.inRot = false;
+        this.trace?.push({ t: this.t, kind: 'health', server: sid, inRot: false });
         this.fx({ kind: 'text', at: { key: sk(sid), dy: -s.h / 2 - 26 }, text: 'removed from rotation', color: C.err, dur: 1.8 });
       }
     }
@@ -1315,24 +1396,40 @@ export class World {
     const s = this.servers.get(id);
     if (!s || !s.up || s.removing) return;
     s.up = false;
+    this.trace?.push({ t: this.t, kind: 'crash', server: id });
     const jobs = [...s.slots, ...s.queue].filter((j): j is Job => !!j);
     s.slots = s.slots.map(() => null);
     s.queue = [];
     for (const job of jobs) {
       const req = this.reqs.get(job.reqId);
       if (!req) continue;
-      if (req.lb) this.after(GATEWAY_TIMEOUT, () => this.gatewayError(req, 502));
-      else this.timeoutAtClient(req);
+      if (!req.lb) this.timeoutAtClient(req);
+      // The connection drops mid-request. NGINX retries a GET on another
+      // server; HAProxy passes the failure on as 502 Bad Gateway.
+      else if (this.cfg.proxy === 'nginx') this.after(0.3, () => this.retryElsewhere(req, id));
+      else this.after(GATEWAY_TIMEOUT, () => this.gatewayError(req, 502));
     }
     this.fx({ kind: 'ring', at: { key: sk(id) }, color: C.err, dur: 0.9, size: 2.4 });
     this.fx({ kind: 'text', at: { key: sk(id), dy: -s.h / 2 - 26 }, text: 'crashed', color: C.err, dur: 1.4 });
     this.rev++;
   }
 
+  private retryElsewhere(req: Req, sid: string) {
+    if (req.done) return;
+    const lb = req.lb ? this.lbs.get(req.lb) : null;
+    if (!lb || lb.removing) return void this.reqs.delete(req.id);
+    if (!lb.up) return this.timeoutAtClient(req);
+    this.release(lb, sid);
+    lb.benched.set(sid, this.t + RETRY.nginxBench);
+    (req.tried ??= []).push(sid);
+    this.route(lb, req);
+  }
+
   reviveServer(id: string) {
     const s = this.servers.get(id);
     if (!s || s.up || s.removing) return;
     s.up = true;
+    this.trace?.push({ t: this.t, kind: 'revive', server: id });
     this.fx({ kind: 'ring', at: { key: sk(id) }, color: C.res, dur: 0.9, size: 2.4 });
     this.fx({ kind: 'text', at: { key: sk(id), dy: -s.h / 2 - 26 }, text: 'rebooted', color: C.res, dur: 1.2 });
     this.rev++;
@@ -1581,8 +1678,7 @@ export class World {
       }
       for (const lb of lbs) {
         for (const s of servers) {
-          const hs = lb.health.get(s.id);
-          const state: WireState['state'] = !lb.up || !s.up ? 'down' : hs && !hs.inRot ? 'out' : lb.active ? 'normal' : 'standby';
+          const state: WireState['state'] = !lb.up || !s.up ? 'down' : !this.inRotation(lb, s.id) ? 'out' : lb.active ? 'normal' : 'standby';
           out.push({ key: `${lk(lb.id)}>${sk(s.id)}`, u: lk(lb.id), d: sk(s.id), kind: 'req', state });
         }
       }
@@ -1721,14 +1817,14 @@ export class World {
         queue: s.queue.slice(0, 14).map((j) => ({ x: j.x, y: j.y, color: j.color })),
         capSlots: Array.from({ length: cap }, (_, i) => this.queueSlot(s, i)),
         overflow: Math.max(0, s.queue.length - 14),
-        inRot: cfg.lb === 'none' ? null : hs ? hs.inRot : true,
+        inRot: cfg.lb === 'none' ? null : lbA ? this.inRotation(lbA, s.id) : true,
         tally: cfg.healthChecks && cfg.lb !== 'none' && hs ? hs.hist : null,
         served: s.served,
         share: totalServed ? s.served / totalServed : 0,
         carts: cartOwners.get(s.id) ?? [],
         util: s.util,
         mark: s.mark ? { kind: s.mark.kind, k: clamp((this.vt - s.mark.vt) / 1.6, 0, 1) } : null,
-        pickable: pickable && s.up && !s.removing && (hs?.inRot ?? true),
+        pickable: pickable && s.up && !s.removing && (lbA ? this.inRotation(lbA, s.id) : true),
       };
     });
 
@@ -1783,7 +1879,7 @@ export class World {
     if (cfg.showBrain && lbA && !lbA.removing && cfg.lb !== 'none') {
       const labels: Record<string, string> = {};
       for (const s of this.servers.values()) labels[s.id] = s.label;
-      const live = this.liveServers().filter((s) => lbA.health.get(s.id)?.inRot ?? true);
+      const live = this.liveServers().filter((s) => this.inRotation(lbA, s.id));
       const pools: Record<string, string[]> = {};
       for (const s of this.liveServers()) if (s.pool) (pools[s.pool] ??= []).push(s.label);
       const land = this.orient === 'landscape';

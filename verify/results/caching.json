@@ -1,0 +1,601 @@
+{
+  "file": "caching",
+  "checks": [
+    {
+      "lesson": "caching",
+      "step": "out-of-room",
+      "title": "redis-server starts with the redis.conf snippet and reads back every value",
+      "software": "Redis 7.2.5",
+      "real": "maxmemory 2147483648, maxmemory-policy allkeys-lru, maxmemory-samples 5",
+      "lesson_says": "maxmemory 2gb, maxmemory-policy allkeys-lru, maxmemory-samples 5",
+      "pass": true,
+      "test": "every Redis config the lessons show loads in redis-server > redis-server + CONFIG GET: caching / out-of-room"
+    },
+    {
+      "lesson": "caching",
+      "step": "lru-lfu-fifo",
+      "title": "redis-server starts with the redis.conf snippet and reads back every value",
+      "software": "Redis 7.2.5",
+      "real": "maxmemory-policy allkeys-lfu, lfu-log-factor 10, lfu-decay-time 1",
+      "lesson_says": "maxmemory-policy allkeys-lfu, lfu-log-factor 10, lfu-decay-time 1",
+      "pass": true,
+      "test": "every Redis config the lessons show loads in redis-server > redis-server + CONFIG GET: caching / lru-lfu-fifo"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "lookup-race",
+      "title": "redis-server starts with the redis.conf snippet and reads back every value",
+      "software": "Redis 7.2.5",
+      "real": "hash-max-listpack-entries 512, hash-max-listpack-value 64",
+      "lesson_says": "hash-max-listpack-entries 512, hash-max-listpack-value 64",
+      "pass": true,
+      "test": "every Redis config the lessons show loads in redis-server > redis-server + CONFIG GET: hash-tables / lookup-race"
+    },
+    {
+      "lesson": "caching",
+      "step": "playground",
+      "title": "redis-server starts with every config the playground generates",
+      "software": "Redis 7.2.5",
+      "real": "576 variants accepted; policies used: allkeys-lfu, allkeys-lru, allkeys-random, volatile-ttl",
+      "lesson_says": "the \"your settings · live\" block is a redis.conf",
+      "pass": true,
+      "test": "every Redis config the lessons show loads in redis-server > every config the playground generates (playground)"
+    },
+    {
+      "lesson": "caching",
+      "software": "Redis 7.2.5",
+      "step": "out-of-room",
+      "title": "Default eviction policy",
+      "real": "noeviction",
+      "lesson_says": "noeviction",
+      "pass": true,
+      "test": "defaults, policies and errors > the defaults the lessons quote"
+    },
+    {
+      "lesson": "caching",
+      "software": "Redis 7.2.5",
+      "step": "out-of-room",
+      "title": "Keys sampled per eviction by default",
+      "real": "5",
+      "lesson_says": "5",
+      "pass": true,
+      "test": "defaults, policies and errors > the defaults the lessons quote"
+    },
+    {
+      "lesson": "caching",
+      "software": "Redis 7.2.5",
+      "step": "lru-lfu-fifo",
+      "title": "Default lfu-log-factor and lfu-decay-time",
+      "real": "10, 1",
+      "lesson_says": "10, 1",
+      "pass": true,
+      "test": "defaults, policies and errors > the defaults the lessons quote"
+    },
+    {
+      "lesson": "caching",
+      "software": "Redis 7.2.5",
+      "step": "ttl",
+      "title": "How often the background expiry job runs (hz)",
+      "real": "10 times a second",
+      "lesson_says": "about 10 times a second",
+      "pass": true,
+      "test": "defaults, policies and errors > the defaults the lessons quote"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "lookup-race",
+      "software": "Redis 7.2.5",
+      "title": "Default listpack limits for hashes",
+      "real": "512 entries, 64 bytes",
+      "lesson_says": "512 entries, 64 bytes (\"these are the defaults\")",
+      "pass": true,
+      "test": "defaults, policies and errors > the defaults the lessons quote"
+    },
+    {
+      "lesson": "caching",
+      "step": "out-of-room",
+      "title": "Default policy with memory full",
+      "software": "Redis 7.2.5",
+      "real": "writes: 200000 | 200000 | OOM command not allowed when used memory > 'maxmemory'. | OOM command not allowed when used memory > 'maxmemory'.; reads still work, DEL still works; evicted_keys 0",
+      "lesson_says": "noeviction: when memory is full, writes fail with an OOM error",
+      "pass": true,
+      "test": "defaults, policies and errors > noeviction: when memory is full, writes fail with an OOM error (out-of-room)"
+    },
+    {
+      "lesson": "caching",
+      "step": "lru-lfu-fifo",
+      "title": "Redis has no FIFO policy",
+      "software": "Redis 7.2.5",
+      "real": "allkeys-fifo rejected; the only choices: volatile-lru, volatile-lfu, volatile-random, volatile-ttl, allkeys-lru, allkeys-lfu, allkeys-random, noeviction",
+      "lesson_says": "Redis has no FIFO policy",
+      "pass": true,
+      "test": "defaults, policies and errors > the policies Redis has: no FIFO; volatile-lru only evicts keys with a TTL (out-of-room, lru-lfu-fifo)"
+    },
+    {
+      "lesson": "caching",
+      "step": "playground",
+      "title": "volatile-ttl when no key has a TTL",
+      "software": "Redis 7.2.5",
+      "real": "writes OK OOM OOM, evicted_keys 0: nothing it may evict",
+      "lesson_says": "FIFO without TTLs maps to allkeys-random",
+      "pass": true,
+      "test": "defaults, policies and errors > the policies Redis has: no FIFO; volatile-lru only evicts keys with a TTL (out-of-room, lru-lfu-fifo)"
+    },
+    {
+      "lesson": "caching",
+      "step": "out-of-room",
+      "title": "volatile-lru only evicts keys that have a TTL",
+      "software": "Redis 7.2.5",
+      "real": "writes OK OK OK OK OOM; left: plain:0, plain:1, plain:2, plain:3, plain:4, plain:5, plain:6 (all three TTL keys evicted, then OOM)",
+      "lesson_says": "volatile-lru (only keys that have a TTL)",
+      "pass": true,
+      "test": "defaults, policies and errors > the policies Redis has: no FIFO; volatile-lru only evicts keys with a TTL (out-of-room, lru-lfu-fifo)"
+    },
+    {
+      "lesson": "caching",
+      "step": "out-of-room",
+      "title": "Memory for 100,000 keys, with and without LRU eviction",
+      "software": "Redis 7.2.5",
+      "real": "dataset 7263480 bytes under noeviction, 7263480 under allkeys-lru",
+      "lesson_says": "it needs no extra memory per key",
+      "pass": true,
+      "test": "defaults, policies and errors > LRU needs no extra memory per key (out-of-room aside)"
+    },
+    {
+      "lesson": "caching",
+      "step": "memory-is-faster",
+      "software": "Redis 7.2.5",
+      "title": "--latency output",
+      "real": "min: 0, max: 1, avg: 0.09 (209 samples) (Redis counted 209 PINGs)",
+      "lesson_says": "min: 0, max: 1, avg: 0.21 (1532 samples); the note: --latency pings Redis over and over",
+      "pass": true,
+      "test": "reads, hits and TTLs > memory-is-faster terminal: --latency and GET, as shown"
+    },
+    {
+      "lesson": "caching",
+      "step": "memory-is-faster",
+      "software": "Redis 7.2.5",
+      "title": "GET product:42 in redis-cli",
+      "real": "\"{\\\"name\\\":\\\"Trail boots\\\",\\\"price\\\":89}\"",
+      "lesson_says": "\"{\\\"name\\\":\\\"Trail boots\\\",\\\"price\\\":89}\"",
+      "pass": true,
+      "test": "reads, hits and TTLs > memory-is-faster terminal: --latency and GET, as shown"
+    },
+    {
+      "lesson": "caching",
+      "step": "memory-is-faster",
+      "software": "Redis 7.2.5",
+      "title": "Redis’s own time per GET",
+      "real": "0.13 µs per GET inside Redis (INFO commandstats); the keyspace is a hash table (Hash table 0 stats (main hash table):)",
+      "lesson_says": "about 1 ms, most of that is the network hop; Redis looks the key up in an in-memory hash table",
+      "pass": true,
+      "test": "reads, hits and TTLs > memory-is-faster terminal: --latency and GET, as shown"
+    },
+    {
+      "lesson": "caching",
+      "step": "hit-or-miss",
+      "software": "Redis 7.2.5",
+      "title": "SCAN output",
+      "real": "1) \"0\" / 2) 1) \"product:42\" /    2) \"product:13\" /    3) \"product:7\"",
+      "lesson_says": "1) \"0\" / 2) 1) \"product:42\" /    2) \"product:7\" /    3) \"product:13\"",
+      "pass": true,
+      "test": "reads, hits and TTLs > hit-or-miss: SCAN finds the cached keys; KEYS blocks, SCAN doesn’t"
+    },
+    {
+      "lesson": "caching",
+      "step": "hit-or-miss",
+      "software": "Redis 7.2.5",
+      "title": "KEYS blocks, SCAN doesn’t (1,000,000 keys)",
+      "real": "KEYS took 188 ms inside Redis and a PING sent meanwhile waited 177 ms; each SCAN COUNT 100 took 28 µs and returned 100 keys on average",
+      "lesson_says": "Avoid KEYS in production: it blocks Redis while it scans everything",
+      "pass": true,
+      "test": "reads, hits and TTLs > hit-or-miss: SCAN finds the cached keys; KEYS blocks, SCAN doesn’t"
+    },
+    {
+      "lesson": "caching",
+      "step": "hit-ratio",
+      "title": "INFO stats | grep keyspace after the hit-or-miss reads",
+      "software": "Redis 7.2.5",
+      "real": "keyspace_hits:6, keyspace_misses:4",
+      "lesson_says": "the same reads in the animation: 6 hits, 4 misses; the snippet's math: 95.0%",
+      "pass": true,
+      "test": "reads, hits and TTLs > hit-ratio terminal: keyspace_hits and keyspace_misses count the cache’s hits and misses"
+    },
+    {
+      "lesson": "caching",
+      "step": "ttl",
+      "software": "Redis 7.2.5",
+      "title": "SET … EX 60",
+      "real": "OK",
+      "lesson_says": "OK",
+      "pass": true,
+      "test": "reads, hits and TTLs > ttl: SET … EX 60 counts down, then the key is gone"
+    },
+    {
+      "lesson": "caching",
+      "step": "ttl",
+      "software": "Redis 7.2.5",
+      "title": "TTL counts down",
+      "real": "(integer) 60 right away, (integer) 42 after 18.0 s",
+      "lesson_says": "(integer) 42 (18 s after the SET)",
+      "pass": true,
+      "test": "reads, hits and TTLs > ttl: SET … EX 60 counts down, then the key is gone"
+    },
+    {
+      "lesson": "caching",
+      "step": "ttl",
+      "software": "Redis 7.2.5",
+      "title": "GET a minute later",
+      "real": "(nil)",
+      "lesson_says": "(nil)",
+      "pass": true,
+      "test": "reads, hits and TTLs > ttl: SET … EX 60 counts down, then the key is gone"
+    },
+    {
+      "lesson": "caching",
+      "step": "ttl",
+      "software": "Redis 7.2.5",
+      "title": "TTL of a key with no expiry, and of a missing key",
+      "real": "(integer) -1, (integer) -2",
+      "lesson_says": "-1 and -2",
+      "pass": true,
+      "test": "reads, hits and TTLs > ttl: SET … EX 60 counts down, then the key is gone"
+    },
+    {
+      "lesson": "caching",
+      "step": "ttl",
+      "title": "How expired keys disappear",
+      "software": "Redis 7.2.5",
+      "real": "background job off: the expired key stayed (DBSIZE 1) until GET touched it (then 0); job on: 1,000 expired keys that nobody touched were gone 86 ms after expiring",
+      "lesson_says": "deleted when something touches it; a background job cleans up the rest about 10 times a second",
+      "pass": true,
+      "test": "reads, hits and TTLs > ttl aside: an expired key is deleted when touched, or by the background job"
+    },
+    {
+      "lesson": "caching",
+      "step": "taming-the-herd",
+      "title": "SET lock:product:42 <token> NX PX 5000 from two app servers",
+      "software": "Redis 7.2.5",
+      "real": "first OK, second (nil); after 5.1 s the second got OK",
+      "lesson_says": "the winner runs the query; the others wait briefly and retry",
+      "pass": true,
+      "test": "reads, hits and TTLs > taming-the-herd aside: a lock with SET NX PX 5000"
+    },
+    {
+      "lesson": "caching",
+      "step": "caches-all-the-way-down",
+      "title": "Deleting a Redis key",
+      "software": "Redis 7.2.5",
+      "real": "0.02 ms per DEL, round trip included (localhost)",
+      "lesson_says": "You can delete a Redis key in a millisecond",
+      "pass": true,
+      "test": "reads, hits and TTLs > a-race-you-can-lose: GET misses with (nil), DEL of a missing key answers 0"
+    },
+    {
+      "lesson": "caching",
+      "step": "a-race-you-can-lose",
+      "title": "GET and DEL replies in the race diagram",
+      "software": "Redis 7.2.5",
+      "real": "GET → (nil); DEL → (integer) 0 when not cached, (integer) 1 when cached",
+      "lesson_says": "(nil): a miss; DEL → 0: nothing to delete",
+      "pass": true,
+      "test": "reads, hits and TTLs > a-race-you-can-lose: GET misses with (nil), DEL of a missing key answers 0"
+    },
+    {
+      "lesson": "caching",
+      "step": "which-key-goes",
+      "software": "Redis 7.2.5",
+      "title": "Which keys LRU evicts, read by read (maxmemory-samples 10)",
+      "real": "10 of 10 runs: 7 hit, 99 miss→8, 42 hit, 3 miss→21, 13 hit, 64 miss→5, 5 miss→5, 17 miss→7, 42 hit, 11 miss→99",
+      "lesson_says": "7 hit, 99 miss→8, 42 hit, 3 miss→21, 13 hit, 64 miss→5, 5 miss→7, 17 miss→99, 42 hit, 11 miss→3",
+      "pass": true,
+      "test": "eviction > which-key-goes: the animation vs real Redis, read by read, in real time"
+    },
+    {
+      "lesson": "caching",
+      "step": "which-key-goes",
+      "software": "Redis 7.2.5",
+      "title": "Which keys LRU evicts, read by read (maxmemory-samples 5, the snippet)",
+      "real": "18 different outcomes in 30 runs; 1 matched the animation; 8 evicted product:5 the moment they wrote it; most common: 7 hit, 99 miss→8, 42 hit, 3 miss→21, 13 hit, 64 miss→5, 5 miss→13, 17 miss→7, 42 hit, 11 miss→99 (4×)",
+      "lesson_says": "7 hit, 99 miss→8, 42 hit, 3 miss→21, 13 hit, 64 miss→5, 5 miss→7, 17 miss→99, 42 hit, 11 miss→3 (the aside: real Redis doesn’t always agree, and sometimes evicts product:5 the moment it’s written)",
+      "pass": true,
+      "test": "eviction > which-key-goes: the animation vs real Redis, read by read, in real time"
+    },
+    {
+      "lesson": "caching",
+      "step": "which-key-goes",
+      "software": "Redis 7.2.5",
+      "title": "Hits on these ten reads",
+      "real": "4 to 5 hits across all runs",
+      "lesson_says": "4 hits",
+      "pass": true,
+      "test": "eviction > which-key-goes: the animation vs real Redis, read by read, in real time"
+    },
+    {
+      "lesson": "caching",
+      "step": "which-key-goes",
+      "software": "Redis 7.2.5",
+      "title": "OBJECT IDLETIME",
+      "real": "a key just read: (integer) 0; product:3, last read 6 s earlier: 6",
+      "lesson_says": "seconds since a key was last read or written (0 right after a read)",
+      "pass": true,
+      "test": "eviction > which-key-goes: the animation vs real Redis, read by read, in real time"
+    },
+    {
+      "lesson": "caching",
+      "step": "out-of-room",
+      "software": "Redis 7.2.5",
+      "title": "Hit ratio over 12,000 reads (6 of 16 products fit)",
+      "real": "maxmemory-samples 5: 65.7%; maxmemory-samples 10: 65.1% (reads placed 10 s apart on Redis’s LRU clock); evicted_keys 4133 / 4197",
+      "lesson_says": "exact LRU (the animation’s cache): 65.7%; the aside: within about two points of exact LRU’s 66%",
+      "pass": true,
+      "test": "eviction > out-of-room: 12,000 reads through exact LRU and through Redis"
+    },
+    {
+      "lesson": "caching",
+      "step": "out-of-room",
+      "software": "Redis 7.2.5",
+      "title": "How often the hot key product:42 gets evicted",
+      "real": "Redis: 157× (samples 5), 146× (samples 10) in 12,000 reads",
+      "lesson_says": "exact LRU: 178× in 12,000 reads; the animation, 10 minutes: evicted 3×, at the very bottom 3.4% of the time, back on its next read: always",
+      "pass": true,
+      "test": "eviction > out-of-room: 12,000 reads through exact LRU and through Redis"
+    },
+    {
+      "lesson": "caching",
+      "step": "lru-lfu-fifo",
+      "software": "Redis 7.2.5",
+      "title": "LFU on stable popularity",
+      "real": "allkeys-lfu, six runs: 72.5%, 71.6%, 70.8%, 61.3%, 64.5% (product:42 evicted 12×), 72.7%; allkeys-lru: 65.7%",
+      "lesson_says": "LFU wins when popularity is stable (the readout’s exact LFU: 74.8%); Redis’s LFU scores below that, though it usually still beats LRU",
+      "pass": true,
+      "test": "eviction > lru-lfu-fifo: the same 12,000 reads under Redis’s LFU, random and volatile-ttl"
+    },
+    {
+      "lesson": "caching",
+      "step": "lru-lfu-fifo",
+      "software": "Redis 7.2.5",
+      "title": "FIFO in Redis: volatile-ttl with one TTL on every key",
+      "real": "volatile-ttl: 60.5% hits, product:42 evicted 595×, 72.1% of evictions the same key, read for read, as FIFO",
+      "lesson_says": "the animation’s FIFO: 60.5%, product:42 evicted 594×; the note: volatile-ttl acts much like FIFO when every key has the same TTL",
+      "pass": true,
+      "test": "eviction > lru-lfu-fifo: the same 12,000 reads under Redis’s LFU, random and volatile-ttl"
+    },
+    {
+      "lesson": "caching",
+      "step": "lru-lfu-fifo",
+      "software": "Redis 7.2.5",
+      "title": "Without TTLs the playground falls back to allkeys-random",
+      "real": "allkeys-random: 58.0% hits, product:42 evicted 682× (the pick depends on the hash table's layout, so this varies from run to run)",
+      "lesson_says": "no FIFO in Redis; without TTLs, this evicts at random instead",
+      "pass": true,
+      "test": "eviction > lru-lfu-fifo: the same 12,000 reads under Redis’s LFU, random and volatile-ttl"
+    },
+    {
+      "lesson": "caching",
+      "step": "lru-lfu-fifo",
+      "software": "Redis 7.2.5",
+      "title": "LFU count after N reads (lfu-log-factor 10)",
+      "real": "100: 12, 1,000: 20, 10,000: 50, 100,000: 141, 1,000,000: 255",
+      "lesson_says": "grow ever more slowly: about 10 after 100 reads, 255 (the max) by a million",
+      "pass": true,
+      "test": "eviction > lru-lfu-fifo snippet: LFU counts grow ever more slowly, top out at 255, and decay"
+    },
+    {
+      "lesson": "caching",
+      "step": "lru-lfu-fifo",
+      "software": "Redis 7.2.5",
+      "title": "An idle key’s count when a minute passes (lfu-decay-time 1)",
+      "real": "27 → 26 after 1 minute boundary",
+      "lesson_says": "drops by 1 each minute",
+      "pass": true,
+      "test": "eviction > lru-lfu-fifo snippet: LFU counts grow ever more slowly, top out at 255, and decay"
+    },
+    {
+      "lesson": "caching",
+      "step": "working-set",
+      "software": "Redis 7.2.5",
+      "title": "INFO memory: the fields shown, in order, \"…\" where lines are skipped",
+      "real": "used_memory_human:2.50M, maxmemory_human:2.00G (maxmemory 2gb)",
+      "lesson_says": "used_memory_human:1.83G, maxmemory_human:2.00G",
+      "pass": true,
+      "test": "eviction > working-set terminal: INFO memory and evicted_keys"
+    },
+    {
+      "lesson": "caching",
+      "step": "working-set",
+      "software": "Redis 7.2.5",
+      "title": "INFO stats | grep evicted_keys",
+      "real": "evicted_keys:110 after 110 evictions",
+      "lesson_says": "evicted_keys:48213",
+      "pass": true,
+      "test": "eviction > working-set terminal: INFO memory and evicted_keys"
+    },
+    {
+      "lesson": "caching",
+      "step": "three-ways-to-write",
+      "software": "Redis 7.2.5",
+      "title": "Out of the box: snapshots, and a crash after one",
+      "real": "save \"3600 1 300 100 60 10000\", appendonly no; after 10,000 writes a snapshot came 61 s after startup; killed with 100 more writes, it restarted with 10000 keys and 0 of the 100",
+      "lesson_says": "snapshots at most once a minute, and a crash loses every write since the last snapshot",
+      "pass": true,
+      "test": "writes > three-ways-to-write: what survives a crash"
+    },
+    {
+      "lesson": "caching",
+      "step": "three-ways-to-write",
+      "software": "Redis 7.2.5",
+      "title": "Append-only file on, then kill -9",
+      "real": "appendfsync everysec; 20000 writes acknowledged, 20000 there after the restart",
+      "lesson_says": "a killed Redis came back with every write it had acknowledged, though by default it syncs that file to disk only once a second",
+      "pass": true,
+      "test": "writes > three-ways-to-write: what survives a crash"
+    },
+    {
+      "lesson": "caching",
+      "step": "three-ways-to-write",
+      "software": "Redis 7.2.5",
+      "title": "No snapshot to reload",
+      "real": "killed with 1,000 keys, restarted with 0",
+      "lesson_says": "Redis comes back cold, because this one has no snapshot to reload",
+      "pass": true,
+      "test": "writes > three-ways-to-write: what survives a crash"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "lookup-race",
+      "software": "Redis 7.2.5",
+      "title": "When a hash stops being a flat list",
+      "real": "512 fields: listpack, 513: hashtable; a 64-byte value: listpack, 65 bytes: hashtable",
+      "lesson_says": "hash-max-listpack-entries 512, hash-max-listpack-value 64",
+      "pass": true,
+      "test": "hash-tables: small hashes are a flat list > lookup-race redis.conf: the switch at 512 entries and 64 bytes, a third of the memory"
+    },
+    {
+      "lesson": "hash-tables",
+      "step": "lookup-race",
+      "software": "Redis 7.2.5",
+      "title": "Flat list vs hash table",
+      "real": "4 fields: 136 vs 368 bytes, 63 vs 58 ns per HGET inside Redis; 512 fields: 10296 vs 32880 bytes, 1260 vs 70 ns per HGET inside Redis",
+      "lesson_says": "the flat list takes about a third of the memory, but lookups slow down as it grows",
+      "pass": true,
+      "test": "hash-tables: small hashes are a flat list > lookup-race redis.conf: the switch at 512 entries and 64 bytes, a third of the memory"
+    },
+    {
+      "lesson": "stack-heap",
+      "step": "fragmentation",
+      "software": "Redis 7.2.5",
+      "title": "INFO memory: the fields shown, in order, \"…\" where lines are skipped",
+      "real": "ok (mem_allocator:libc)",
+      "lesson_says": "… used_memory_human:1.02G … used_memory_rss_human:1.48G … mem_fragmentation_ratio:1.45 …",
+      "pass": true,
+      "test": "stack-heap: a fragmented heap > fragmentation: INFO memory after deleting every other key"
+    },
+    {
+      "lesson": "stack-heap",
+      "step": "fragmentation",
+      "software": "Redis 7.2.5",
+      "title": "Deleting every other key of a million",
+      "real": "used_memory 177 MB → 93 MB, RSS 184 MB → 184 MB, ratio 1.04 → 1.98; 500,000 new keys: used 177 MB, RSS 184 MB",
+      "lesson_says": "1.02G used, 1.48G held, ratio 1.45: \"45% overhead, mostly holes\"",
+      "pass": true,
+      "test": "stack-heap: a fragmented heap > fragmentation: INFO memory after deleting every other key"
+    },
+    {
+      "lesson": "stack-heap",
+      "step": "fragmentation",
+      "software": "Redis 7.2.5",
+      "title": "mem_fragmentation_ratio is RSS divided by used memory",
+      "real": "1.98 reported, 1.98 computed",
+      "lesson_says": "1.45 = 1.48G / 1.02G (1.45)",
+      "pass": true,
+      "test": "stack-heap: a fragmented heap > fragmentation: INFO memory after deleting every other key"
+    }
+  ],
+  "stamps": [
+    {
+      "hash": "1t02qv4",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "loads",
+      "note": "Redis 7.2.5 starts with this config, and CONFIG GET reads back every value.",
+      "test": "every Redis config the lessons show loads in redis-server > redis-server + CONFIG GET: caching / out-of-room"
+    },
+    {
+      "hash": "26p29h",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "loads",
+      "note": "Redis 7.2.5 starts with this config, and CONFIG GET reads back every value.",
+      "test": "every Redis config the lessons show loads in redis-server > redis-server + CONFIG GET: caching / lru-lfu-fifo"
+    },
+    {
+      "hash": "jxv7km",
+      "lesson": "hash-tables",
+      "by": "Redis 7.2.5",
+      "kind": "loads",
+      "note": "Redis 7.2.5 starts with this config, and CONFIG GET reads back every value.",
+      "test": "every Redis config the lessons show loads in redis-server > redis-server + CONFIG GET: hash-tables / lookup-race"
+    },
+    {
+      "hash": "8qu9f0",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: against localhost instead of 10.0.2.6, --latency printed the same min/max/avg line, and GET returned the JSON exactly as shown.",
+      "test": "reads, hits and TTLs > memory-is-faster terminal: --latency and GET, as shown"
+    },
+    {
+      "hash": "1livcip",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: SCAN returned the three cached keys in one batch with cursor 0 (their order varies). On a million keys, KEYS held up every other client; SCAN never did.",
+      "test": "reads, hits and TTLs > hit-or-miss: SCAN finds the cached keys; KEYS blocks, SCAN doesn’t"
+    },
+    {
+      "hash": "yu6xfd",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: after the ten reads from the hit-or-miss step, grep printed just these two counters, with the same hits and misses as the animation.",
+      "test": "reads, hits and TTLs > hit-ratio terminal: keyspace_hits and keyspace_misses count the cache’s hits and misses"
+    },
+    {
+      "hash": "1p23k9c",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: TTL started at 60 and dropped one a second (42 after 18 s); a minute after the SET, GET returned (nil).",
+      "test": "reads, hits and TTLs > ttl: SET … EX 60 counts down, then the key is gone"
+    },
+    {
+      "hash": "1apf79w",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: a key just read showed 0, and a key left alone counted up one per second.",
+      "test": "eviction > which-key-goes: the animation vs real Redis, read by read, in real time"
+    },
+    {
+      "hash": "1t02qv4",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: with maxmemory scaled down so six values fit, it evicted by idle time; over this lesson’s 12,000 reads its hit ratio stayed within about two points of exact LRU.",
+      "test": "eviction > out-of-room: 12,000 reads through exact LRU and through Redis"
+    },
+    {
+      "hash": "26p29h",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: a key’s count grew ever more slowly and stopped at 255 by a million reads; left idle, it dropped by one when the minute turned.",
+      "test": "eviction > lru-lfu-fifo snippet: LFU counts grow ever more slowly, top out at 255, and decay"
+    },
+    {
+      "hash": "17cr45e",
+      "lesson": "caching",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: INFO memory printed these fields in this order (with maxmemory 2gb, 2.00G), and grep evicted_keys printed one line counting every eviction.",
+      "test": "eviction > working-set terminal: INFO memory and evicted_keys"
+    },
+    {
+      "hash": "jxv7km",
+      "lesson": "hash-tables",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: these are its defaults. A hash of 512 small fields stayed a flat list and the 513th made it a hash table; the flat list took about a third of the memory.",
+      "test": "hash-tables: small hashes are a flat list > lookup-race redis.conf: the switch at 512 entries and 64 bytes, a third of the memory"
+    },
+    {
+      "hash": "n5g9o3",
+      "lesson": "stack-heap",
+      "by": "Redis 7.2.5",
+      "kind": "ran",
+      "note": "Ran it on Redis 7.2.5: with libc malloc, deleting every other key of a million halved used memory but not RSS, so the ratio (RSS ÷ used) doubled; new keys then filled the holes without growing RSS.",
+      "test": "stack-heap: a fragmented heap > fragmentation: INFO memory after deleting every other key"
+    }
+  ]
+}

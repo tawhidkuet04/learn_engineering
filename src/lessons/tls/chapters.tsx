@@ -879,6 +879,8 @@ location / {
 }
 server {
   listen 443 ssl;
+  ssl_certificate     /etc/ssl/fullchain.pem;
+  ssl_certificate_key /etc/ssl/privkey.pem;
 !  add_header Strict-Transport-Security
 !   "max-age=63072000; includeSubDomains; preload"
 !   always;

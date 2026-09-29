@@ -1,5 +1,20 @@
 import type { ReactNode } from 'react';
+import VERIFIED from '@/content/verified.json';
+import { snippetHash } from '@/lib/snippetHash';
 import css from './lesson.module.css';
+
+interface Stamp {
+  by: string;
+  note: string;
+  kind: 'loads' | 'ran';
+}
+
+/** What `npm run verify` confirmed about this exact snippet, if anything. */
+function stampsFor(code: string): Stamp[] {
+  const all = (VERIFIED.snippets as Record<string, Stamp[]>)[snippetHash(code)] ?? [];
+  const ran = all.filter((s) => s.kind === 'ran');
+  return ran.length ? ran : all;
+}
 
 export type CodeLang = 'nginx' | 'haproxy' | 'js' | 'conf' | 'python' | 'sql' | 'shell' | 'c' | 'http';
 
@@ -58,6 +73,8 @@ function tokenize(line: string, lang: CodeLang): ReactNode[] {
 
 export function CodeBlock({ spec }: { spec: CodeSpec }) {
   const lines = spec.code.replace(/^\n+|\n+$/g, '').split('\n');
+  const stamps = stampsFor(spec.code);
+  const by = [...new Set(stamps.map((s) => s.by))].join(' & ');
   return (
     <figure className={css.code}>
       <figcaption className={css.codeHead}>
@@ -67,7 +84,22 @@ export function CodeBlock({ spec }: { spec: CodeSpec }) {
           <i />
         </span>
         <span>{spec.title}</span>
-        <span className={css.codeTag}>in the real world</span>
+        {by ? (
+          <a
+            className={css.codeTested}
+            href="/tested"
+            target="_blank"
+            rel="noopener"
+            title="This exact snippet was run against the real software by the site's test suite. Click for every check."
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M4.5 12.5l5 5 10-11" />
+            </svg>
+            tested on {by}
+          </a>
+        ) : (
+          <span className={css.codeTag}>in the real world</span>
+        )}
       </figcaption>
       <pre className={css.pre}>
         {lines.map((raw, i) => {
@@ -82,6 +114,13 @@ export function CodeBlock({ spec }: { spec: CodeSpec }) {
         })}
       </pre>
       {spec.note && <p className={css.codeNote}>{spec.note}</p>}
+      {stamps.length > 0 && (
+        <p className={css.codeProof}>
+          {stamps.map((s) => (
+            <span key={s.note}>{s.note} </span>
+          ))}
+        </p>
+      )}
     </figure>
   );
 }

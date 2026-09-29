@@ -7,10 +7,10 @@ import { usePoll } from '@/components/lesson/usePoll';
 import { toMs, type ReplConfig, type ReplSim } from './sim';
 import css from './replication.module.css';
 
-type ModeId = 'async' | 'one' | 'backup' | 'any';
+export type ModeId = 'async' | 'one' | 'backup' | 'any';
 
 /** Commit modes. Like Patroni's synchronous mode, names follow whoever the followers are right now. */
-const MODES: { id: ModeId; label: string; sub: (s: ReplSim) => string }[] = [
+export const MODES: { id: ModeId; label: string; sub: (s: ReplSim) => string }[] = [
   { id: 'async', label: 'Async', sub: () => 'no standby waits' },
   { id: 'one', label: 'Sync to one', sub: (s) => `FIRST 1 (${names(s, 'one').join(', ')})` },
   { id: 'backup', label: 'Sync + backup', sub: (s) => `FIRST 1 (${names(s, 'backup').join(', ')})` },
@@ -24,9 +24,29 @@ function names(s: ReplSim, mode: ModeId): string[] {
   return fs;
 }
 
-function applyMode(s: ReplSim, mode: ModeId) {
+export function applyMode(s: ReplSim, mode: ModeId) {
   if (mode === 'async') s.setSync(false);
   else s.setSync(true, names(s, mode), mode === 'any' ? 'any' : 'first');
+}
+
+/** The "your cluster · live" config for the cluster as it is right now. */
+export function liveConfig(sim: ReplSim): string {
+  const L = sim.leader();
+  const cfg = sim.cfg;
+  const followers = sim.followers();
+  const readTo = cfg.readFrom === 'leader' ? L?.label ?? 'the leader' : followers.filter((f) => f.up).map((f) => f.label).join(', ') || 'the leader';
+  return [
+    `# postgresql.conf on the leader (${L?.label ?? 'none!'})`,
+    `!synchronous_commit = on`,
+    cfg.sync ? `!synchronous_standby_names = '${cfg.syncMethod === 'any' ? 'ANY' : 'FIRST'} 1 (${cfg.syncNames.join(', ')})'` : `!synchronous_standby_names = ''   # async`,
+    '',
+    '# the app',
+    `#   writes → ${L?.label ?? 'nobody'}${L ? ` (${L.ip})` : ''}`,
+    `#   reads  → ${readTo}`,
+    '',
+    '# failover manager',
+    `#   automatic failover: ${cfg.failover === 'off' ? 'off' : 'on'} · fencing: ${cfg.fencing ? 'on' : 'off'}`,
+  ].join('\n');
 }
 
 interface Mission {
@@ -129,22 +149,8 @@ export function Playground({ sim, initial }: { sim: ReplSim; initial: ReplConfig
     return () => window.clearInterval(id);
   }, [sim]);
 
-  const L = sim.leader();
   const cfg = sim.cfg;
-  const followers = sim.followers();
-  const readTo = cfg.readFrom === 'leader' ? L?.label ?? 'the leader' : followers.filter((f) => f.up).map((f) => f.label).join(', ') || 'the leader';
-  const config = [
-    `# postgresql.conf on the leader (${L?.label ?? 'none!'})`,
-    `!synchronous_commit = on`,
-    cfg.sync ? `!synchronous_standby_names = '${cfg.syncMethod === 'any' ? 'ANY' : 'FIRST'} 1 (${cfg.syncNames.join(', ')})'` : `!synchronous_standby_names = ''   # async`,
-    '',
-    '# the app',
-    `#   writes → ${L?.label ?? 'nobody'}${L ? ` (${L.ip})` : ''}`,
-    `#   reads  → ${readTo}`,
-    '',
-    '# failover manager',
-    `#   automatic failover: ${cfg.failover === 'off' ? 'off' : 'on'} · fencing: ${cfg.fencing ? 'on' : 'off'}`,
-  ].join('\n');
+  const config = liveConfig(sim);
 
   return (
     <div className={css.pg}>

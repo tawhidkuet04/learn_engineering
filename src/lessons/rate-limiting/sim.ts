@@ -4,7 +4,7 @@ import { PredictGame } from '@/lib/sim/predict';
 import { mulberry32 } from '@/lib/sim/rng';
 import { Sim, portCurve, type ScriptEvent, type WireSpec } from '@/lib/sim/Sim';
 import { limiterCard, singleBucket } from './geo';
-import { ALGO_NAMES, busiestSpan, countAllowed, decide, freshState, settle, type Algo, type Decision, type KeyState, type Params } from './limiter';
+import { ALGO_NAMES, busiestSpan, countAllowed, decide, freshState, leak, settle, type Algo, type Decision, type KeyState, type Params } from './limiter';
 
 /* ------------------------------------------------------------------ */
 /* Config                                                              */
@@ -225,6 +225,8 @@ export class RateSim extends Sim {
   rejected = 0;
   maxWait = 0;
   last: LastDecision | null = null;
+  /** Every limiter decision, in order, when set (headless checks in verify/). */
+  trace: { d: Decision; client: string; node: string }[] | null = null;
   notes = new Map<number, FlightNote>();
 
   /** Limiter clock origin: lt = t - origin */
@@ -790,10 +792,8 @@ export class RateSim extends Sim {
       for (const s of this.keys.values()) {
         settle(s, lt, p, sc === 'dist' ? 'fixed' : algo);
         if (algo === 'leaky') {
-          while (s.queue.length && lt >= s.nextLeak - 1e-9) {
-            const q = s.queue.shift()!;
+          for (const { req: q } of leak(s, lt, p)) {
             this.maxWait = Math.max(this.maxWait, lt - q.at);
-            s.nextLeak += 1 / p.rate;
             s.takeAt = lt;
             this.forwardQueued(q.id, q.client);
             this.rev++;
@@ -989,6 +989,7 @@ export class RateSim extends Sim {
       this.bestEver = Math.max(this.bestEver, this.best.count);
     }
     this.last = { d, client: req.client, node, vt: this.vt };
+    this.trace?.push({ d, client: req.client, node });
     if (this.cfg.scene === 'storm') {
       const st = this.storms[this.storms.length - 1];
       if (st) {

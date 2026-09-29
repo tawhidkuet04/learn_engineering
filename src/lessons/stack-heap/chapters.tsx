@@ -490,11 +490,14 @@ $ python3 -c 'import sys; print(sys.getrecursionlimit())'
           title: 'redis-cli: a fragmented heap in production',
           lang: 'conf',
           code: `127.0.0.1:6379> INFO memory
+…
 used_memory_human:1.02G
+…
 used_memory_rss_human:1.48G
+…
 !mem_fragmentation_ratio:1.45
-mem_allocator:jemalloc-5.3.0`,
-          note: 'Redis holds 1.48 GB of RAM to store 1.02 GB of data: 45% overhead, mostly holes.',
+…`,
+          note: 'Redis holds 1.48 GB of RAM to store 1.02 GB of data: 45% overhead, mostly holes. The ratio is RSS divided by used memory.',
         },
         hud: ['heap'],
         legend: ['malloc', 'ptr', 'free', 'hole'],

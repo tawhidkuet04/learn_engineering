@@ -2,8 +2,8 @@ import type { Fn, Machine, Op, Program } from './engine';
 
 /*
  * Every snippet the lesson runs: the exact source the learner reads, and the
- * ops the machine executes for it (line numbers are 1-based). Outputs were
- * checked against Node 22, which orders tasks and microtasks like browsers.
+ * ops the machine executes for it (line numbers are 1-based). The outputs are
+ * checked against Chrome and Node 22 by verify/js-runtime.test.ts.
  */
 
 const log = (line: number, text: string, src?: string): Op => ({ op: 'log', line, text, src });
