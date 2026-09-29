@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { Fragment, isValidElement, type ReactNode } from 'react';
 
 /** Small line-drawn schematics, one per topic, on a 48×48 grid. */
 const G: Record<string, ReactNode> = {
@@ -218,10 +218,29 @@ const G: Record<string, ReactNode> = {
   ),
 };
 
-export function TopicGlyph({ slug, size = 44 }: { slug: string; size?: number }) {
+/**
+ * The glyph's shapes without the wrapping fragment. next/og's renderer only
+ * accepts plain SVG elements inside <svg>.
+ */
+function shapes(slug: string): ReactNode {
+  const g = G[slug] ?? <rect x="8" y="8" width="32" height="32" rx="3" />;
+  return isValidElement<{ children?: ReactNode }>(g) && g.type === Fragment ? g.props.children : g;
+}
+
+export function TopicGlyph({
+  slug,
+  size = 44,
+  color = 'currentColor',
+  strokeWidth = 1.4,
+}: {
+  slug: string;
+  size?: number;
+  color?: string;
+  strokeWidth?: number;
+}) {
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      {G[slug] ?? <rect x="8" y="8" width="32" height="32" rx="3" />}
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {shapes(slug)}
     </svg>
   );
 }

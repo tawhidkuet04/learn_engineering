@@ -18,6 +18,7 @@ const PATHS = {
   code: 'M9 7l-5 5 5 5M15 7l5 5-5 5',
   book: 'M5 4.5h9a3 3 0 0 1 3 3v12H8a3 3 0 0 1-3-3zM17 7.5h2v12h-2',
   flag: 'M6 21V4M6 4h11l-2 4 2 4H6',
+  coffee: 'M4.5 9.5h11.5v4.5a5 5 0 0 1-5 5h-1.5a5 5 0 0 1-5-5zM16 11h1.2a2.8 2.8 0 0 1 0 5.6H15.4M8.5 3.5c-.8 1 .8 1.8 0 3M12 3.5c-.8 1 .8 1.8 0 3',
 } as const;
 
 export type IconName = keyof typeof PATHS;

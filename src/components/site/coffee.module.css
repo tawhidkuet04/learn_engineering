@@ -1,0 +1,127 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  height: 36px;
+  padding: 0 13px;
+  border-radius: 9px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 150ms,
+    border-color 150ms,
+    transform 150ms,
+    box-shadow 200ms;
+}
+
+.ghost {
+  border: 1px solid var(--rule-strong);
+  color: var(--text-1);
+  background: transparent;
+}
+
+.ghost:hover {
+  border-color: rgba(255, 210, 63, 0.55);
+  background: rgba(255, 210, 63, 0.08);
+}
+
+.ghost .cup {
+  color: var(--accent);
+}
+
+.solid {
+  height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 12px 34px rgba(255, 210, 63, 0.18);
+}
+
+.solid:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 40px rgba(255, 210, 63, 0.3);
+}
+
+.cup {
+  flex: none;
+  transition: transform 300ms;
+}
+
+.btn:hover .cup {
+  transform: rotate(-12deg);
+}
+
+@media (max-width: 720px) {
+  .compact {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+  .compact .label {
+    display: none;
+  }
+}
+
+/* ---------- closing band on the home page ---------- */
+.band {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px 40px;
+  max-width: calc(1360px - 2 * var(--gutter, 44px));
+  margin: 40px auto 0;
+  padding: 30px 34px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 210, 63, 0.3);
+  background:
+    radial-gradient(ellipse 60% 120% at 100% 50%, rgba(255, 210, 63, 0.09), transparent 70%),
+    rgba(12, 19, 34, 0.7);
+}
+
+.bandKicker {
+  margin: 0 0 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.bandTitle {
+  margin: 0;
+  max-width: 640px;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.6vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+
+.bandTitle em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.bandSub {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+@media (max-width: 720px) {
+  .band {
+    margin: 32px 18px 0;
+    padding: 24px 22px;
+  }
+}

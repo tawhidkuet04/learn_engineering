@@ -1,0 +1,8 @@
+/opengraph-image
+  Content-Type: image/png
+
+/learn/*/opengraph-image
+  Content-Type: image/png
+
+/tested/opengraph-image
+  Content-Type: image/png

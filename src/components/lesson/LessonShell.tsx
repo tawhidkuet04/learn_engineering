@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { CoffeeButton } from '@/components/site/CoffeeButton';
 import { Logo } from '@/components/site/Logo';
 import { Icon } from './Icon';
 import css from './lesson.module.css';
@@ -97,6 +98,7 @@ export function LessonShell({ code, track, title, chapters, index, visited, onIn
             <kbd>←</kbd>
             <kbd>→</kbd> steps · <kbd>space</kbd> pause
           </span>
+          <CoffeeButton compact />
           <button type="button" className={css.menuBtn} onClick={() => setMenuOpen((o) => !o)} aria-expanded={menuOpen}>
             <Icon name="list" size={15} />
             <span>Contents</span>
