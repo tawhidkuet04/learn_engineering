@@ -1325,15 +1325,6 @@
   },
   {
    "lesson": "load-balancing",
-   "step": "least-connections",
-   "title": "New requests avoid the server that is still busy",
-   "software": "nginx 1.31.6",
-   "real": "web-1 busy with a slow request; the next six went to web-2, web-3, web-2, web-3, web-2, web-3",
-   "lesson_says": "new requests flow to web-2 and web-3 until web-1 catches up",
-   "pass": true
-  },
-  {
-   "lesson": "load-balancing",
    "step": "weighted",
    "title": "Weighted order, request by request",
    "software": "nginx 1.31.6",
@@ -1416,24 +1407,6 @@
   {
    "lesson": "load-balancing",
    "step": "a-server-crashes",
-   "title": "A request in progress when its server dies",
-   "software": "HAProxy 3.4.6",
-   "real": "502 after 0.4 s",
-   "lesson_says": "502",
-   "pass": true
-  },
-  {
-   "lesson": "load-balancing",
-   "step": "a-server-crashes",
-   "title": "A GET in progress when its server dies",
-   "software": "nginx 1.31.6",
-   "real": "200, finished by web-2 after 2.4 s",
-   "lesson_says": "200 (retried on another server)",
-   "pass": true
-  },
-  {
-   "lesson": "load-balancing",
-   "step": "a-server-crashes",
    "title": "With option redispatch, a refused request goes to another server",
    "software": "HAProxy 3.4.6",
    "real": "200 web-1, 200 web-3, 200 web-3, 200 web-1, 200 web-1, 200 web-1; slowest 1 ms",
@@ -1483,6 +1456,33 @@
    "software": "nginx 1.31.6",
    "real": "/api/cart → web-1, web-2, web-1, web-2; /media/hero.jpg → web-3, web-3",
    "lesson_says": "/api/* → web-1, web-2; /media/* → web-3",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "least-connections",
+   "title": "New requests avoid the server that is still busy",
+   "software": "nginx 1.31.6",
+   "real": "web-1 busy with a slow request; the next six went to web-2, web-3, web-2, web-3, web-2, web-3",
+   "lesson_says": "new requests flow to web-2 and web-3 until web-1 catches up",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "A request in progress when its server dies",
+   "software": "HAProxy 3.4.6",
+   "real": "502 after 0.4 s",
+   "lesson_says": "502",
+   "pass": true
+  },
+  {
+   "lesson": "load-balancing",
+   "step": "a-server-crashes",
+   "title": "A GET in progress when its server dies",
+   "software": "nginx 1.31.6",
+   "real": "200, finished by web-2 after 2.4 s",
+   "lesson_says": "200 (retried on another server)",
    "pass": true
   },
   {

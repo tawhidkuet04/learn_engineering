@@ -133,16 +133,6 @@
     },
     {
       "lesson": "load-balancing",
-      "step": "least-connections",
-      "title": "New requests avoid the server that is still busy",
-      "software": "nginx 1.31.6",
-      "real": "web-1 busy with a slow request; the next six went to web-2, web-3, web-2, web-3, web-2, web-3",
-      "lesson_says": "new requests flow to web-2 and web-3 until web-1 catches up",
-      "pass": true,
-      "test": "choosing a server > least connections steers around a busy server (least-connections)"
-    },
-    {
-      "lesson": "load-balancing",
       "step": "weighted",
       "title": "Weighted order, request by request",
       "software": "nginx 1.31.6",
@@ -234,26 +224,6 @@
     {
       "lesson": "load-balancing",
       "step": "a-server-crashes",
-      "software": "HAProxy 3.4.6",
-      "title": "A request in progress when its server dies",
-      "real": "502 after 0.4 s",
-      "lesson_says": "502",
-      "pass": true,
-      "test": "when servers fail > a request in progress when its server dies"
-    },
-    {
-      "lesson": "load-balancing",
-      "step": "a-server-crashes",
-      "software": "nginx 1.31.6",
-      "title": "A GET in progress when its server dies",
-      "real": "200, finished by web-2 after 2.4 s",
-      "lesson_says": "200 (retried on another server)",
-      "pass": true,
-      "test": "when servers fail > a request in progress when its server dies"
-    },
-    {
-      "lesson": "load-balancing",
-      "step": "a-server-crashes",
       "title": "With option redispatch, a refused request goes to another server",
       "software": "HAProxy 3.4.6",
       "real": "200 web-1, 200 web-3, 200 web-3, 200 web-1, 200 web-1, 200 web-1; slowest 1 ms",
@@ -310,6 +280,36 @@
       "lesson_says": "/api/* → web-1, web-2; /media/* → web-3",
       "pass": true,
       "test": "layer 4 and layer 7 > layer 7 routes by path (layer-7)"
+    },
+    {
+      "lesson": "load-balancing",
+      "step": "least-connections",
+      "title": "New requests avoid the server that is still busy",
+      "software": "nginx 1.31.6",
+      "real": "web-1 busy with a slow request; the next six went to web-2, web-3, web-2, web-3, web-2, web-3",
+      "lesson_says": "new requests flow to web-2 and web-3 until web-1 catches up",
+      "pass": true,
+      "test": "choosing a server > least connections steers around a busy server (least-connections)"
+    },
+    {
+      "lesson": "load-balancing",
+      "step": "a-server-crashes",
+      "software": "HAProxy 3.4.6",
+      "title": "A request in progress when its server dies",
+      "real": "502 after 0.4 s",
+      "lesson_says": "502",
+      "pass": true,
+      "test": "when servers fail > a request in progress when its server dies"
+    },
+    {
+      "lesson": "load-balancing",
+      "step": "a-server-crashes",
+      "software": "nginx 1.31.6",
+      "title": "A GET in progress when its server dies",
+      "real": "200, finished by web-2 after 2.4 s",
+      "lesson_says": "200 (retried on another server)",
+      "pass": true,
+      "test": "when servers fail > a request in progress when its server dies"
     }
   ],
   "stamps": [
@@ -410,14 +410,6 @@
       "test": "choosing a server > X-Forwarded-For carries the visitor address (the-load-balancer-forwards-it)"
     },
     {
-      "hash": "18uaq5b",
-      "lesson": "load-balancing",
-      "by": "nginx 1.31.6",
-      "kind": "ran",
-      "note": "Ran it on nginx 1.31.6: while web-1 held a slow request, new requests went only to the other two.",
-      "test": "choosing a server > least connections steers around a busy server (least-connections)"
-    },
-    {
       "hash": "i2qd7m",
       "lesson": "load-balancing",
       "by": "nginx 1.31.6",
@@ -456,6 +448,14 @@
       "kind": "ran",
       "note": "Ran it on nginx 1.31.6 over HTTPS: /api/ requests alternated between the two API servers and /media/ went to the media server.",
       "test": "layer 4 and layer 7 > layer 7 routes by path (layer-7)"
+    },
+    {
+      "hash": "18uaq5b",
+      "lesson": "load-balancing",
+      "by": "nginx 1.31.6",
+      "kind": "ran",
+      "note": "Ran it on nginx 1.31.6: while web-1 held a slow request, new requests went only to the other two.",
+      "test": "choosing a server > least connections steers around a busy server (least-connections)"
     }
   ]
 }

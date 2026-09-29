@@ -298,9 +298,9 @@ export async function startBackends(names: string[]): Promise<Backend[]> {
             res.writeHead(200, { 'content-type': 'application/json', 'x-backend': name });
             res.end(body);
           };
-          // A test asks for a delay with ?ms=; never more than a minute.
-          const ms = Math.min(60_000, (url.pathname === '/slow' ? Number(url.searchParams.get('ms') ?? 0) : 0) + b.delayMs);
-          if (ms > 0) setTimeout(send, ms);
+          // A test asks for a delay with ?ms=; anything over a minute is ignored.
+          const ms = (url.pathname === '/slow' ? Number(url.searchParams.get('ms') ?? 0) : 0) + b.delayMs;
+          if (ms > 0 && ms <= 60_000) setTimeout(send, ms);
           else send();
         });
         server.keepAliveTimeout = 60_000;
